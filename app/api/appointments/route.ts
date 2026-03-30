@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   let data: z.infer<typeof createAppointmentSchema>
   try {
     data = createAppointmentSchema.parse(body)
-  } catch (err) {
+  } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Dados inválidos', details: err.errors }, { status: 422 })
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { type ReactNode, useState, useTransition } from 'react'
 import { useSession } from 'next-auth/react'
 import {
   Check,
@@ -28,7 +28,7 @@ interface PlanConfig {
   name: string
   price: number | null
   description: string
-  icon: React.ReactNode
+  icon: ReactNode
   color: string
   badgeColor: string
   buttonColor: string

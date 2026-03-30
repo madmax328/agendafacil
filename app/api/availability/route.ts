@@ -43,7 +43,7 @@ export async function PUT(req: NextRequest) {
   let rows: z.infer<typeof upsertSchema>
   try {
     rows = upsertSchema.parse(body)
-  } catch (err) {
+  } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Dados inválidos', details: err.errors }, { status: 422 })
     }

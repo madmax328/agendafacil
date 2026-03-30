@@ -157,7 +157,7 @@ export async function POST(
   let data: z.infer<typeof bookingSchema>
   try {
     data = bookingSchema.parse(body)
-  } catch (err) {
+  } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Dados inválidos', details: err.errors }, { status: 422 })
     }

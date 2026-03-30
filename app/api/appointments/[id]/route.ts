@@ -28,7 +28,7 @@ export async function PATCH(
   let data: z.infer<typeof patchSchema>
   try {
     data = patchSchema.parse(body)
-  } catch (err) {
+  } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Dados inválidos', details: err.errors }, { status: 422 })
     }

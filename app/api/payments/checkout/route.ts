@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
   const checkoutSession = await createCheckoutSession({
     customerId,
-    priceId: PLANS[data.plan].priceId,
+    priceId: PLANS[data.plan as keyof typeof PLANS].priceId,
     professionalId: session.user.id,
     successUrl: `${baseUrl}/assinatura?success=1`,
     cancelUrl: `${baseUrl}/assinatura?cancelled=1`,
