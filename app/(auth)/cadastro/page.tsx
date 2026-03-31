@@ -3,15 +3,15 @@
 import { Suspense, useState, type FormEvent } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, Mail, Calendar } from 'lucide-react'
+import { Loader2, Mail, Calendar, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
 
-// Componente separado pois usa useSearchParams (exige Suspense boundary)
-function LoginForm() {
+function CadastroForm() {
   const [email, setEmail] = useState('')
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
@@ -19,26 +19,9 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const { toast } = useToast()
 
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard'
-  const errorParam = searchParams.get('error')
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/onboarding'
 
-  const authErrorMessages: Record<string, string> = {
-    OAuthSignin: 'Erro ao iniciar autenticação com Google.',
-    OAuthCallback: 'Erro ao concluir autenticação com Google.',
-    OAuthCreateAccount: 'Não foi possível criar a conta com Google.',
-    EmailCreateAccount: 'Não foi possível criar a conta com e-mail.',
-    Callback: 'Erro durante o retorno de autenticação.',
-    OAuthAccountNotLinked: 'Este e-mail já está vinculado a outra forma de acesso.',
-    EmailSignin: 'Não foi possível enviar o e-mail de acesso.',
-    CredentialsSignin: 'Credenciais inválidas. Tente novamente.',
-    Default: 'Ocorreu um erro ao fazer login. Tente novamente.',
-  }
-
-  const errorMessage = errorParam
-    ? (authErrorMessages[errorParam] ?? authErrorMessages.Default)
-    : null
-
-  async function handleGoogleSignIn() {
+  async function handleGoogleSignUp() {
     try {
       setLoadingGoogle(true)
       await signIn('google', { callbackUrl })
@@ -52,7 +35,7 @@ function LoginForm() {
     }
   }
 
-  async function handleEmailSignIn(e: FormEvent<HTMLFormElement>) {
+  async function handleEmailSignUp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
     if (!email.trim()) {
@@ -75,7 +58,7 @@ function LoginForm() {
       if (result?.error) {
         toast({
           title: 'Erro ao enviar e-mail',
-          description: 'Não foi possível enviar o link de acesso. Verifique o e-mail e tente novamente.',
+          description: 'Verifique o endereço e tente novamente.',
           variant: 'destructive',
         })
         setLoadingEmail(false)
@@ -97,24 +80,19 @@ function LoginForm() {
     <div className="px-8 py-8 space-y-6">
       <div className="text-center">
         <h2 className="text-xl font-semibold text-gray-900">
-          Bem-vindo de volta!
+          Crie sua conta grátis
         </h2>
         <p className="text-sm text-gray-500 mt-1">
-          Acesse sua conta para gerenciar sua agenda
+          Sem cartão de crédito • Setup em 10 minutos
         </p>
       </div>
 
-      {errorMessage && (
-        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">
-          {errorMessage}
-        </div>
-      )}
-
+      {/* Google */}
       <Button
         type="button"
         variant="outline"
         className="w-full h-11 gap-3 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
-        onClick={handleGoogleSignIn}
+        onClick={handleGoogleSignUp}
         disabled={loadingGoogle || loadingEmail}
       >
         {loadingGoogle ? (
@@ -122,7 +100,7 @@ function LoginForm() {
         ) : (
           <GoogleIcon />
         )}
-        <span className="font-medium">Entrar com Google</span>
+        <span className="font-medium">Cadastrar com Google</span>
       </Button>
 
       <div className="flex items-center gap-4">
@@ -133,10 +111,11 @@ function LoginForm() {
         <Separator className="flex-1" />
       </div>
 
-      <form onSubmit={handleEmailSignIn} className="space-y-4">
+      {/* E-mail */}
+      <form onSubmit={handleEmailSignUp} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email" className="text-gray-700 font-medium">
-            Endereço de e-mail
+            Seu melhor e-mail
           </Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -165,18 +144,18 @@ function LoginForm() {
               Enviando link...
             </>
           ) : (
-            'Entrar com e-mail'
+            'Criar conta com e-mail'
           )}
         </Button>
       </form>
 
       <p className="text-xs text-center text-gray-400 leading-relaxed">
-        Ao entrar, você concorda com nossos{' '}
-        <a href="/termos" className="text-blue-600 hover:underline font-medium">
+        Ao criar sua conta, você concorda com nossos{' '}
+        <a href="/termos" className="text-blue-600 hover:underline">
           Termos de Uso
         </a>{' '}
         e{' '}
-        <a href="/privacidade" className="text-blue-600 hover:underline font-medium">
+        <a href="/privacidade" className="text-blue-600 hover:underline">
           Política de Privacidade
         </a>
         .
@@ -185,7 +164,7 @@ function LoginForm() {
   )
 }
 
-export default function LoginPage() {
+export default function CadastroPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -201,25 +180,36 @@ export default function LoginPage() {
               </h1>
             </div>
             <p className="text-blue-100 text-sm mt-1">
-              Sua agenda profissional online
+              Comece a usar de graça hoje mesmo
             </p>
           </div>
 
-          {/* Body — Suspense obrigatório para useSearchParams no App Router */}
-          <Suspense fallback={<div className="px-8 py-8 text-center text-gray-400">Carregando...</div>}>
-            <LoginForm />
+          {/* Body */}
+          <Suspense fallback={
+            <div className="px-8 py-8 text-center text-gray-400">
+              Carregando...
+            </div>
+          }>
+            <CadastroForm />
           </Suspense>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Ainda não tem conta?{' '}
-          <a
-            href="/cadastro"
-            className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
+        {/* Link para login */}
+        <div className="text-center text-sm text-gray-500 mt-6 space-y-2">
+          <p>
+            Já tem uma conta?{' '}
+            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+              Entrar
+            </Link>
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors text-xs"
           >
-            Crie uma gratuitamente
-          </a>
-        </p>
+            <ArrowLeft className="h-3 w-3" />
+            Voltar para o início
+          </Link>
+        </div>
       </div>
     </div>
   )

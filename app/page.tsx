@@ -45,7 +45,7 @@ export default function LandingPage() {
               Entrar
             </Link>
             <Link
-              href="/login"
+              href="/cadastro"
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             >
               Começar grátis
@@ -72,7 +72,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/login"
+              href="/cadastro"
               className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50 font-semibold px-8 py-4 rounded-xl text-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
             >
               Criar minha agenda grátis
@@ -240,7 +240,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Link
-                href="/login"
+                href="/cadastro"
                 className="block text-center border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-xl transition-colors"
               >
                 Começar grátis
@@ -273,7 +273,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Link
-                href="/login"
+                href="/cadastro"
                 className="block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors"
               >
                 Assinar Starter
@@ -303,7 +303,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Link
-                href="/login"
+                href="/cadastro"
                 className="block text-center border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-xl transition-colors"
               >
                 Assinar Pro
@@ -364,7 +364,7 @@ export default function LandingPage() {
             Crie sua conta grátis hoje e tenha sua página de agendamento funcionando em menos de 10 minutos.
           </p>
           <Link
-            href="/login"
+            href="/cadastro"
             className="inline-flex items-center gap-2 bg-white text-blue-700 hover:bg-blue-50 font-bold px-10 py-4 rounded-xl text-lg transition-colors shadow-lg"
           >
             Criar minha agenda agora
