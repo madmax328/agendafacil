@@ -1,16 +1,7 @@
-import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
-import { authOptions } from '@/lib/auth'
 
-export default async function RootPage() {
-  try {
-    const session = await getServerSession(authOptions)
-    if (session?.user?.id) {
-      redirect('/dashboard')
-    }
-  } catch {
-    // Variáveis de ambiente não configuradas — redireciona para login
-  }
-
+// Redireciona sempre para o login — a verificação de sessão
+// acontece no middleware e nos layouts de cada seção.
+export default function RootPage() {
   redirect('/login')
 }
