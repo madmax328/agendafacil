@@ -3,7 +3,7 @@
 import { Suspense, useState, type FormEvent } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, Mail, Calendar, ArrowLeft, FlaskConical } from 'lucide-react'
+import { Loader2, Mail, Calendar, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,35 +15,11 @@ function CadastroForm() {
   const [email, setEmail] = useState('')
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
-  const [loadingDev, setLoadingDev] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
 
   const callbackUrl = searchParams.get('callbackUrl') ?? '/onboarding'
-
-  // Dev login — acesso rápido sem configurar Google ou Resend
-  async function handleDevLogin(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!email.trim()) return
-    try {
-      setLoadingDev(true)
-      const result = await signIn('dev-login', {
-        email: email.trim().toLowerCase(),
-        redirect: false,
-        callbackUrl,
-      })
-      if (result?.error) {
-        toast({ title: 'Erro no login de teste', description: result.error, variant: 'destructive' })
-        setLoadingDev(false)
-        return
-      }
-      router.push(result?.url ?? callbackUrl)
-    } catch (err) {
-      toast({ title: 'Erro inesperado', description: String(err), variant: 'destructive' })
-      setLoadingDev(false)
-    }
-  }
 
   async function handleGoogleSignUp() {
     try {
@@ -66,18 +42,24 @@ function CadastroForm() {
         callbackUrl,
       })
       if (result?.error) {
-        toast({ title: 'Erro ao enviar e-mail', description: 'Verifique o endereço e tente novamente.', variant: 'destructive' })
+        toast({
+          title: 'Erro ao enviar e-mail',
+          description: 'Verifique o endereço e tente novamente.',
+          variant: 'destructive',
+        })
         setLoadingEmail(false)
         return
       }
       router.push('/verificar-email')
     } catch {
-      toast({ title: 'Erro ao enviar e-mail', description: 'Verifique se o RESEND_API_KEY está configurado.', variant: 'destructive' })
+      toast({
+        title: 'Erro ao enviar e-mail',
+        description: 'Serviço de e-mail não configurado. Contate o suporte.',
+        variant: 'destructive',
+      })
       setLoadingEmail(false)
     }
   }
-
-  const devMode = process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === 'true'
 
   return (
     <div className="px-8 py-8 space-y-5">
@@ -86,41 +68,12 @@ function CadastroForm() {
         <p className="text-sm text-gray-500 mt-1">Sem cartão de crédito • Setup em 10 minutos</p>
       </div>
 
-      {/* ── MODO TESTE (sem Google / Resend) ── */}
-      {devMode && (
-        <div className="rounded-xl border-2 border-dashed border-orange-300 bg-orange-50 p-4 space-y-3">
-          <div className="flex items-center gap-2 text-orange-700 text-sm font-medium">
-            <FlaskConical className="h-4 w-4" />
-            Modo de teste — sem Google nem e-mail
-          </div>
-          <form onSubmit={handleDevLogin} className="flex gap-2">
-            <Input
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-9 text-sm border-orange-200"
-              required
-            />
-            <Button
-              type="submit"
-              size="sm"
-              className="bg-orange-500 hover:bg-orange-600 text-white shrink-0"
-              disabled={loadingDev}
-            >
-              {loadingDev ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Entrar'}
-            </Button>
-          </form>
-        </div>
-      )}
-
-      {/* Google */}
       <Button
         type="button"
         variant="outline"
         className="w-full h-11 gap-3 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
         onClick={handleGoogleSignUp}
-        disabled={loadingGoogle || loadingEmail || loadingDev}
+        disabled={loadingGoogle || loadingEmail}
       >
         {loadingGoogle ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
         <span className="font-medium">Cadastrar com Google</span>
@@ -132,7 +85,6 @@ function CadastroForm() {
         <Separator className="flex-1" />
       </div>
 
-      {/* E-mail magic link */}
       <form onSubmit={handleEmailSignUp} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email" className="text-gray-700 font-medium">Seu melhor e-mail</Label>
@@ -146,7 +98,7 @@ function CadastroForm() {
               onChange={(e) => setEmail(e.target.value)}
               className="pl-9 h-11 border-gray-200"
               autoComplete="email"
-              disabled={loadingGoogle || loadingEmail || loadingDev}
+              disabled={loadingGoogle || loadingEmail}
               required
             />
           </div>
@@ -154,11 +106,11 @@ function CadastroForm() {
         <Button
           type="submit"
           className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
-          disabled={loadingGoogle || loadingEmail || loadingDev}
+          disabled={loadingGoogle || loadingEmail}
         >
-          {loadingEmail ? (
-            <><Loader2 className="h-4 w-4 animate-spin mr-2" />Enviando link...</>
-          ) : 'Criar conta com e-mail'}
+          {loadingEmail
+            ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Enviando link...</>
+            : 'Criar conta com e-mail'}
         </Button>
       </form>
 
