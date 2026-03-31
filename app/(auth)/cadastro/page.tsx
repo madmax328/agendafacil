@@ -3,7 +3,7 @@
 import { Suspense, useState, type FormEvent } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, Mail, Calendar, ArrowLeft } from 'lucide-react'
+import { Loader2, Mail, Calendar, ArrowLeft, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,38 +15,49 @@ function CadastroForm() {
   const [email, setEmail] = useState('')
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
+  const [loadingDev, setLoadingDev] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
 
   const callbackUrl = searchParams.get('callbackUrl') ?? '/onboarding'
 
+  // Dev login — acesso rápido sem configurar Google ou Resend
+  async function handleDevLogin(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!email.trim()) return
+    try {
+      setLoadingDev(true)
+      const result = await signIn('dev-login', {
+        email: email.trim().toLowerCase(),
+        redirect: false,
+        callbackUrl,
+      })
+      if (result?.error) {
+        toast({ title: 'Erro no login de teste', description: result.error, variant: 'destructive' })
+        setLoadingDev(false)
+        return
+      }
+      router.push(result?.url ?? callbackUrl)
+    } catch (err) {
+      toast({ title: 'Erro inesperado', description: String(err), variant: 'destructive' })
+      setLoadingDev(false)
+    }
+  }
+
   async function handleGoogleSignUp() {
     try {
       setLoadingGoogle(true)
       await signIn('google', { callbackUrl })
     } catch {
-      toast({
-        title: 'Erro ao entrar com Google',
-        description: 'Tente novamente em alguns instantes.',
-        variant: 'destructive',
-      })
+      toast({ title: 'Erro ao entrar com Google', description: 'Tente novamente.', variant: 'destructive' })
       setLoadingGoogle(false)
     }
   }
 
   async function handleEmailSignUp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-
-    if (!email.trim()) {
-      toast({
-        title: 'E-mail obrigatório',
-        description: 'Por favor, informe seu endereço de e-mail.',
-        variant: 'destructive',
-      })
-      return
-    }
-
+    if (!email.trim()) return
     try {
       setLoadingEmail(true)
       const result = await signIn('email', {
@@ -54,69 +65,77 @@ function CadastroForm() {
         redirect: false,
         callbackUrl,
       })
-
       if (result?.error) {
-        toast({
-          title: 'Erro ao enviar e-mail',
-          description: 'Verifique o endereço e tente novamente.',
-          variant: 'destructive',
-        })
+        toast({ title: 'Erro ao enviar e-mail', description: 'Verifique o endereço e tente novamente.', variant: 'destructive' })
         setLoadingEmail(false)
         return
       }
-
       router.push('/verificar-email')
     } catch {
-      toast({
-        title: 'Erro inesperado',
-        description: 'Tente novamente em alguns instantes.',
-        variant: 'destructive',
-      })
+      toast({ title: 'Erro ao enviar e-mail', description: 'Verifique se o RESEND_API_KEY está configurado.', variant: 'destructive' })
       setLoadingEmail(false)
     }
   }
 
+  const devMode = process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === 'true'
+
   return (
-    <div className="px-8 py-8 space-y-6">
+    <div className="px-8 py-8 space-y-5">
       <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Crie sua conta grátis
-        </h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Sem cartão de crédito • Setup em 10 minutos
-        </p>
+        <h2 className="text-xl font-semibold text-gray-900">Crie sua conta grátis</h2>
+        <p className="text-sm text-gray-500 mt-1">Sem cartão de crédito • Setup em 10 minutos</p>
       </div>
+
+      {/* ── MODO TESTE (sem Google / Resend) ── */}
+      {devMode && (
+        <div className="rounded-xl border-2 border-dashed border-orange-300 bg-orange-50 p-4 space-y-3">
+          <div className="flex items-center gap-2 text-orange-700 text-sm font-medium">
+            <FlaskConical className="h-4 w-4" />
+            Modo de teste — sem Google nem e-mail
+          </div>
+          <form onSubmit={handleDevLogin} className="flex gap-2">
+            <Input
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-9 text-sm border-orange-200"
+              required
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="bg-orange-500 hover:bg-orange-600 text-white shrink-0"
+              disabled={loadingDev}
+            >
+              {loadingDev ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Entrar'}
+            </Button>
+          </form>
+        </div>
+      )}
 
       {/* Google */}
       <Button
         type="button"
         variant="outline"
-        className="w-full h-11 gap-3 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+        className="w-full h-11 gap-3 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
         onClick={handleGoogleSignUp}
-        disabled={loadingGoogle || loadingEmail}
+        disabled={loadingGoogle || loadingEmail || loadingDev}
       >
-        {loadingGoogle ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <GoogleIcon />
-        )}
+        {loadingGoogle ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
         <span className="font-medium">Cadastrar com Google</span>
       </Button>
 
       <div className="flex items-center gap-4">
         <Separator className="flex-1" />
-        <span className="text-xs text-gray-400 font-medium uppercase tracking-wide">
-          ou
-        </span>
+        <span className="text-xs text-gray-400 font-medium uppercase tracking-wide">ou</span>
         <Separator className="flex-1" />
       </div>
 
-      {/* E-mail */}
+      {/* E-mail magic link */}
       <form onSubmit={handleEmailSignUp} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-gray-700 font-medium">
-            Seu melhor e-mail
-          </Label>
+          <Label htmlFor="email" className="text-gray-700 font-medium">Seu melhor e-mail</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -125,40 +144,29 @@ function CadastroForm() {
               placeholder="voce@exemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-9 h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+              className="pl-9 h-11 border-gray-200"
               autoComplete="email"
-              disabled={loadingGoogle || loadingEmail}
+              disabled={loadingGoogle || loadingEmail || loadingDev}
               required
             />
           </div>
         </div>
-
         <Button
           type="submit"
-          className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors"
-          disabled={loadingGoogle || loadingEmail}
+          className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+          disabled={loadingGoogle || loadingEmail || loadingDev}
         >
           {loadingEmail ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              Enviando link...
-            </>
-          ) : (
-            'Criar conta com e-mail'
-          )}
+            <><Loader2 className="h-4 w-4 animate-spin mr-2" />Enviando link...</>
+          ) : 'Criar conta com e-mail'}
         </Button>
       </form>
 
       <p className="text-xs text-center text-gray-400 leading-relaxed">
         Ao criar sua conta, você concorda com nossos{' '}
-        <a href="/termos" className="text-blue-600 hover:underline">
-          Termos de Uso
-        </a>{' '}
+        <a href="/termos" className="text-blue-600 hover:underline">Termos de Uso</a>{' '}
         e{' '}
-        <a href="/privacidade" className="text-blue-600 hover:underline">
-          Política de Privacidade
-        </a>
-        .
+        <a href="/privacidade" className="text-blue-600 hover:underline">Política de Privacidade</a>.
       </p>
     </div>
   )
@@ -169,45 +177,26 @@ export default function CadastroPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
-          {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-10 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               <div className="bg-white/20 rounded-xl p-2">
                 <Calendar className="h-7 w-7 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-white tracking-tight">
-                AgendaFácil
-              </h1>
+              <h1 className="text-3xl font-bold text-white tracking-tight">AgendaFácil</h1>
             </div>
-            <p className="text-blue-100 text-sm mt-1">
-              Comece a usar de graça hoje mesmo
-            </p>
+            <p className="text-blue-100 text-sm mt-1">Comece a usar de graça hoje mesmo</p>
           </div>
-
-          {/* Body */}
-          <Suspense fallback={
-            <div className="px-8 py-8 text-center text-gray-400">
-              Carregando...
-            </div>
-          }>
+          <Suspense fallback={<div className="px-8 py-8 text-center text-gray-400">Carregando...</div>}>
             <CadastroForm />
           </Suspense>
         </div>
-
-        {/* Link para login */}
         <div className="text-center text-sm text-gray-500 mt-6 space-y-2">
           <p>
             Já tem uma conta?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
-              Entrar
-            </Link>
+            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">Entrar</Link>
           </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors text-xs"
-          >
-            <ArrowLeft className="h-3 w-3" />
-            Voltar para o início
+          <Link href="/" className="inline-flex items-center gap-1 text-gray-400 hover:text-gray-600 text-xs">
+            <ArrowLeft className="h-3 w-3" />Voltar para o início
           </Link>
         </div>
       </div>
