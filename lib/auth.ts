@@ -4,12 +4,11 @@ import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/prisma'
+import type { Plan } from '@prisma/client'
 
-// Monta a lista de providers dinamicamente com base nas env vars disponíveis
 function buildProviders() {
   const providers = []
 
-  // Google OAuth — só ativo se as credenciais estiverem configuradas
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     providers.push(
       GoogleProvider({
@@ -19,25 +18,21 @@ function buildProviders() {
     )
   }
 
-  // Magic link por e-mail — só ativo se RESEND_API_KEY estiver configurada
   if (process.env.RESEND_API_KEY) {
     providers.push(
       EmailProvider({
         server: {
           host: 'smtp.resend.com',
           port: 465,
-          auth: {
-            user: 'resend',
-            pass: process.env.RESEND_API_KEY,
-          },
+          auth: { user: 'resend', pass: process.env.RESEND_API_KEY },
         },
         from: process.env.EMAIL_FROM ?? 'AgendaFácil <onboarding@resend.dev>',
       })
     )
   }
 
-  // Provider de desenvolvimento — APENAS em ambiente local/preview (nunca em produção)
-  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_DEV_LOGIN === 'true') {
+  // Provider de teste — ativo se ENABLE_DEV_LOGIN=true
+  if (process.env.ENABLE_DEV_LOGIN === 'true') {
     providers.push(
       CredentialsProvider({
         id: 'dev-login',
@@ -48,7 +43,6 @@ function buildProviders() {
         async authorize(credentials) {
           if (!credentials?.email) return null
 
-          // Busca ou cria o profissional pelo e-mail
           let professional = await prisma.professional.findUnique({
             where: { email: credentials.email },
           })
@@ -62,7 +56,7 @@ function buildProviders() {
           return {
             id: professional.id,
             email: professional.email,
-            name: professional.name || professional.email,
+            name: professional.name || credentials.email,
           }
         },
       })
@@ -73,18 +67,30 @@ function buildProviders() {
 }
 
 export const authOptions: NextAuthOptions = {
+  // PrismaAdapter cria os usuários na DB — sessions ficam no JWT
   adapter: PrismaAdapter(prisma) as any,
   providers: buildProviders(),
+  // JWT permite o CredentialsProvider funcionar + OAuth/Email
+  session: { strategy: 'jwt' },
   callbacks: {
-    async session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id
+    async jwt({ token, user }) {
+      // Na primeira autenticação, user está preenchido
+      if (user) {
+        token.id = user.id
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user && token.id) {
+        session.user.id = token.id as string
+
         const professional = await prisma.professional.findUnique({
-          where: { id: user.id },
+          where: { id: token.id as string },
           select: { plan: true, slug: true, businessName: true, businessType: true },
         })
+
         if (professional) {
-          session.user.plan = professional.plan
+          session.user.plan = professional.plan as Plan
           session.user.slug = professional.slug ?? undefined
           session.user.businessName = professional.businessName
           session.user.businessType = professional.businessType
@@ -98,9 +104,6 @@ export const authOptions: NextAuthOptions = {
     error: '/login',
     verifyRequest: '/verificar-email',
     newUser: '/onboarding',
-  },
-  session: {
-    strategy: 'database',
   },
   secret: process.env.NEXTAUTH_SECRET,
 }
