@@ -10,12 +10,12 @@ CREATE TYPE "PaymentStatus" AS ENUM ('UNPAID', 'PAID', 'REFUNDED');
 -- CreateTable
 CREATE TABLE "Professional" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" TEXT NOT NULL DEFAULT '',
     "email" TEXT NOT NULL,
     "phone" TEXT,
-    "slug" TEXT NOT NULL,
-    "businessName" TEXT NOT NULL,
-    "businessType" TEXT NOT NULL,
+    "slug" TEXT,
+    "businessName" TEXT NOT NULL DEFAULT '',
+    "businessType" TEXT NOT NULL DEFAULT 'outros',
     "whatsappToken" TEXT,
     "pixKey" TEXT,
     "plan" "Plan" NOT NULL DEFAULT 'FREE',
@@ -137,7 +137,7 @@ CREATE UNIQUE INDEX "VerificationToken_identifier_token_key" ON "VerificationTok
 
 -- AddForeignKey
 ALTER TABLE "Service" ADD CONSTRAINT "Service_professionalId_fkey" FOREIGN KEY ("professionalId") REFERENCES "Professional"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "Customer" ADD CONSTRAINT "Customer_professionalId_fkey" FOREIGN KEY ("professionalId") REFERENCES "Professional"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Customer" ADD CONSTRAINT "Customer_professionalId_fkey" FOREIGN KEY ("customerId") REFERENCES "Professional"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_professionalId_fkey" FOREIGN KEY ("professionalId") REFERENCES "Professional"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -10,12 +10,12 @@ datasource db {
 
 model Professional {
   id            String   @id @default(cuid())
-  name          String
+  name          String   @default("")
   email         String   @unique
   phone         String?
-  slug          String   @unique
-  businessName  String
-  businessType  String   // "salao", "clinica", "dentista", "psicologo"
+  slug          String?  @unique
+  businessName  String   @default("")
+  businessType  String   @default("outros")  // "salao", "clinica", "dentista", "psicologo"
   whatsappToken String?
   pixKey        String?
   plan          Plan     @default(FREE)
