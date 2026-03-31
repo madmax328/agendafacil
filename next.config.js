@@ -2,7 +2,8 @@
 const nextConfig = {
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000"],
+      // Permite server actions em todos os domínios (localhost + Vercel)
+      allowedOrigins: ["*"],
     },
   },
   images: {
@@ -12,6 +13,16 @@ const nextConfig = {
       "res.cloudinary.com",
       "images.unsplash.com",
     ],
+  },
+  // Redireciona a raiz para o login diretamente no edge (mais confiável)
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/login",
+        permanent: false,
+      },
+    ];
   },
 };
 
