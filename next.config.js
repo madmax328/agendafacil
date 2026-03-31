@@ -14,16 +14,6 @@ const nextConfig = {
       "images.unsplash.com",
     ],
   },
-  // Redireciona a raiz para o login diretamente no edge (mais confiável)
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/login",
-        permanent: false,
-      },
-    ];
-  },
 };
 
 module.exports = nextConfig;
