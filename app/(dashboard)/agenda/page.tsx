@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   ChevronLeft,
   ChevronRight,
@@ -287,7 +287,7 @@ export default function AgendaPage() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
   const { toast } = useToast()
 
-  const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 0 })
+  const weekEnd = useMemo(() => endOfWeek(currentWeek, { weekStartsOn: 0 }), [currentWeek])
 
   const fetchAppointments = useCallback(async () => {
     setLoading(true)

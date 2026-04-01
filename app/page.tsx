@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import {
   Calendar,
@@ -32,20 +33,31 @@ const CATEGORIES = [
   { value: 'nutricionista', label: 'Nutricionista', emoji: '🥗', color: 'bg-lime-50 text-lime-700 border-lime-200 hover:bg-lime-100' },
 ]
 
-async function getFeaturedProfessionals() {
+async function getFeaturedProfessionals(city?: string) {
+  // Try to show pros from visitor's city first, fall back to all
+  if (city) {
+    const local = await prisma.professional.findMany({
+      where: { slug: { not: null }, city: { contains: city, mode: 'insensitive' } },
+      select: {
+        id: true, slug: true, name: true, businessName: true,
+        businessType: true, city: true, state: true,
+        isFeatured: true,
+        _count: { select: { services: { where: { active: true } } } },
+      },
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+      take: 6,
+    })
+    if (local.length >= 3) return local
+  }
   return prisma.professional.findMany({
     where: { slug: { not: null } },
     select: {
-      id: true,
-      slug: true,
-      name: true,
-      businessName: true,
-      businessType: true,
-      city: true,
-      state: true,
+      id: true, slug: true, name: true, businessName: true,
+      businessType: true, city: true, state: true,
+      isFeatured: true,
       _count: { select: { services: { where: { active: true } } } },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
     take: 6,
   })
 }
@@ -62,7 +74,11 @@ const TYPE_LABEL: Record<string, string> = {
 }
 
 export default async function HomePage() {
-  const featured = await getFeaturedProfessionals()
+  // Vercel injects x-vercel-ip-city header (URL-encoded), e.g. "S%C3%A3o%20Paulo"
+  const headersList = await headers()
+  const rawCity = headersList.get('x-vercel-ip-city') ?? ''
+  const visitorCity = rawCity ? decodeURIComponent(rawCity) : undefined
+  const featured = await getFeaturedProfessionals(visitorCity)
 
   return (
     <div className="min-h-screen bg-white">
@@ -164,7 +180,16 @@ export default async function HomePage() {
         <section className="py-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Profissionais em destaque</h2>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {visitorCity ? `Profissionais em ${visitorCity}` : 'Profissionais em destaque'}
+                </h2>
+                {visitorCity && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Encontramos profissionais perto de você
+                  </p>
+                )}
+              </div>
               <Link href="/profissionais" className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
                 Ver todos <ArrowRight className="h-4 w-4" />
               </Link>
@@ -184,9 +209,16 @@ export default async function HomePage() {
                       {emoji}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-gray-900 truncate group-hover:text-blue-700 transition-colors">
-                        {pro.businessName || pro.name || 'Sem nome'}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-gray-900 truncate group-hover:text-blue-700 transition-colors">
+                          {pro.businessName || pro.name || 'Sem nome'}
+                        </p>
+                        {pro.isFeatured && (
+                          <span className="shrink-0 text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200 px-1.5 py-0.5 rounded-full">
+                            ⭐ Destaque
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-500 mt-0.5">{typeLabel}</p>
                       {location && (
                         <div className="flex items-center gap-1 text-xs text-gray-400 mt-1.5">
@@ -294,8 +326,8 @@ export default async function HomePage() {
           </div>
           <p>© {new Date().getFullYear()} AgendaFácil. Todos os direitos reservados.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
-            <a href="#" className="hover:text-white transition-colors">Privacidade</a>
+            <Link href="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
+            <Link href="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>
             <Link href="/para-profissionais" className="hover:text-white transition-colors">Para profissionais</Link>
             <Link href="/login" className="hover:text-white transition-colors">Entrar</Link>
           </div>

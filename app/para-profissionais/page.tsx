@@ -345,8 +345,8 @@ export default function ParaProfissionaisPage() {
           </Link>
           <p>© {new Date().getFullYear()} AgendaFácil. Todos os direitos reservados.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
-            <a href="#" className="hover:text-white transition-colors">Privacidade</a>
+            <Link href="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
+            <Link href="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>
             <Link href="/" className="hover:text-white transition-colors">Para clientes</Link>
             <Link href="/login" className="hover:text-white transition-colors">Entrar</Link>
           </div>
