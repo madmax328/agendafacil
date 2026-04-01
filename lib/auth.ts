@@ -1,38 +1,12 @@
 import { NextAuthOptions } from 'next-auth'
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import { prisma } from '@/lib/prisma'
+import { ProfessionalAdapter } from '@/lib/auth-adapter'
 import type { Plan } from '@prisma/client'
 
-// Adapter customizado: usa o PrismaAdapter mas sobrescreve createUser
-// para garantir compatibilidade com o modelo Professional
-function buildAdapter() {
-  const adapter = PrismaAdapter(prisma) as any
-
-  // PrismaAdapter espera um modelo User genérico. Sobrescrevemos createUser
-  // para passar apenas os campos que Professional aceita.
-  adapter.createUser = async (user: {
-    email: string
-    name?: string | null
-    image?: string | null
-    emailVerified?: Date | null
-  }) => {
-    return prisma.professional.create({
-      data: {
-        email: user.email,
-        name: user.name ?? '',
-        image: user.image ?? null,
-        emailVerified: user.emailVerified ?? null,
-      },
-    })
-  }
-
-  return adapter
-}
-
 export const authOptions: NextAuthOptions = {
-  adapter: buildAdapter(),
+  adapter: ProfessionalAdapter(),
 
   providers: [
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
