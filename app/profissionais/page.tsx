@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ProfessionaisSearch } from './search'
+import { ProfissionaisSearch } from './search'
 
 export const metadata = {
   title: 'Encontrar Profissionais | AgendaFácil',
