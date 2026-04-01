@@ -72,8 +72,9 @@ const profileSchema = z.object({
 })
 
 const whatsappSchema = z.object({
-  whatsappToken: z.string().optional(),
   zapiInstanceId: z.string().optional(),
+  whatsappToken: z.string().optional(),
+  zapiClientToken: z.string().optional(),
 })
 
 type ProfileFormData = z.infer<typeof profileSchema>
@@ -270,7 +271,11 @@ function WhatsAppTab() {
       const res = await fetch('/api/profile')
       if (res.ok) {
         const data = await res.json()
-        reset({ whatsappToken: data.whatsappToken ?? '', zapiInstanceId: data.zapiInstanceId ?? '' })
+        reset({
+        zapiInstanceId: data.zapiInstanceId ?? '',
+        whatsappToken: data.whatsappToken ?? '',
+        zapiClientToken: data.zapiClientToken ?? '',
+      })
       }
     }
     load()
@@ -303,8 +308,9 @@ function WhatsAppTab() {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            whatsappToken: data.whatsappToken ?? '',
             zapiInstanceId: data.zapiInstanceId ?? '',
+            whatsappToken: data.whatsappToken ?? '',
+            zapiClientToken: data.zapiClientToken ?? '',
           }),
         })
         if (!res.ok) {
@@ -385,28 +391,39 @@ function WhatsAppTab() {
 
         <div className="space-y-1.5">
           <Label htmlFor="whatsappToken" className="text-gray-700 font-medium">
-            Token Z-API
+            Token da instância
           </Label>
           <Input
             id="whatsappToken"
             type="password"
-            placeholder="Seu token de autenticação"
+            placeholder="Token mostrado na página da instância"
             {...register('whatsappToken')}
           />
-          {errors.whatsappToken && (
-            <p className="text-xs text-red-600 flex items-center gap-1">
-              <AlertCircle className="h-3 w-3" /> {errors.whatsappToken.message}
-            </p>
-          )}
+          <p className="text-xs text-gray-400">Encontrado na página da sua instância em app.z-api.io</p>
         </div>
 
-        <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-700 space-y-1">
-          <p className="font-semibold">Como obter suas credenciais:</p>
-          <ol className="list-decimal list-inside space-y-0.5 text-blue-600">
-            <li>Acesse o painel em <span className="font-mono text-xs">app.z-api.io</span></li>
-            <li>Crie ou selecione uma instância WhatsApp</li>
-            <li>Copie o ID da instância e o token de segurança</li>
-            <li>Cole os valores acima e salve</li>
+        <div className="space-y-1.5">
+          <Label htmlFor="zapiClientToken" className="text-gray-700 font-medium">
+            Client-Token <span className="text-gray-400 font-normal">(Security Token)</span>
+          </Label>
+          <Input
+            id="zapiClientToken"
+            type="password"
+            placeholder="Security Token da sua conta Z-API"
+            {...register('zapiClientToken')}
+          />
+          <p className="text-xs text-gray-400">
+            Encontrado em <span className="font-mono">app.z-api.io → Segurança → Security Token</span>
+          </p>
+        </div>
+
+        <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-700 space-y-2">
+          <p className="font-semibold">Como obter suas credenciais Z-API:</p>
+          <ol className="list-decimal list-inside space-y-1 text-blue-600">
+            <li>Acesse <span className="font-mono text-xs">app.z-api.io</span> e entre na sua instância</li>
+            <li>Copie o <strong>ID da instância</strong> e o <strong>Token</strong> da página principal</li>
+            <li>Vá em <strong>Segurança</strong> e copie o <strong>Security Token</strong> (Client-Token)</li>
+            <li>Cole os três valores acima, salve e clique em "Verificar"</li>
           </ol>
         </div>
       </div>

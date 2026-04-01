@@ -18,9 +18,10 @@ model Professional {
   slug          String?   @unique
   businessName  String    @default("")
   businessType  String    @default("outros")
-  whatsappToken String?
+  whatsappToken  String?
   zapiInstanceId String?
-  pixKey        String?
+  zapiClientToken String?
+  pixKey         String?
   plan          Plan      @default(FREE)
   planExpiresAt DateTime?
   stripeCustomerId     String?

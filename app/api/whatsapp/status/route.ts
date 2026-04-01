@@ -9,27 +9,28 @@ export async function GET() {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
-  // Read credentials from the professional's own profile
   const professional = await prisma.professional.findUnique({
     where: { id: session.user.id },
-    select: { zapiInstanceId: true, whatsappToken: true },
+    select: { zapiInstanceId: true, whatsappToken: true, zapiClientToken: true },
   })
 
-  const instanceId = professional?.zapiInstanceId
-  const token = professional?.whatsappToken
+  const instanceId = professional?.zapiInstanceId?.trim()
+  const instanceToken = professional?.whatsappToken?.trim()
+  // Client-Token (Security Token) — falls back to instance token if not set separately
+  const clientToken = professional?.zapiClientToken?.trim() || instanceToken
 
-  if (!instanceId || !token) {
+  if (!instanceId || !instanceToken) {
     return NextResponse.json({
       connected: false,
-      reason: 'Credenciais não configuradas. Salve o ID da instância e o Token primeiro.',
+      reason: 'Credenciais não configuradas. Preencha o ID da instância, o Token e o Client-Token, depois salve.',
     })
   }
 
   try {
     const res = await fetch(
-      `https://api.z-api.io/instances/${instanceId}/token/${token}/status`,
+      `https://api.z-api.io/instances/${instanceId}/token/${instanceToken}/status`,
       {
-        headers: { 'Client-Token': token },
+        headers: { 'Client-Token': clientToken ?? '' },
         signal: AbortSignal.timeout(8000),
       },
     )
@@ -38,12 +39,11 @@ export async function GET() {
       const text = await res.text().catch(() => '')
       return NextResponse.json({
         connected: false,
-        reason: `Erro Z-API: ${res.status}${text ? ' – ' + text : ''}`,
+        reason: `Erro Z-API ${res.status}: ${text || 'resposta inválida'}`,
       })
     }
 
     const data = await res.json()
-    // Z-API returns { connected: boolean, session: string, ... }
     return NextResponse.json({
       connected: data.connected === true,
       session: data.session ?? null,
