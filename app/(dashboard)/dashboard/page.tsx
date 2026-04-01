@@ -10,6 +10,8 @@ import {
   UserPlus,
   Clock,
   ChevronRight,
+  Link2,
+  ExternalLink,
 } from 'lucide-react'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
@@ -24,6 +26,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { CopyLinkButton } from '@/components/copy-link-button'
 
 export const metadata = {
   title: 'Dashboard',
@@ -102,6 +105,14 @@ export default async function DashboardPage() {
   }
 
   const professionalId = session.user.id
+  const professional = await prisma.professional.findUnique({
+    where: { id: professionalId },
+    select: { slug: true, businessName: true },
+  })
+  const slug = professional?.slug ?? null
+  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://agendafacil.com.br'
+  const bookingUrl = slug ? `${baseUrl}/${slug}` : null
+
   const now = new Date()
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const endOfToday = new Date(
@@ -232,6 +243,39 @@ export default async function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* Public booking link banner */}
+      {bookingUrl ? (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-5 py-4">
+          <div className="flex items-center gap-2 text-blue-700 shrink-0">
+            <Link2 className="h-5 w-5" />
+            <span className="text-sm font-semibold">Seu link de agendamento:</span>
+          </div>
+          <div className="flex flex-1 items-center gap-2 min-w-0">
+            <code className="flex-1 truncate text-sm bg-white border border-blue-200 rounded-lg px-3 py-1.5 text-blue-800 font-mono select-all">
+              {bookingUrl}
+            </code>
+            <CopyLinkButton url={bookingUrl} />
+            <Button asChild size="sm" variant="outline" className="shrink-0 border-blue-200 text-blue-700 hover:bg-blue-100 gap-1">
+              <a href={bookingUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Abrir</span>
+              </a>
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-5 py-4">
+          <Link2 className="h-5 w-5 text-amber-600 shrink-0" />
+          <p className="text-sm text-amber-800">
+            Seu link de agendamento ainda não foi configurado.{' '}
+            <Link href="/configuracoes" className="font-semibold underline hover:no-underline">
+              Complete seu perfil
+            </Link>{' '}
+            para ativar sua página pública.
+          </p>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">

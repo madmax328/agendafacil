@@ -36,6 +36,7 @@ export default function LandingPage() {
             <a href="#funcionalidades" className="hover:text-blue-600 transition-colors">Funcionalidades</a>
             <a href="#planos" className="hover:text-blue-600 transition-colors">Planos</a>
             <a href="#depoimentos" className="hover:text-blue-600 transition-colors">Depoimentos</a>
+            <Link href="/profissionais" className="hover:text-blue-600 transition-colors">Encontrar profissional</Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link
