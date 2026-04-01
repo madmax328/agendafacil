@@ -225,9 +225,15 @@ export default function ParaProfissionaisPage() {
                 <span className="text-gray-400">/mês</span>
               </div>
               <ul className="space-y-3 mb-8">
-                {['30 agendamentos/mês', '1 serviço', 'Página de agendamento', 'Confirmação por e-mail'].map((f) => (
+                {[
+                  '30 agendamentos/mês',
+                  '1 serviço',
+                  'Página de agendamento',
+                  'Confirmação por e-mail',
+                  '❌ Sem lembretes WhatsApp',
+                ].map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    <Check className={`h-4 w-4 mt-0.5 shrink-0 ${f.startsWith('❌') ? 'text-gray-300' : 'text-green-500'}`} />
                     {f}
                   </li>
                 ))}
@@ -249,7 +255,13 @@ export default function ParaProfissionaisPage() {
                 <span className="text-gray-400">/mês</span>
               </div>
               <ul className="space-y-3 mb-8">
-                {['200 agendamentos/mês', 'Serviços ilimitados', 'Lembretes WhatsApp automáticos', 'Gestão de clientes', 'Dashboard de estatísticas'].map((f) => (
+                {[
+                  '200 agendamentos/mês',
+                  'Serviços ilimitados',
+                  '✅ Confirmação WhatsApp automática',
+                  'Gestão de clientes',
+                  'Dashboard de estatísticas',
+                ].map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
                     <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                     {f}
@@ -270,7 +282,14 @@ export default function ParaProfissionaisPage() {
                 <span className="text-gray-400">/mês</span>
               </div>
               <ul className="space-y-3 mb-8">
-                {['Agendamentos ilimitados', 'Tudo do Starter', 'Pix integrado', 'Analytics avançados', 'Suporte prioritário'].map((f) => (
+                {[
+                  'Agendamentos ilimitados',
+                  'Tudo do Starter',
+                  '✅ Confirmação + 2 lembretes WhatsApp',
+                  'Pix integrado',
+                  'Analytics avançados',
+                  'Suporte prioritário',
+                ].map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
                     <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                     {f}

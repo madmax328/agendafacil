@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
+import { sendWhatsAppMessage, whatsappTemplates } from '@/lib/whatsapp'
+import { format } from 'date-fns'
 
 const createAppointmentSchema = z.object({
   customerId: z.string(),
@@ -105,6 +107,20 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  const professional = await prisma.professional.findUnique({
+    where: { id: session.user.id },
+    select: {
+      plan: true,
+      businessName: true,
+      address: true,
+      city: true,
+      state: true,
+      zapiInstanceId: true,
+      whatsappToken: true,
+      zapiClientToken: true,
+    },
+  })
+
   const appointment = await prisma.appointment.create({
     data: {
       professionalId: session.user.id,
@@ -114,11 +130,36 @@ export async function POST(req: NextRequest) {
       endsAt,
       notes: data.notes,
     },
-    include: {
-      customer: true,
-      service: true,
-    },
+    include: { customer: true, service: true },
   })
+
+  // Send WhatsApp confirmation — STARTER and PRO only
+  if (
+    professional &&
+    (professional.plan === 'STARTER' || professional.plan === 'PRO') &&
+    professional.zapiInstanceId &&
+    professional.whatsappToken
+  ) {
+    const address = [professional.address, professional.city, professional.state]
+      .filter(Boolean).join(', ')
+
+    await sendWhatsAppMessage({
+      phone: appointment.customer.phone,
+      message: whatsappTemplates.confirmacaoAgendamento({
+        clientName: appointment.customer.name,
+        serviceName: appointment.service.name,
+        professionalName: professional.businessName ?? '',
+        date: format(scheduledAt, 'dd/MM/yyyy'),
+        time: format(scheduledAt, 'HH:mm'),
+        address: address || undefined,
+      }),
+      credentials: {
+        instanceId: professional.zapiInstanceId,
+        instanceToken: professional.whatsappToken,
+        clientToken: professional.zapiClientToken ?? undefined,
+      },
+    })
+  }
 
   return NextResponse.json(appointment, { status: 201 })
 }

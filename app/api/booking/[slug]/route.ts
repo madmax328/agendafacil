@@ -140,6 +140,10 @@ export async function POST(
       address: true,
       city: true,
       state: true,
+      plan: true,
+      zapiInstanceId: true,
+      whatsappToken: true,
+      zapiClientToken: true,
     },
   })
 
@@ -228,22 +232,32 @@ export async function POST(
     include: { customer: true, service: true },
   })
 
-  // Send WhatsApp confirmation (best-effort)
-  const address = [professional.address, professional.city, professional.state]
-    .filter(Boolean)
-    .join(', ')
+  // Send WhatsApp confirmation — only for STARTER and PRO plans
+  if (
+    (professional.plan === 'STARTER' || professional.plan === 'PRO') &&
+    professional.zapiInstanceId &&
+    professional.whatsappToken
+  ) {
+    const address = [professional.address, professional.city, professional.state]
+      .filter(Boolean).join(', ')
 
-  await sendWhatsAppMessage({
-    phone: customer.phone,
-    message: whatsappTemplates.confirmacaoAgendamento({
-      clientName: customer.name,
-      serviceName: service.name,
-      professionalName: professional.businessName,
-      date: format(scheduledAt, "dd/MM/yyyy"),
-      time: format(scheduledAt, 'HH:mm'),
-      address: address || undefined,
-    }),
-  })
+    await sendWhatsAppMessage({
+      phone: customer.phone,
+      message: whatsappTemplates.confirmacaoAgendamento({
+        clientName: customer.name,
+        serviceName: service.name,
+        professionalName: professional.businessName ?? '',
+        date: format(scheduledAt, 'dd/MM/yyyy'),
+        time: format(scheduledAt, 'HH:mm'),
+        address: address || undefined,
+      }),
+      credentials: {
+        instanceId: professional.zapiInstanceId,
+        instanceToken: professional.whatsappToken,
+        clientToken: professional.zapiClientToken ?? undefined,
+      },
+    })
+  }
 
   return NextResponse.json(appointment, { status: 201 })
 }

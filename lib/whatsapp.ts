@@ -1,42 +1,60 @@
 // Integração com Z-API para envio de mensagens WhatsApp
+// Cada profissional usa as suas próprias credenciais Z-API
 
-const ZAPI_BASE_URL = `https://api.z-api.io/instances/${process.env.ZAPI_INSTANCE_ID}/token/${process.env.ZAPI_TOKEN}`
+export interface WhatsAppCredentials {
+  instanceId: string
+  instanceToken: string
+  clientToken?: string  // Security Token — usa instanceToken como fallback
+}
 
 interface SendMessageParams {
   phone: string
   message: string
+  credentials: WhatsAppCredentials
 }
 
-export async function sendWhatsAppMessage({ phone, message }: SendMessageParams): Promise<boolean> {
-  try {
-    // Formata o número para padrão internacional
-    const formattedPhone = formatPhone(phone)
+export async function sendWhatsAppMessage({
+  phone,
+  message,
+  credentials,
+}: SendMessageParams): Promise<boolean> {
+  const { instanceId, instanceToken, clientToken } = credentials
 
-    const response = await fetch(`${ZAPI_BASE_URL}/send-text`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Client-Token': process.env.ZAPI_TOKEN || '',
+  if (!instanceId || !instanceToken) {
+    console.warn('[WhatsApp] Credenciais não configuradas para este profissional')
+    return false
+  }
+
+  try {
+    const formattedPhone = formatPhone(phone)
+    const authToken = clientToken || instanceToken
+
+    const response = await fetch(
+      `https://api.z-api.io/instances/${instanceId}/token/${instanceToken}/send-text`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Client-Token': authToken,
+        },
+        body: JSON.stringify({ phone: formattedPhone, message }),
+        signal: AbortSignal.timeout(10000),
       },
-      body: JSON.stringify({
-        phone: formattedPhone,
-        message,
-      }),
-    })
+    )
 
     if (!response.ok) {
-      console.error('Erro ao enviar mensagem WhatsApp:', await response.text())
+      console.error('[WhatsApp] Erro ao enviar:', await response.text())
       return false
     }
 
     return true
   } catch (error) {
-    console.error('Erro na integração WhatsApp:', error)
+    console.error('[WhatsApp] Erro na integração:', error)
     return false
   }
 }
 
-// Formata número de telefone para padrão E.164
+// Formata número para padrão E.164 com DDI Brasil
 function formatPhone(phone: string): string {
   const digits = phone.replace(/\D/g, '')
   if (digits.startsWith('55')) return digits
