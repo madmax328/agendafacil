@@ -10,7 +10,7 @@ datasource db {
 
 model Professional {
   id            String    @id @default(cuid())
-  name          String    @default("")
+  name          String?   @default("")
   email         String    @unique
   emailVerified DateTime?           // obrigatório para o PrismaAdapter (NextAuth)
   image         String?
