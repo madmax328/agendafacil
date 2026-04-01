@@ -236,7 +236,7 @@ export default async function DashboardPage() {
             </Link>
           </Button>
           <Button asChild size="sm" variant="outline" className="gap-2">
-            <Link href="/clientes/novo">
+            <Link href="/clientes">
               <UserPlus className="h-4 w-4" />
               Novo Cliente
             </Link>

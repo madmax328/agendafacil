@@ -11,6 +11,7 @@ import {
   Calendar,
   LayoutGrid,
 } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { formatCurrency } from '@/lib/utils'
@@ -400,13 +401,11 @@ export default function AgendaPage() {
             Hoje
           </Button>
 
-          <Button
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5"
-            onClick={() => toast({ title: 'Abrindo formulário de agendamento...' })}
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Novo Agendamento</span>
+          <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5">
+            <Link href="/agenda/novo">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Novo Agendamento</span>
+            </Link>
           </Button>
         </div>
       </div>
