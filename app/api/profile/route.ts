@@ -35,6 +35,7 @@ export async function GET() {
       state: true,
       pixKey: true,
       whatsappToken: true,
+      zapiInstanceId: true,
       slug: true,
       plan: true,
     },

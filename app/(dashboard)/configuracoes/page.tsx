@@ -254,6 +254,7 @@ function PerfilTab() {
 function WhatsAppTab() {
   const [isPending, startTransition] = useTransition()
   const [connectionStatus, setConnectionStatus] = useState<'unknown' | 'connected' | 'disconnected'>('unknown')
+  const [connectionDetail, setConnectionDetail] = useState<string>('')
   const [checkingStatus, setCheckingStatus] = useState(false)
   const { toast } = useToast()
 
@@ -279,14 +280,17 @@ function WhatsAppTab() {
     setCheckingStatus(true)
     try {
       const res = await fetch('/api/whatsapp/status')
-      if (res.ok) {
-        const data = await res.json()
-        setConnectionStatus(data.connected ? 'connected' : 'disconnected')
+      const data = await res.json()
+      if (data.connected) {
+        setConnectionStatus('connected')
+        setConnectionDetail(data.session ? `Sessão: ${data.session}` : 'WhatsApp conectado e funcionando')
       } else {
         setConnectionStatus('disconnected')
+        setConnectionDetail(data.reason ?? 'Não foi possível conectar')
       }
     } catch {
       setConnectionStatus('disconnected')
+      setConnectionDetail('Erro de rede ao verificar status')
     } finally {
       setCheckingStatus(false)
     }
@@ -298,12 +302,24 @@ function WhatsAppTab() {
         const res = await fetch('/api/profile', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify({
+            whatsappToken: data.whatsappToken ?? '',
+            zapiInstanceId: data.zapiInstanceId ?? '',
+          }),
         })
-        if (!res.ok) throw new Error()
-        toast({ title: 'Configurações WhatsApp salvas!' })
-      } catch {
-        toast({ title: 'Erro ao salvar configurações', variant: 'destructive' })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err.error ?? 'Erro desconhecido')
+        }
+        toast({ title: 'Credenciais WhatsApp salvas!', description: 'Clique em "Verificar" para testar a conexão.' })
+        setConnectionStatus('unknown')
+        setConnectionDetail('')
+      } catch (err) {
+        toast({
+          title: 'Erro ao salvar credenciais',
+          description: err instanceof Error ? err.message : 'Tente novamente.',
+          variant: 'destructive',
+        })
       }
     })
   }
@@ -332,10 +348,10 @@ function WhatsAppTab() {
               <p className="text-sm font-medium text-gray-900">Status da conexão</p>
               <p className="text-xs text-gray-500">
                 {connectionStatus === 'connected'
-                  ? 'WhatsApp conectado e funcionando'
+                  ? connectionDetail || 'WhatsApp conectado e funcionando'
                   : connectionStatus === 'disconnected'
-                  ? 'Não conectado – verifique as credenciais'
-                  : 'Status desconhecido'}
+                  ? connectionDetail || 'Não conectado – verifique as credenciais'
+                  : 'Salve as credenciais e clique em "Verificar"'}
               </p>
             </div>
           </div>
