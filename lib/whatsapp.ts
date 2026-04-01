@@ -1,64 +1,50 @@
-// Integração com Z-API para envio de mensagens WhatsApp
-// Cada profissional usa as suas próprias credenciais Z-API
+// Integração centralizada com Twilio WhatsApp Business API
+// Variáveis de ambiente necessárias:
+//   TWILIO_ACCOUNT_SID   — Account SID (começa com AC)
+//   TWILIO_AUTH_TOKEN    — Auth Token
+//   TWILIO_WHATSAPP_NUMBER — Número aprovado, ex: whatsapp:+14155238886
 
-export interface WhatsAppCredentials {
-  instanceId: string
-  instanceToken: string
-  clientToken?: string  // Security Token — usa instanceToken como fallback
+import twilio from 'twilio'
+
+function getClient() {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID
+  const authToken = process.env.TWILIO_AUTH_TOKEN
+  if (!accountSid || !authToken) return null
+  return twilio(accountSid, authToken)
 }
 
-interface SendMessageParams {
-  phone: string
-  message: string
-  credentials: WhatsAppCredentials
+function formatPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '')
+  const withCountry = digits.startsWith('55') ? digits : `55${digits}`
+  return `whatsapp:+${withCountry}`
 }
 
 export async function sendWhatsAppMessage({
   phone,
   message,
-  credentials,
-}: SendMessageParams): Promise<boolean> {
-  const { instanceId, instanceToken, clientToken } = credentials
+}: {
+  phone: string
+  message: string
+}): Promise<boolean> {
+  const client = getClient()
+  const from = process.env.TWILIO_WHATSAPP_NUMBER
 
-  if (!instanceId || !instanceToken) {
-    console.warn('[WhatsApp] Credenciais não configuradas para este profissional')
+  if (!client || !from) {
+    console.warn('[WhatsApp] Twilio não configurado (TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / TWILIO_WHATSAPP_NUMBER)')
     return false
   }
 
   try {
-    const formattedPhone = formatPhone(phone)
-    const authToken = clientToken || instanceToken
-
-    const response = await fetch(
-      `https://api.z-api.io/instances/${instanceId}/token/${instanceToken}/send-text`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Client-Token': authToken,
-        },
-        body: JSON.stringify({ phone: formattedPhone, message }),
-        signal: AbortSignal.timeout(10000),
-      },
-    )
-
-    if (!response.ok) {
-      console.error('[WhatsApp] Erro ao enviar:', await response.text())
-      return false
-    }
-
+    await client.messages.create({
+      from,
+      to: formatPhone(phone),
+      body: message,
+    })
     return true
   } catch (error) {
-    console.error('[WhatsApp] Erro na integração:', error)
+    console.error('[WhatsApp] Erro ao enviar mensagem:', error)
     return false
   }
-}
-
-// Formata número para padrão E.164 com DDI Brasil
-function formatPhone(phone: string): string {
-  const digits = phone.replace(/\D/g, '')
-  if (digits.startsWith('55')) return digits
-  return `55${digits}`
 }
 
 // Templates de mensagens em português

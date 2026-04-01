@@ -1,33 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { sendWhatsAppMessage, type WhatsAppCredentials } from '@/lib/whatsapp'
-
-// ── Z-API webhook payload types ────────────────────────────────────────────────
-
-interface ZApiMessage {
-  phone: string
-  isGroup: boolean
-  isStatusReply: boolean
-  momment: number
-  type: 'ReceivedCallback' | string
-  text?: { message: string }
-  image?: { caption?: string }
-  audio?: unknown
-  document?: unknown
-  video?: unknown
-}
+import { sendWhatsAppMessage } from '@/lib/whatsapp'
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function normalizePhone(phone: string): string {
-  const digits = phone.replace(/\D/g, '')
+  // Strip whatsapp: prefix if present
+  const raw = phone.replace(/^whatsapp:\+?/, '')
+  const digits = raw.replace(/\D/g, '')
+  // Remove Brazil country code (55) prefix to match DB storage format
   if (digits.startsWith('55') && digits.length > 11) return digits.slice(2)
   return digits
-}
-
-function extractTextMessage(body: ZApiMessage): string | null {
-  if (body.text?.message) return body.text.message.trim()
-  return null
 }
 
 async function findCustomerAndProfessional(phone: string) {
@@ -41,9 +24,6 @@ async function findCustomerAndProfessional(phone: string) {
         select: {
           id: true,
           businessName: true,
-          zapiInstanceId: true,
-          whatsappToken: true,
-          zapiClientToken: true,
         },
       },
     },
@@ -62,19 +42,6 @@ async function getNextAppointment(customerId: string) {
   })
 }
 
-function getCredentials(pro: {
-  zapiInstanceId: string | null
-  whatsappToken: string | null
-  zapiClientToken: string | null
-}): WhatsAppCredentials | null {
-  if (!pro.zapiInstanceId || !pro.whatsappToken) return null
-  return {
-    instanceId: pro.zapiInstanceId,
-    instanceToken: pro.whatsappToken,
-    clientToken: pro.zapiClientToken ?? undefined,
-  }
-}
-
 function buildHelpMessage(businessName: string): string {
   return `Olá! 👋 Você está falando com o sistema automático de *${businessName}*.
 
@@ -87,41 +54,40 @@ Se precisar de ajuda humana, entre em contato diretamente com o estabelecimento.
 // ── Webhook handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  let body: ZApiMessage
+  // Twilio sends form-encoded data
+  let formData: URLSearchParams
   try {
-    body = await req.json()
+    const text = await req.text()
+    formData = new URLSearchParams(text)
   } catch {
-    return NextResponse.json({ error: 'Payload inválido' }, { status: 400 })
+    return new NextResponse('ok', { status: 200 })
   }
 
-  if (body.isGroup || body.isStatusReply) return NextResponse.json({ ok: true })
+  const from = formData.get('From') ?? ''
+  const messageText = (formData.get('Body') ?? '').trim()
 
-  const messageText = extractTextMessage(body)
-  if (!messageText) return NextResponse.json({ ok: true })
+  if (!from || !messageText) {
+    return new NextResponse('ok', { status: 200 })
+  }
 
-  const phone = body.phone
-  const command = messageText.toUpperCase().trim()
+  const command = messageText.toUpperCase()
 
   try {
-    const customer = await findCustomerAndProfessional(phone)
+    const customer = await findCustomerAndProfessional(from)
 
     if (!customer) {
-      // Can't determine which professional's Z-API to reply through — skip
-      return NextResponse.json({ ok: true })
+      return new NextResponse('ok', { status: 200 })
     }
 
     const { professional } = customer
-    const credentials = getCredentials(professional)
-
-    // No credentials configured — can't reply
-    if (!credentials) return NextResponse.json({ ok: true })
+    // Extract phone digits for reply (Twilio formatPhone in lib/whatsapp handles country code)
+    const replyPhone = normalizePhone(from)
 
     if (command === 'HORARIO' || command === 'HORÁRIO') {
       const next = await getNextAppointment(customer.id)
       if (!next) {
         await sendWhatsAppMessage({
-          phone,
-          credentials,
+          phone: replyPhone,
           message: `Olá ${customer.name}! 😊\n\nVocê não possui agendamentos futuros em *${professional.businessName}*.\n\nAcesse nosso link para agendar um novo horário!`,
         })
       } else {
@@ -130,8 +96,7 @@ export async function POST(req: NextRequest) {
         const date = format(new Date(next.scheduledAt), 'dd/MM/yyyy', { locale: ptBR })
         const time = format(new Date(next.scheduledAt), 'HH:mm')
         await sendWhatsAppMessage({
-          phone,
-          credentials,
+          phone: replyPhone,
           message: `Olá ${customer.name}! 📅\n\nSeu próximo agendamento em *${professional.businessName}*:\n\n📋 Serviço: ${next.service.name}\n📅 Data: ${date}\n🕐 Horário: ${time}\n\nAté lá! 😊`,
         })
       }
@@ -139,8 +104,7 @@ export async function POST(req: NextRequest) {
       const next = await getNextAppointment(customer.id)
       if (!next) {
         await sendWhatsAppMessage({
-          phone,
-          credentials,
+          phone: replyPhone,
           message: `Olá ${customer.name}! Não encontramos agendamentos futuros para cancelar. 😊`,
         })
       } else {
@@ -152,15 +116,13 @@ export async function POST(req: NextRequest) {
         const date = format(new Date(next.scheduledAt), 'dd/MM/yyyy')
         const time = format(new Date(next.scheduledAt), 'HH:mm')
         await sendWhatsAppMessage({
-          phone,
-          credentials,
+          phone: replyPhone,
           message: `Olá ${customer.name}! ✅\n\nSeu agendamento de *${next.service.name}* em ${date} às ${time} foi *cancelado*.\n\nSe quiser reagendar, acesse nosso link. Até mais! 😊`,
         })
       }
     } else {
       await sendWhatsAppMessage({
-        phone,
-        credentials,
+        phone: replyPhone,
         message: buildHelpMessage(professional.businessName ?? ''),
       })
     }
@@ -168,10 +130,10 @@ export async function POST(req: NextRequest) {
     console.error('[WhatsApp Webhook] Erro:', err)
   }
 
-  return NextResponse.json({ ok: true })
+  return new NextResponse('ok', { status: 200 })
 }
 
-// Z-API sends GET to verify the webhook endpoint
+// Twilio may send GET to verify the webhook endpoint
 export async function GET() {
   return NextResponse.json({ status: 'webhook ativo' })
 }

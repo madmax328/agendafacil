@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -9,44 +8,40 @@ export async function GET() {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
-  const professional = await prisma.professional.findUnique({
-    where: { id: session.user.id },
-    select: { zapiInstanceId: true, whatsappToken: true, zapiClientToken: true },
-  })
+  const accountSid = process.env.TWILIO_ACCOUNT_SID?.trim()
+  const authToken = process.env.TWILIO_AUTH_TOKEN?.trim()
+  const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER?.trim()
 
-  const instanceId = professional?.zapiInstanceId?.trim()
-  const instanceToken = professional?.whatsappToken?.trim()
-  // Client-Token (Security Token) — falls back to instance token if not set separately
-  const clientToken = professional?.zapiClientToken?.trim() || instanceToken
-
-  if (!instanceId || !instanceToken) {
+  if (!accountSid || !authToken || !whatsappNumber) {
     return NextResponse.json({
       connected: false,
-      reason: 'Credenciais não configuradas. Preencha o ID da instância, o Token e o Client-Token, depois salve.',
+      reason: 'Twilio não configurado no servidor (TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / TWILIO_WHATSAPP_NUMBER).',
     })
   }
 
+  // Validate credentials by calling Twilio's account endpoint
   try {
+    const credentials = Buffer.from(`${accountSid}:${authToken}`).toString('base64')
     const res = await fetch(
-      `https://api.z-api.io/instances/${instanceId}/token/${instanceToken}/status`,
+      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}.json`,
       {
-        headers: { 'Client-Token': clientToken ?? '' },
+        headers: { Authorization: `Basic ${credentials}` },
         signal: AbortSignal.timeout(8000),
       },
     )
 
     if (!res.ok) {
-      const text = await res.text().catch(() => '')
       return NextResponse.json({
         connected: false,
-        reason: `Erro Z-API ${res.status}: ${text || 'resposta inválida'}`,
+        reason: `Credenciais Twilio inválidas (HTTP ${res.status})`,
       })
     }
 
     const data = await res.json()
     return NextResponse.json({
-      connected: data.connected === true,
-      session: data.session ?? null,
+      connected: true,
+      accountName: data.friendly_name ?? accountSid,
+      whatsappNumber,
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erro desconhecido'

@@ -141,9 +141,6 @@ export async function POST(
       city: true,
       state: true,
       plan: true,
-      zapiInstanceId: true,
-      whatsappToken: true,
-      zapiClientToken: true,
     },
   })
 
@@ -233,11 +230,7 @@ export async function POST(
   })
 
   // Send WhatsApp confirmation — only for STARTER and PRO plans
-  if (
-    (professional.plan === 'STARTER' || professional.plan === 'PRO') &&
-    professional.zapiInstanceId &&
-    professional.whatsappToken
-  ) {
+  if (professional.plan === 'STARTER' || professional.plan === 'PRO') {
     const address = [professional.address, professional.city, professional.state]
       .filter(Boolean).join(', ')
 
@@ -251,11 +244,6 @@ export async function POST(
         time: format(scheduledAt, 'HH:mm'),
         address: address || undefined,
       }),
-      credentials: {
-        instanceId: professional.zapiInstanceId,
-        instanceToken: professional.whatsappToken,
-        clientToken: professional.zapiClientToken ?? undefined,
-      },
     })
   }
 

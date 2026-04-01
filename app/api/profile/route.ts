@@ -12,9 +12,6 @@ const updateProfileSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   pixKey: z.string().optional(),
-  whatsappToken: z.string().optional(),
-  zapiInstanceId: z.string().optional(),
-  zapiClientToken: z.string().optional(),
 })
 
 export async function GET() {
@@ -35,9 +32,6 @@ export async function GET() {
       city: true,
       state: true,
       pixKey: true,
-      whatsappToken: true,
-      zapiInstanceId: true,
-      zapiClientToken: true,
       slug: true,
       plan: true,
     },

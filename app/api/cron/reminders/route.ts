@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { sendWhatsAppMessage, whatsappTemplates, type WhatsAppCredentials } from '@/lib/whatsapp'
+import { sendWhatsAppMessage, whatsappTemplates } from '@/lib/whatsapp'
 import { addHours, addDays, startOfDay, endOfDay, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -20,21 +20,6 @@ function isAuthorized(req: NextRequest): boolean {
   }
 
   return token === cronSecret
-}
-
-// ── Plan helpers ───────────────────────────────────────────────────────────────
-
-function getCredentials(pro: {
-  zapiInstanceId: string | null
-  whatsappToken: string | null
-  zapiClientToken: string | null
-}): WhatsAppCredentials | null {
-  if (!pro.zapiInstanceId || !pro.whatsappToken) return null
-  return {
-    instanceId: pro.zapiInstanceId,
-    instanceToken: pro.whatsappToken,
-    clientToken: pro.zapiClientToken ?? undefined,
-  }
 }
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -71,9 +56,6 @@ async function sendDayBeforeReminders(now: Date): Promise<ReminderResult[]> {
           address: true,
           city: true,
           state: true,
-          zapiInstanceId: true,
-          whatsappToken: true,
-          zapiClientToken: true,
         },
       },
     },
@@ -82,18 +64,11 @@ async function sendDayBeforeReminders(now: Date): Promise<ReminderResult[]> {
   const results: ReminderResult[] = []
 
   for (const appt of appointments) {
-    const credentials = getCredentials(appt.professional)
-
     // Mark as sent regardless to avoid duplicate attempts
     await prisma.appointment.update({
       where: { id: appt.id },
       data: { reminderDayBefore: true },
     })
-
-    if (!credentials) {
-      results.push({ appointmentId: appt.id, customerName: appt.customer.name, type: 'J-1', sent: false, skipped: 'sem credenciais Z-API' })
-      continue
-    }
 
     const address = [appt.professional.address, appt.professional.city, appt.professional.state]
       .filter(Boolean).join(', ')
@@ -107,7 +82,6 @@ async function sendDayBeforeReminders(now: Date): Promise<ReminderResult[]> {
         time: format(new Date(appt.scheduledAt), 'HH:mm'),
         address: address || undefined,
       }),
-      credentials,
     })
 
     results.push({ appointmentId: appt.id, customerName: appt.customer.name, type: 'J-1', sent })
@@ -140,9 +114,6 @@ async function sendTwoHourReminders(now: Date): Promise<ReminderResult[]> {
           address: true,
           city: true,
           state: true,
-          zapiInstanceId: true,
-          whatsappToken: true,
-          zapiClientToken: true,
         },
       },
     },
@@ -151,17 +122,10 @@ async function sendTwoHourReminders(now: Date): Promise<ReminderResult[]> {
   const results: ReminderResult[] = []
 
   for (const appt of appointments) {
-    const credentials = getCredentials(appt.professional)
-
     await prisma.appointment.update({
       where: { id: appt.id },
       data: { reminderTwoHours: true },
     })
-
-    if (!credentials) {
-      results.push({ appointmentId: appt.id, customerName: appt.customer.name, type: 'H-2', sent: false, skipped: 'sem credenciais Z-API' })
-      continue
-    }
 
     const address = [appt.professional.address, appt.professional.city, appt.professional.state]
       .filter(Boolean).join(', ')
@@ -175,7 +139,6 @@ async function sendTwoHourReminders(now: Date): Promise<ReminderResult[]> {
         time: format(new Date(appt.scheduledAt), 'HH:mm'),
         address: address || undefined,
       }),
-      credentials,
     })
 
     results.push({ appointmentId: appt.id, customerName: appt.customer.name, type: 'H-2', sent })

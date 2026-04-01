@@ -1,6 +1,7 @@
 'use client'
 
 import { type ReactNode, useState, useEffect, useTransition } from 'react'
+import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -14,6 +15,9 @@ import {
   XCircle,
   AlertCircle,
   RefreshCw,
+  Crown,
+  Zap,
+  Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -71,14 +75,7 @@ const profileSchema = z.object({
   pixKey: z.string().optional(),
 })
 
-const whatsappSchema = z.object({
-  zapiInstanceId: z.string().optional(),
-  whatsappToken: z.string().optional(),
-  zapiClientToken: z.string().optional(),
-})
-
 type ProfileFormData = z.infer<typeof profileSchema>
-type WhatsappFormData = z.infer<typeof whatsappSchema>
 
 interface AvailabilityRow {
   dayOfWeek: number
@@ -252,34 +249,38 @@ function PerfilTab() {
 
 // ── WhatsApp Tab ───────────────────────────────────────────────────────────────
 
+const PLAN_WHATSAPP_FEATURES: Record<string, { label: string; available: boolean }[]> = {
+  FREE: [
+    { label: 'Confirmação via WhatsApp', available: false },
+    { label: 'Lembrete J-1 (dia anterior)', available: false },
+    { label: 'Lembrete H-2 (2 horas antes)', available: false },
+  ],
+  STARTER: [
+    { label: 'Confirmação via WhatsApp', available: true },
+    { label: 'Lembrete J-1 (dia anterior)', available: false },
+    { label: 'Lembrete H-2 (2 horas antes)', available: false },
+  ],
+  PRO: [
+    { label: 'Confirmação via WhatsApp', available: true },
+    { label: 'Lembrete J-1 (dia anterior)', available: true },
+    { label: 'Lembrete H-2 (2 horas antes)', available: true },
+  ],
+}
+
+const PLAN_ICON: Record<string, ReactNode> = {
+  FREE: <Sparkles className="h-5 w-5 text-gray-500" />,
+  STARTER: <Zap className="h-5 w-5 text-blue-500" />,
+  PRO: <Crown className="h-5 w-5 text-purple-500" />,
+}
+
 function WhatsAppTab() {
-  const [isPending, startTransition] = useTransition()
+  const { data: session } = useSession()
   const [connectionStatus, setConnectionStatus] = useState<'unknown' | 'connected' | 'disconnected'>('unknown')
   const [connectionDetail, setConnectionDetail] = useState<string>('')
   const [checkingStatus, setCheckingStatus] = useState(false)
-  const { toast } = useToast()
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<WhatsappFormData>({ resolver: zodResolver(whatsappSchema) })
-
-  useEffect(() => {
-    async function load() {
-      const res = await fetch('/api/profile')
-      if (res.ok) {
-        const data = await res.json()
-        reset({
-        zapiInstanceId: data.zapiInstanceId ?? '',
-        whatsappToken: data.whatsappToken ?? '',
-        zapiClientToken: data.zapiClientToken ?? '',
-      })
-      }
-    }
-    load()
-  }, [reset])
+  const plan: string = (session?.user as { plan?: string })?.plan ?? 'FREE'
+  const features = PLAN_WHATSAPP_FEATURES[plan] ?? PLAN_WHATSAPP_FEATURES.FREE
 
   async function checkConnection() {
     setCheckingStatus(true)
@@ -288,7 +289,7 @@ function WhatsAppTab() {
       const data = await res.json()
       if (data.connected) {
         setConnectionStatus('connected')
-        setConnectionDetail(data.session ? `Sessão: ${data.session}` : 'WhatsApp conectado e funcionando')
+        setConnectionDetail(data.accountName ? `Conta: ${data.accountName}` : 'Twilio conectado e funcionando')
       } else {
         setConnectionStatus('disconnected')
         setConnectionDetail(data.reason ?? 'Não foi possível conectar')
@@ -301,46 +302,17 @@ function WhatsAppTab() {
     }
   }
 
-  function onSubmit(data: WhatsappFormData) {
-    startTransition(async () => {
-      try {
-        const res = await fetch('/api/profile', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            zapiInstanceId: data.zapiInstanceId ?? '',
-            whatsappToken: data.whatsappToken ?? '',
-            zapiClientToken: data.zapiClientToken ?? '',
-          }),
-        })
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}))
-          throw new Error(err.error ?? 'Erro desconhecido')
-        }
-        toast({ title: 'Credenciais WhatsApp salvas!', description: 'Clique em "Verificar" para testar a conexão.' })
-        setConnectionStatus('unknown')
-        setConnectionDetail('')
-      } catch (err) {
-        toast({
-          title: 'Erro ao salvar credenciais',
-          description: err instanceof Error ? err.message : 'Tente novamente.',
-          variant: 'destructive',
-        })
-      }
-    })
-  }
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
         <div>
-          <h3 className="text-base font-semibold text-gray-900">Integração Z-API</h3>
+          <h3 className="text-base font-semibold text-gray-900">WhatsApp — Twilio Business API</h3>
           <p className="text-sm text-gray-500 mt-1">
-            Configure a integração com Z-API para enviar confirmações e lembretes via WhatsApp.
+            O envio de mensagens é gerenciado pela plataforma. Não é necessário nenhuma configuração adicional da sua parte.
           </p>
         </div>
 
-        {/* Status indicator */}
+        {/* Connection status */}
         <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50">
           <div className="flex items-center gap-3">
             {connectionStatus === 'connected' ? (
@@ -351,13 +323,13 @@ function WhatsAppTab() {
               <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
             )}
             <div>
-              <p className="text-sm font-medium text-gray-900">Status da conexão</p>
+              <p className="text-sm font-medium text-gray-900">Status do serviço</p>
               <p className="text-xs text-gray-500">
                 {connectionStatus === 'connected'
-                  ? connectionDetail || 'WhatsApp conectado e funcionando'
+                  ? connectionDetail
                   : connectionStatus === 'disconnected'
-                  ? connectionDetail || 'Não conectado – verifique as credenciais'
-                  : 'Salve as credenciais e clique em "Verificar"'}
+                  ? connectionDetail
+                  : 'Clique em "Verificar" para testar'}
               </p>
             </div>
           </div>
@@ -378,67 +350,39 @@ function WhatsAppTab() {
           </Button>
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="zapiInstanceId" className="text-gray-700 font-medium">
-            ID da instância Z-API
-          </Label>
-          <Input
-            id="zapiInstanceId"
-            placeholder="Ex: 3ABC12345"
-            {...register('zapiInstanceId')}
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="whatsappToken" className="text-gray-700 font-medium">
-            Token da instância
-          </Label>
-          <Input
-            id="whatsappToken"
-            type="password"
-            placeholder="Token mostrado na página da instância"
-            {...register('whatsappToken')}
-          />
-          <p className="text-xs text-gray-400">Encontrado na página da sua instância em app.z-api.io</p>
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="zapiClientToken" className="text-gray-700 font-medium">
-            Client-Token <span className="text-gray-400 font-normal">(Security Token)</span>
-          </Label>
-          <Input
-            id="zapiClientToken"
-            type="password"
-            placeholder="Security Token da sua conta Z-API"
-            {...register('zapiClientToken')}
-          />
-          <p className="text-xs text-gray-400">
-            Encontrado em <span className="font-mono">app.z-api.io → Segurança → Security Token</span>
-          </p>
-        </div>
-
-        <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-700 space-y-2">
-          <p className="font-semibold">Como obter suas credenciais Z-API:</p>
-          <ol className="list-decimal list-inside space-y-1 text-blue-600">
-            <li>Acesse <span className="font-mono text-xs">app.z-api.io</span> e entre na sua instância</li>
-            <li>Copie o <strong>ID da instância</strong> e o <strong>Token</strong> da página principal</li>
-            <li>Vá em <strong>Segurança</strong> e copie o <strong>Security Token</strong> (Client-Token)</li>
-            <li>Cole os três valores acima, salve e clique em "Verificar"</li>
-          </ol>
+        {/* Plan features */}
+        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50 space-y-3">
+          <div className="flex items-center gap-2">
+            {PLAN_ICON[plan]}
+            <p className="text-sm font-semibold text-gray-900">
+              Recursos do plano {plan === 'FREE' ? 'Grátis' : plan.charAt(0) + plan.slice(1).toLowerCase()}
+            </p>
+          </div>
+          <ul className="space-y-2">
+            {features.map((f) => (
+              <li key={f.label} className="flex items-center gap-2.5">
+                <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${f.available ? 'bg-green-100' : 'bg-gray-100'}`}>
+                  <CheckCircle2 className={`h-3 w-3 ${f.available ? 'text-green-600' : 'text-gray-300'}`} />
+                </div>
+                <span className={`text-sm ${f.available ? 'text-gray-700' : 'text-gray-400 line-through'}`}>
+                  {f.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {plan === 'FREE' && (
+            <p className="text-xs text-blue-600 font-medium pt-1">
+              Faça upgrade para o plano Starter ou Pro para ativar o envio automático de mensagens.
+            </p>
+          )}
+          {plan === 'STARTER' && (
+            <p className="text-xs text-purple-600 font-medium pt-1">
+              Faça upgrade para o plano Pro para ativar os lembretes automáticos (J-1 e H-2).
+            </p>
+          )}
         </div>
       </div>
-
-      <div className="flex justify-end">
-        <Button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
-          disabled={isPending}
-        >
-          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Salvar WhatsApp
-        </Button>
-      </div>
-    </form>
+    </div>
   )
 }
 
