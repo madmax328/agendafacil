@@ -1,30 +1,73 @@
 import Link from 'next/link'
+import { prisma } from '@/lib/prisma'
 import {
   Calendar,
-  MessageCircle,
-  CreditCard,
-  BarChart3,
-  Check,
-  ArrowRight,
+  Search,
+  MapPin,
   Star,
-  Clock,
-  Users,
+  ArrowRight,
   Scissors,
   Stethoscope,
   Brain,
+  Smile,
+  Dumbbell,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react'
 
 export const metadata = {
-  title: 'AgendaFácil – Agendamento Online para Profissionais de Saúde e Beleza',
+  title: 'AgendaFácil – Agende Online com os Melhores Profissionais',
   description:
-    'Pare de gerenciar seus agendamentos pelo WhatsApp. Tenha uma agenda online profissional com lembretes automáticos e pagamento Pix integrado.',
+    'Encontre salões, clínicas, dentistas, psicólogos e muito mais perto de você. Agende online 24h, sem precisar ligar ou mandar mensagem.',
 }
 
-export default function LandingPage() {
+const CATEGORIES = [
+  { value: 'salao', label: 'Salão de Beleza', emoji: '💇', color: 'bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100' },
+  { value: 'barbearia', label: 'Barbearia', emoji: '✂️', color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
+  { value: 'dentista', label: 'Dentista', emoji: '🦷', color: 'bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-100' },
+  { value: 'psicologo', label: 'Psicólogo', emoji: '🧠', color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' },
+  { value: 'clinica', label: 'Clínica', emoji: '🏥', color: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' },
+  { value: 'estetica', label: 'Estética', emoji: '✨', color: 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100' },
+  { value: 'massagem', label: 'Massagem', emoji: '💆', color: 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100' },
+  { value: 'nutricionista', label: 'Nutricionista', emoji: '🥗', color: 'bg-lime-50 text-lime-700 border-lime-200 hover:bg-lime-100' },
+]
+
+async function getFeaturedProfessionals() {
+  return prisma.professional.findMany({
+    where: { slug: { not: null } },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      businessName: true,
+      businessType: true,
+      city: true,
+      state: true,
+      _count: { select: { services: { where: { active: true } } } },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 6,
+  })
+}
+
+const TYPE_EMOJI: Record<string, string> = {
+  salao: '💇', barbearia: '✂️', clinica: '🏥', dentista: '🦷',
+  psicologo: '🧠', estetica: '✨', massagem: '💆', nutricionista: '🥗',
+  fisioterapia: '🦴', outros: '📋',
+}
+const TYPE_LABEL: Record<string, string> = {
+  salao: 'Salão de Beleza', barbearia: 'Barbearia', clinica: 'Clínica',
+  dentista: 'Dentista', psicologo: 'Psicólogo', estetica: 'Estética',
+  massagem: 'Massagem', nutricionista: 'Nutricionista', fisioterapia: 'Fisioterapia', outros: 'Profissional',
+}
+
+export default async function HomePage() {
+  const featured = await getFeaturedProfessionals()
+
   return (
     <div className="min-h-screen bg-white">
       {/* ── NAVBAR ── */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             <div className="bg-blue-600 rounded-lg p-1.5">
@@ -32,174 +75,152 @@ export default function LandingPage() {
             </div>
             <span className="text-xl font-bold text-gray-900">AgendaFácil</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <a href="#funcionalidades" className="hover:text-blue-600 transition-colors">Funcionalidades</a>
-            <a href="#planos" className="hover:text-blue-600 transition-colors">Planos</a>
-            <a href="#depoimentos" className="hover:text-blue-600 transition-colors">Depoimentos</a>
-            <Link href="/profissionais" className="hover:text-blue-600 transition-colors">Encontrar profissional</Link>
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
+            <Link href="/profissionais" className="hover:text-blue-600 transition-colors">Explorar profissionais</Link>
+            <Link href="/para-profissionais" className="hover:text-blue-600 transition-colors">Para profissionais</Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
-            >
+            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
               Entrar
             </Link>
             <Link
-              href="/cadastro"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+              href="/para-profissionais"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
             >
-              Começar grátis
+              Cadastre seu negócio
             </Link>
           </div>
         </div>
       </header>
 
       {/* ── HERO ── */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-28 text-center">
+      <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-20 md:py-28 text-center">
           <div className="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
             <Star className="h-4 w-4 text-yellow-300 fill-yellow-300" />
-            Mais de 500 profissionais já usam o AgendaFácil
+            Agende online 24h, sem precisar ligar
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-            Chega de gerenciar
+          <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-5">
+            Encontre e agende
             <br />
-            <span className="text-blue-200">agenda pelo WhatsApp</span>
+            <span className="text-blue-200">com quem você confia</span>
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Tenha sua página de agendamento online em minutos. Seus clientes marcam
-            horário 24h, você recebe lembretes automáticos e ninguém esquece mais.
+            Salões, clínicas, dentistas, psicólogos e muito mais.
+            Escolha o horário que quiser e confirme em segundos.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/cadastro"
-              className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50 font-semibold px-8 py-4 rounded-xl text-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
+
+          {/* Search bar */}
+          <form action="/profissionais" method="get" className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              <input
+                name="q"
+                type="text"
+                placeholder="Busque por serviço ou profissional..."
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-lg"
+              />
+            </div>
+            <div className="relative sm:w-44">
+              <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              <input
+                name="cidade"
+                type="text"
+                placeholder="Cidade..."
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-lg"
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-white text-blue-700 hover:bg-blue-50 font-semibold px-7 py-3.5 rounded-xl transition-colors shadow-lg shrink-0"
             >
-              Criar minha agenda grátis
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-            <p className="text-blue-200 text-sm">Grátis para sempre • Sem cartão de crédito</p>
-          </div>
+              Buscar
+            </button>
+          </form>
+        </div>
+      </section>
 
-          {/* Tipos de profissionais */}
-          <div className="mt-14 flex flex-wrap justify-center gap-4">
-            {[
-              { icon: Scissors, label: 'Salão de Beleza' },
-              { icon: Stethoscope, label: 'Clínica' },
-              { icon: Stethoscope, label: 'Dentista' },
-              { icon: Brain, label: 'Psicólogo' },
-              { icon: Users, label: 'Personal Trainer' },
-            ].map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 text-sm">
-                <Icon className="h-4 w-4 text-blue-200" />
-                <span>{label}</span>
-              </div>
+      {/* ── CATEGORIAS ── */}
+      <section className="py-12 bg-gray-50 border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <p className="text-center text-sm font-medium text-gray-500 mb-6">Navegue por categoria</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            {CATEGORIES.map((cat) => (
+              <Link
+                key={cat.value}
+                href={`/profissionais?tipo=${cat.value}`}
+                className={`flex flex-col items-center gap-2 border rounded-xl py-4 px-2 text-xs font-medium transition-colors text-center ${cat.color}`}
+              >
+                <span className="text-2xl">{cat.emoji}</span>
+                {cat.label}
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── PROBLEMA ── */}
-      <section className="bg-gray-50 py-16">
+      {/* ── PROFISSIONAIS EM DESTAQUE ── */}
+      {featured.length > 0 && (
+        <section className="py-16">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-gray-900">Profissionais em destaque</h2>
+              <Link href="/profissionais" className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                Ver todos <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {featured.map((pro) => {
+                const emoji = TYPE_EMOJI[pro.businessType] ?? '📋'
+                const typeLabel = TYPE_LABEL[pro.businessType] ?? 'Profissional'
+                const location = [pro.city, pro.state].filter(Boolean).join(', ')
+                return (
+                  <Link
+                    key={pro.id}
+                    href={`/${pro.slug}`}
+                    className="flex items-start gap-4 bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-blue-200 transition-all group"
+                  >
+                    <div className="text-3xl shrink-0 bg-gray-50 rounded-xl w-14 h-14 flex items-center justify-center">
+                      {emoji}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-gray-900 truncate group-hover:text-blue-700 transition-colors">
+                        {pro.businessName || pro.name || 'Sem nome'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">{typeLabel}</p>
+                      {location && (
+                        <div className="flex items-center gap-1 text-xs text-gray-400 mt-1.5">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          {location}
+                        </div>
+                      )}
+                      <p className="text-xs text-blue-600 font-medium mt-2">
+                        {pro._count.services} serviço{pro._count.services !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-blue-400 transition-colors shrink-0 mt-1" />
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── COMO FUNCIONA (cliente) ── */}
+      <section className="bg-blue-50 py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Você se reconhece nessa situação?
-          </h2>
-          <p className="text-gray-500 mb-10">Os maiores problemas de quem gerencia agenda pelo WhatsApp</p>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { emoji: '😤', title: 'Mensagens sem fim', desc: 'Horas por dia respondendo "que horário tem?" no WhatsApp' },
-              { emoji: '😱', title: 'Clientes que não aparecem', desc: 'No-shows frequentes que fazem você perder tempo e dinheiro' },
-              { emoji: '😰', title: 'Agenda desorganizada', desc: 'Horários marcados em papel, caderno e cabeça — fácil de errar' },
-            ].map(({ emoji, title, desc }) => (
-              <div key={title} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-left">
-                <div className="text-3xl mb-3">{emoji}</div>
-                <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FUNCIONALIDADES ── */}
-      <section id="funcionalidades" className="py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Tudo que você precisa em um só lugar
-            </h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-              Desenvolvido especialmente para profissionais autônomos e pequenas clínicas no Brasil
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Calendar,
-                color: 'bg-blue-100 text-blue-600',
-                title: 'Agenda Online 24h',
-                desc: 'Seus clientes marcam horário a qualquer hora pelo celular, sem precisar falar com você.',
-              },
-              {
-                icon: MessageCircle,
-                color: 'bg-green-100 text-green-600',
-                title: 'Lembretes pelo WhatsApp',
-                desc: 'Lembrete automático 1 dia antes e 2 horas antes do horário. Adeus no-show!',
-              },
-              {
-                icon: CreditCard,
-                color: 'bg-purple-100 text-purple-600',
-                title: 'Pagamento via Pix',
-                desc: 'Aceite pagamentos antecipados via Pix integrado e elimine cancelamentos de última hora.',
-              },
-              {
-                icon: BarChart3,
-                color: 'bg-orange-100 text-orange-600',
-                title: 'Dashboard completo',
-                desc: 'Veja seus agendamentos, receita do mês e taxa de comparecimento em tempo real.',
-              },
-              {
-                icon: Users,
-                color: 'bg-pink-100 text-pink-600',
-                title: 'Gestão de clientes',
-                desc: 'Histórico completo de cada cliente: serviços, agendamentos e anotações.',
-              },
-              {
-                icon: Clock,
-                color: 'bg-teal-100 text-teal-600',
-                title: 'Disponibilidade flexível',
-                desc: 'Configure seus horários por dia da semana. O sistema bloqueia automaticamente.',
-              },
-            ].map(({ icon: Icon, color, title, desc }) => (
-              <div key={title} className="flex gap-4">
-                <div className={`${color} rounded-xl p-3 h-fit shrink-0`}>
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── COMO FUNCIONA ── */}
-      <section className="bg-blue-50 py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12">Como funciona</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">Como funciona para você</h2>
+          <p className="text-gray-500 mb-12">Agende em menos de 1 minuto, sem criar conta</p>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: '1', title: 'Crie sua conta', desc: 'Cadastre-se em 2 minutos e configure seus serviços e horários disponíveis.' },
-              { step: '2', title: 'Compartilhe seu link', desc: 'Envie seu link personalizado (agendafacil.com/seu-nome) para seus clientes pelo WhatsApp.' },
-              { step: '3', title: 'Receba agendamentos', desc: 'Os clientes marcam sozinhos e você recebe notificação. Lembretes automáticos cuidam do resto.' },
-            ].map(({ step, title, desc }) => (
-              <div key={step} className="text-center">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+              { step: '1', emoji: '🔍', title: 'Encontre o profissional', desc: 'Busque por serviço, tipo ou cidade. Veja os horários disponíveis em tempo real.' },
+              { step: '2', emoji: '📅', title: 'Escolha o horário', desc: 'Selecione o dia e horário que desejar. Veja os serviços e preços disponíveis.' },
+              { step: '3', emoji: '✅', title: 'Confirmação na hora', desc: 'Receba confirmação por e-mail. O profissional cuida do lembrete automático.' },
+            ].map(({ step, emoji, title, desc }) => (
+              <div key={step} className="bg-white rounded-2xl p-6 shadow-sm text-left">
+                <div className="text-3xl mb-4">{emoji}</div>
+                <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold mb-3">
                   {step}
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
@@ -207,147 +228,34 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ── PLANOS ── */}
-      <section id="planos" className="py-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Planos e preços</h2>
-            <p className="text-gray-500 text-lg">Comece de graça. Upgrade quando precisar.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* FREE */}
-            <div className="rounded-2xl border-2 border-gray-200 p-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Gratuito</h3>
-              <p className="text-gray-500 text-sm mb-6">Para testar e começar</p>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">R$0</span>
-                <span className="text-gray-400">/mês</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  '30 agendamentos/mês',
-                  '1 serviço',
-                  'Página de agendamento',
-                  'Confirmação por e-mail',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/cadastro"
-                className="block text-center border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-xl transition-colors"
-              >
-                Começar grátis
-              </Link>
-            </div>
-
-            {/* STARTER */}
-            <div className="rounded-2xl border-2 border-blue-600 p-8 relative shadow-xl">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full">
-                MAIS POPULAR
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Starter</h3>
-              <p className="text-gray-500 text-sm mb-6">Para profissionais em crescimento</p>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">R$99</span>
-                <span className="text-gray-400">/mês</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  '200 agendamentos/mês',
-                  'Serviços ilimitados',
-                  'Lembretes WhatsApp automáticos',
-                  'Gestão de clientes',
-                  'Dashboard de estatísticas',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/cadastro"
-                className="block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors"
-              >
-                Assinar Starter
-              </Link>
-            </div>
-
-            {/* PRO */}
-            <div className="rounded-2xl border-2 border-gray-200 p-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Pro</h3>
-              <p className="text-gray-500 text-sm mb-6">Para clínicas e salões maiores</p>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">R$199</span>
-                <span className="text-gray-400">/mês</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Agendamentos ilimitados',
-                  'Tudo do Starter',
-                  'Pix integrado',
-                  'Analytics avançados',
-                  'Suporte prioritário',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/cadastro"
-                className="block text-center border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-xl transition-colors"
-              >
-                Assinar Pro
-              </Link>
-            </div>
+          <div className="mt-10">
+            <Link
+              href="/profissionais"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-xl transition-colors shadow-md"
+            >
+              Encontrar profissional agora
+              <ArrowRight className="h-5 w-5" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── DEPOIMENTOS ── */}
-      <section id="depoimentos" className="bg-gray-50 py-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-            O que dizem nossos clientes
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
+      {/* ── VANTAGENS PARA CLIENTES ── */}
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">Por que usar o AgendaFácil?</h2>
+          <div className="grid sm:grid-cols-2 gap-6">
             {[
-              {
-                name: 'Ana Paula S.',
-                role: 'Cabeleireira, São Paulo',
-                text: 'Reduzi meus no-shows em 70%! Os lembretes automáticos no WhatsApp mudaram meu negócio.',
-              },
-              {
-                name: 'Dr. Carlos M.',
-                role: 'Psicólogo, Belo Horizonte',
-                text: 'Meus pacientes adoraram poder marcar consulta pelo celular a qualquer hora. Profissional demais!',
-              },
-              {
-                name: 'Fernanda L.',
-                role: 'Esteticista, Rio de Janeiro',
-                text: 'Antes eu passava 2 horas por dia no WhatsApp marcando horários. Agora é automático!',
-              },
-            ].map(({ name, role, text }) => (
-              <div key={name} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex mb-4">
-                  {[1,2,3,4,5].map((i) => (
-                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-4">"{text}"</p>
+              { emoji: '🕐', title: 'Disponível 24h', desc: 'Agende a qualquer hora, inclusive no fim de semana ou de madrugada.' },
+              { emoji: '🔔', title: 'Lembrete automático', desc: 'Receba lembretes para não esquecer seu compromisso.' },
+              { emoji: '📱', title: 'Sem download de app', desc: 'Tudo pelo celular ou computador, diretamente no navegador.' },
+              { emoji: '💳', title: 'Pix integrado', desc: 'Pague com antecedência via Pix e garanta seu horário.' },
+            ].map(({ emoji, title, desc }) => (
+              <div key={title} className="flex items-start gap-4 bg-gray-50 rounded-xl p-5 border border-gray-100">
+                <span className="text-2xl shrink-0">{emoji}</span>
                 <div>
-                  <p className="font-semibold text-gray-900 text-sm">{name}</p>
-                  <p className="text-gray-400 text-xs">{role}</p>
+                  <p className="font-semibold text-gray-900 text-sm">{title}</p>
+                  <p className="text-gray-500 text-sm mt-1 leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -355,28 +263,28 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CTA FINAL ── */}
-      <section className="bg-blue-600 py-20 text-white text-center">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Pronto para simplificar sua agenda?
-          </h2>
-          <p className="text-blue-100 text-lg mb-8">
-            Crie sua conta grátis hoje e tenha sua página de agendamento funcionando em menos de 10 minutos.
-          </p>
+      {/* ── CTA PARA PROFISSIONAIS ── */}
+      <section className="bg-gray-900 py-14 text-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <div>
+            <p className="text-sm font-medium text-blue-400 mb-1">Você é profissional?</p>
+            <h3 className="text-2xl font-bold">Cadastre seu negócio gratuitamente</h3>
+            <p className="text-gray-400 text-sm mt-2">
+              Tenha sua página de agendamento, lembretes automáticos e muito mais.
+            </p>
+          </div>
           <Link
-            href="/cadastro"
-            className="inline-flex items-center gap-2 bg-white text-blue-700 hover:bg-blue-50 font-bold px-10 py-4 rounded-xl text-lg transition-colors shadow-lg"
+            href="/para-profissionais"
+            className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors flex items-center gap-2 shadow-md"
           >
-            Criar minha agenda agora
-            <ArrowRight className="h-5 w-5" />
+            Saiba mais
+            <ArrowRight className="h-4 w-4" />
           </Link>
-          <p className="text-blue-200 text-sm mt-4">Grátis para sempre • Sem cartão de crédito • Setup em 10 minutos</p>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-gray-900 text-gray-400 py-10">
+      <footer className="bg-gray-950 text-gray-500 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-2">
             <div className="bg-blue-600 rounded-lg p-1">
@@ -388,6 +296,7 @@ export default function LandingPage() {
           <div className="flex gap-6">
             <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
             <a href="#" className="hover:text-white transition-colors">Privacidade</a>
+            <Link href="/para-profissionais" className="hover:text-white transition-colors">Para profissionais</Link>
             <Link href="/login" className="hover:text-white transition-colors">Entrar</Link>
           </div>
         </div>
