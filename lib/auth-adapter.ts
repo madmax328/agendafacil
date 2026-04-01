@@ -1,12 +1,12 @@
 // Adapter NextAuth customizado que usa o modelo Professional
 // em vez do modelo User padrão esperado pelo PrismaAdapter
-import type { Adapter } from 'next-auth/adapters'
+import type { Adapter, AdapterUser } from 'next-auth/adapters'
 import { prisma } from '@/lib/prisma'
 
 export function ProfessionalAdapter(): Adapter {
   return {
     // ── Usuário ──────────────────────────────────────────────
-    async createUser(user) {
+    async createUser(user: AdapterUser) {
       return prisma.professional.create({
         data: {
           email: user.email,
