@@ -574,7 +574,9 @@ function Step5Confirmation({ service, date, time, clientInfo, professional, onNe
         </div>
         <h2 className="text-xl font-bold text-gray-900">Agendamento confirmado!</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Você receberá uma confirmação via WhatsApp em breve.
+          {clientInfo.email
+            ? `Confirmação enviada para ${clientInfo.email}`
+            : 'Anote os detalhes abaixo para não esquecer.'}
         </p>
       </div>
 
