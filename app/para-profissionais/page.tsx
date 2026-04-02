@@ -226,15 +226,16 @@ export default function ParaProfissionaisPage() {
               </div>
               <ul className="space-y-3 mb-8">
                 {[
-                  '30 agendamentos/mês',
-                  '1 serviço',
-                  'Página de agendamento',
-                  'Confirmação por e-mail',
-                  '❌ Sem lembretes WhatsApp',
+                  { label: '30 agendamentos/mês', ok: true },
+                  { label: '1 serviço', ok: true },
+                  { label: 'Página de agendamento', ok: true },
+                  { label: 'Confirmação por e-mail', ok: true },
+                  { label: 'Confirmação via WhatsApp', ok: false },
+                  { label: 'Lembretes automáticos', ok: false },
                 ].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className={`h-4 w-4 mt-0.5 shrink-0 ${f.startsWith('❌') ? 'text-gray-300' : 'text-green-500'}`} />
-                    {f}
+                  <li key={f.label} className="flex items-start gap-2 text-sm text-gray-600">
+                    <Check className={`h-4 w-4 mt-0.5 shrink-0 ${f.ok ? 'text-green-500' : 'text-gray-300'}`} />
+                    <span className={f.ok ? '' : 'text-gray-400 line-through'}>{f.label}</span>
                   </li>
                 ))}
               </ul>
@@ -258,7 +259,8 @@ export default function ParaProfissionaisPage() {
                 {[
                   '200 agendamentos/mês',
                   'Serviços ilimitados',
-                  '✅ Confirmação WhatsApp automática',
+                  'Confirmação por e-mail',
+                  'Confirmação via WhatsApp',
                   'Gestão de clientes',
                   'Dashboard de estatísticas',
                 ].map((f) => (
@@ -285,7 +287,8 @@ export default function ParaProfissionaisPage() {
                 {[
                   'Agendamentos ilimitados',
                   'Tudo do Starter',
-                  '✅ Confirmação + 2 lembretes WhatsApp',
+                  'Lembretes automáticos (J-1 e H-2)',
+                  'E-mail + WhatsApp automáticos',
                   'Pix integrado',
                   'Analytics avançados',
                   'Suporte prioritário',
