@@ -251,7 +251,7 @@ export default function ParaProfissionaisPage() {
               <h3 className="text-lg font-bold text-gray-900 mb-1">Starter</h3>
               <p className="text-gray-500 text-sm mb-6">Para profissionais em crescimento</p>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">R$49</span>
+                <span className="text-4xl font-bold text-gray-900">R$39</span>
                 <span className="text-gray-400">/mês</span>
               </div>
               <ul className="space-y-3 mb-8">
@@ -278,7 +278,7 @@ export default function ParaProfissionaisPage() {
               <h3 className="text-lg font-bold text-gray-900 mb-1">Pro</h3>
               <p className="text-gray-500 text-sm mb-6">Para clínicas e salões maiores</p>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">R$97</span>
+                <span className="text-4xl font-bold text-gray-900">R$69</span>
                 <span className="text-gray-400">/mês</span>
               </div>
               <ul className="space-y-3 mb-8">

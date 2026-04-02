@@ -63,7 +63,7 @@ const PLANS: PlanConfig[] = [
   {
     id: 'STARTER',
     name: 'Starter',
-    price: 49,
+    price: 39,
     description: 'Para profissionais que querem crescer com automação.',
     icon: <Zap className="h-6 w-6" />,
     color: 'border-blue-400',
@@ -85,7 +85,7 @@ const PLANS: PlanConfig[] = [
   {
     id: 'PRO',
     name: 'Pro',
-    price: 97,
+    price: 69,
     description: 'Para negócios consolidados que exigem o máximo.',
     icon: <Crown className="h-6 w-6" />,
     color: 'border-purple-400',
