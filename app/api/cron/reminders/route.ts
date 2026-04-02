@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendWhatsAppMessage, whatsappTemplates } from '@/lib/whatsapp'
+import { sendLembreteEmail } from '@/lib/email'
 import { addHours, addDays, startOfDay, endOfDay, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -73,13 +74,27 @@ async function sendDayBeforeReminders(now: Date): Promise<ReminderResult[]> {
     const address = [appt.professional.address, appt.professional.city, appt.professional.state]
       .filter(Boolean).join(', ')
 
+    const lembreteData = {
+      clientName: appt.customer.name,
+      serviceName: appt.service.name,
+      professionalName: appt.professional.businessName,
+      date: format(new Date(appt.scheduledAt), 'dd/MM/yyyy'),
+      time: format(new Date(appt.scheduledAt), 'HH:mm'),
+      address: address || undefined,
+    }
+
+    // Email — todos que tenham email
+    if (appt.customer.email) {
+      await sendLembreteEmail({ ...lembreteData, clientEmail: appt.customer.email }, 'J-1')
+    }
+
     const sent = await sendWhatsAppMessage({
       phone: appt.customer.phone,
       message: whatsappTemplates.lembreteVigilia({
         clientName: appt.customer.name,
         serviceName: appt.service.name,
         professionalName: appt.professional.businessName,
-        time: format(new Date(appt.scheduledAt), 'HH:mm'),
+        time: lembreteData.time,
         address: address || undefined,
       }),
     })
@@ -130,13 +145,27 @@ async function sendTwoHourReminders(now: Date): Promise<ReminderResult[]> {
     const address = [appt.professional.address, appt.professional.city, appt.professional.state]
       .filter(Boolean).join(', ')
 
+    const lembreteData = {
+      clientName: appt.customer.name,
+      serviceName: appt.service.name,
+      professionalName: appt.professional.businessName,
+      date: format(new Date(appt.scheduledAt), 'dd/MM/yyyy'),
+      time: format(new Date(appt.scheduledAt), 'HH:mm'),
+      address: address || undefined,
+    }
+
+    // Email — todos que tenham email
+    if (appt.customer.email) {
+      await sendLembreteEmail({ ...lembreteData, clientEmail: appt.customer.email }, 'H-2')
+    }
+
     const sent = await sendWhatsAppMessage({
       phone: appt.customer.phone,
       message: whatsappTemplates.lembreteDuasHoras({
         clientName: appt.customer.name,
         serviceName: appt.service.name,
         professionalName: appt.professional.businessName,
-        time: format(new Date(appt.scheduledAt), 'HH:mm'),
+        time: lembreteData.time,
         address: address || undefined,
       }),
     })

@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 import { sendWhatsAppMessage, whatsappTemplates } from '@/lib/whatsapp'
+import { sendConfirmacaoEmail } from '@/lib/email'
 import { format } from 'date-fns'
 
 const createAppointmentSchema = z.object({
@@ -130,25 +131,31 @@ export async function POST(req: NextRequest) {
     include: { customer: true, service: true },
   })
 
-  // Send WhatsApp confirmation — STARTER and PRO only
-  if (
-    professional &&
-    (professional.plan === 'STARTER' || professional.plan === 'PRO')
-  ) {
+  if (professional) {
     const address = [professional.address, professional.city, professional.state]
       .filter(Boolean).join(', ')
 
-    await sendWhatsAppMessage({
-      phone: appointment.customer.phone,
-      message: whatsappTemplates.confirmacaoAgendamento({
-        clientName: appointment.customer.name,
-        serviceName: appointment.service.name,
-        professionalName: professional.businessName ?? '',
-        date: format(scheduledAt, 'dd/MM/yyyy'),
-        time: format(scheduledAt, 'HH:mm'),
-        address: address || undefined,
-      }),
-    })
+    const confirmacaoData = {
+      clientName: appointment.customer.name,
+      serviceName: appointment.service.name,
+      professionalName: professional.businessName ?? '',
+      date: format(scheduledAt, 'dd/MM/yyyy'),
+      time: format(scheduledAt, 'HH:mm'),
+      address: address || undefined,
+    }
+
+    // Email — todos os planos
+    if (appointment.customer.email) {
+      await sendConfirmacaoEmail({ ...confirmacaoData, clientEmail: appointment.customer.email })
+    }
+
+    // WhatsApp — STARTER e PRO
+    if (professional.plan === 'STARTER' || professional.plan === 'PRO') {
+      await sendWhatsAppMessage({
+        phone: appointment.customer.phone,
+        message: whatsappTemplates.confirmacaoAgendamento(confirmacaoData),
+      })
+    }
   }
 
   return NextResponse.json(appointment, { status: 201 })

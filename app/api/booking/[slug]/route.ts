@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { addMinutes, format, parseISO, setHours, setMinutes, eachMinuteOfInterval } from 'date-fns'
 import { sendWhatsAppMessage, whatsappTemplates } from '@/lib/whatsapp'
+import { sendConfirmacaoEmail } from '@/lib/email'
 
 // ── GET: public info + available time slots ────────────────────────────────────
 
@@ -229,21 +230,28 @@ export async function POST(
     include: { customer: true, service: true },
   })
 
-  // Send WhatsApp confirmation — only for STARTER and PRO plans
-  if (professional.plan === 'STARTER' || professional.plan === 'PRO') {
-    const address = [professional.address, professional.city, professional.state]
-      .filter(Boolean).join(', ')
+  const address = [professional.address, professional.city, professional.state]
+    .filter(Boolean).join(', ')
 
+  const confirmacaoData = {
+    clientName: customer.name,
+    serviceName: service.name,
+    professionalName: professional.businessName ?? '',
+    date: format(scheduledAt, 'dd/MM/yyyy'),
+    time: format(scheduledAt, 'HH:mm'),
+    address: address || undefined,
+  }
+
+  // Email de confirmação — todos os planos (grátis)
+  if (customer.email) {
+    await sendConfirmacaoEmail({ ...confirmacaoData, clientEmail: customer.email })
+  }
+
+  // WhatsApp — apenas STARTER e PRO
+  if (professional.plan === 'STARTER' || professional.plan === 'PRO') {
     await sendWhatsAppMessage({
       phone: customer.phone,
-      message: whatsappTemplates.confirmacaoAgendamento({
-        clientName: customer.name,
-        serviceName: service.name,
-        professionalName: professional.businessName ?? '',
-        date: format(scheduledAt, 'dd/MM/yyyy'),
-        time: format(scheduledAt, 'HH:mm'),
-        address: address || undefined,
-      }),
+      message: whatsappTemplates.confirmacaoAgendamento(confirmacaoData),
     })
   }
 
