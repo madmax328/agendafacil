@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
-import { sendWhatsAppMessage, whatsappTemplates } from '@/lib/whatsapp'
 import { sendConfirmacaoEmail } from '@/lib/email'
 import { format } from 'date-fns'
 
@@ -147,14 +146,6 @@ export async function POST(req: NextRequest) {
     // Email — todos os planos
     if (appointment.customer.email) {
       await sendConfirmacaoEmail({ ...confirmacaoData, clientEmail: appointment.customer.email })
-    }
-
-    // WhatsApp — STARTER e PRO
-    if (professional.plan === 'STARTER' || professional.plan === 'PRO') {
-      await sendWhatsAppMessage({
-        phone: appointment.customer.phone,
-        message: whatsappTemplates.confirmacaoAgendamento(confirmacaoData),
-      })
     }
   }
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { sendWhatsAppMessage, whatsappTemplates } from '@/lib/whatsapp'
 import { sendLembreteEmail } from '@/lib/email'
 import { addHours, addDays, startOfDay, endOfDay, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -83,21 +82,9 @@ async function sendDayBeforeReminders(now: Date): Promise<ReminderResult[]> {
       address: address || undefined,
     }
 
-    // Email — todos que tenham email
-    if (appt.customer.email) {
-      await sendLembreteEmail({ ...lembreteData, clientEmail: appt.customer.email }, 'J-1')
-    }
-
-    const sent = await sendWhatsAppMessage({
-      phone: appt.customer.phone,
-      message: whatsappTemplates.lembreteVigilia({
-        clientName: appt.customer.name,
-        serviceName: appt.service.name,
-        professionalName: appt.professional.businessName,
-        time: lembreteData.time,
-        address: address || undefined,
-      }),
-    })
+    const sent = appt.customer.email
+      ? await sendLembreteEmail({ ...lembreteData, clientEmail: appt.customer.email }, 'J-1')
+      : false
 
     results.push({ appointmentId: appt.id, customerName: appt.customer.name, type: 'J-1', sent })
   }
@@ -154,21 +141,9 @@ async function sendTwoHourReminders(now: Date): Promise<ReminderResult[]> {
       address: address || undefined,
     }
 
-    // Email — todos que tenham email
-    if (appt.customer.email) {
-      await sendLembreteEmail({ ...lembreteData, clientEmail: appt.customer.email }, 'H-2')
-    }
-
-    const sent = await sendWhatsAppMessage({
-      phone: appt.customer.phone,
-      message: whatsappTemplates.lembreteDuasHoras({
-        clientName: appt.customer.name,
-        serviceName: appt.service.name,
-        professionalName: appt.professional.businessName,
-        time: lembreteData.time,
-        address: address || undefined,
-      }),
-    })
+    const sent = appt.customer.email
+      ? await sendLembreteEmail({ ...lembreteData, clientEmail: appt.customer.email }, 'H-2')
+      : false
 
     results.push({ appointmentId: appt.id, customerName: appt.customer.name, type: 'H-2', sent })
   }

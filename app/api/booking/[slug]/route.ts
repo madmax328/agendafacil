@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { addMinutes, format, parseISO, setHours, setMinutes, eachMinuteOfInterval } from 'date-fns'
-import { sendWhatsAppMessage, whatsappTemplates } from '@/lib/whatsapp'
 import { sendConfirmacaoEmail } from '@/lib/email'
 
 // ── GET: public info + available time slots ────────────────────────────────────
@@ -242,17 +241,9 @@ export async function POST(
     address: address || undefined,
   }
 
-  // Email de confirmação — todos os planos (grátis)
+  // Email de confirmação — todos os planos
   if (customer.email) {
     await sendConfirmacaoEmail({ ...confirmacaoData, clientEmail: customer.email })
-  }
-
-  // WhatsApp — apenas STARTER e PRO
-  if (professional.plan === 'STARTER' || professional.plan === 'PRO') {
-    await sendWhatsAppMessage({
-      phone: customer.phone,
-      message: whatsappTemplates.confirmacaoAgendamento(confirmacaoData),
-    })
   }
 
   return NextResponse.json(appointment, { status: 201 })

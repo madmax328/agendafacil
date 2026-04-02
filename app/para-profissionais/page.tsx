@@ -230,8 +230,7 @@ export default function ParaProfissionaisPage() {
                   { label: '1 serviço', ok: true },
                   { label: 'Página de agendamento', ok: true },
                   { label: 'Confirmação por e-mail', ok: true },
-                  { label: 'Confirmação via WhatsApp', ok: false },
-                  { label: 'Lembretes automáticos', ok: false },
+                  { label: 'Lembretes automáticos por e-mail', ok: false },
                 ].map((f) => (
                   <li key={f.label} className="flex items-start gap-2 text-sm text-gray-600">
                     <Check className={`h-4 w-4 mt-0.5 shrink-0 ${f.ok ? 'text-green-500' : 'text-gray-300'}`} />
@@ -260,7 +259,6 @@ export default function ParaProfissionaisPage() {
                   '200 agendamentos/mês',
                   'Serviços ilimitados',
                   'Confirmação por e-mail',
-                  'Confirmação via WhatsApp',
                   'Gestão de clientes',
                   'Dashboard de estatísticas',
                 ].map((f) => (
@@ -287,8 +285,7 @@ export default function ParaProfissionaisPage() {
                 {[
                   'Agendamentos ilimitados',
                   'Tudo do Starter',
-                  'Lembretes automáticos (J-1 e H-2)',
-                  'E-mail + WhatsApp automáticos',
+                  'Lembretes automáticos por e-mail (J-1 e H-2)',
                   'Pix integrado',
                   'Analytics avançados',
                   'Suporte prioritário',

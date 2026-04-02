@@ -26,7 +26,7 @@ import { useToast } from '@/components/ui/use-toast'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type TabId = 'perfil' | 'whatsapp' | 'disponibilidade'
+type TabId = 'perfil' | 'disponibilidade'
 
 interface Tab {
   id: TabId
@@ -532,7 +532,6 @@ function DisponibilidadeTab() {
 
 const TABS: Tab[] = [
   { id: 'perfil', label: 'Perfil', icon: <Building2 className="h-4 w-4" /> },
-  { id: 'whatsapp', label: 'WhatsApp', icon: <MessageCircle className="h-4 w-4" /> },
   { id: 'disponibilidade', label: 'Disponibilidade', icon: <Clock className="h-4 w-4" /> },
 ]
 
@@ -569,7 +568,6 @@ export default function ConfiguracoesPage() {
 
       {/* Tab content */}
       {activeTab === 'perfil' && <PerfilTab />}
-      {activeTab === 'whatsapp' && <WhatsAppTab />}
       {activeTab === 'disponibilidade' && <DisponibilidadeTab />}
     </div>
   )
