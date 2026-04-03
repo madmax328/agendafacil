@@ -95,51 +95,48 @@ async function ProfissionaisList({
         const emoji = TYPE_EMOJI[pro.businessType] ?? '📋'
         const location = [pro.city, pro.state].filter(Boolean).join(', ')
         return (
-          <Card
+          <Link
             key={pro.id}
-            className="hover:shadow-md transition-shadow border-gray-200 overflow-hidden"
+            href={`/${pro.slug}`}
+            className="group bg-white rounded-2xl border border-gray-200 hover:border-blue-200 hover:shadow-lg hover:-translate-y-0.5 transition-all overflow-hidden flex flex-col"
           >
-            <CardContent className="p-0">
-              {/* Color header based on type */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-500 h-2" />
-              <div className="p-5 space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="text-3xl shrink-0">{emoji}</div>
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate leading-tight">
-                      {pro.businessName || pro.name || 'Sem nome'}
-                    </h3>
-                    <Badge variant="secondary" className="mt-1 text-xs">
-                      {label}
-                    </Badge>
-                  </div>
+            {/* Type color bar */}
+            <div className="h-1.5 bg-blue-600 w-full" />
+            <div className="p-5 flex flex-col flex-1 gap-3">
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-2xl shrink-0">
+                  {emoji}
                 </div>
-
-                {location && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{location}</span>
-                  </div>
-                )}
-
-                <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                  <Calendar className="h-3.5 w-3.5 shrink-0" />
-                  <span>{pro._count.services} serviço{pro._count.services !== 1 ? 's' : ''} disponível{pro._count.services !== 1 ? 'is' : ''}</span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-bold text-gray-900 truncate leading-tight group-hover:text-blue-700 transition-colors">
+                    {pro.businessName || pro.name || 'Sem nome'}
+                  </h3>
+                  <span className="inline-block mt-1 text-xs font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                    {label}
+                  </span>
                 </div>
-
-                <Button
-                  asChild
-                  size="sm"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-1.5 mt-1"
-                >
-                  <Link href={`/${pro.slug}`}>
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    Agendar agora
-                  </Link>
-                </Button>
               </div>
-            </CardContent>
-          </Card>
+
+              {location && (
+                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                  <MapPin className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{location}</span>
+                </div>
+              )}
+
+              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                <Star className="h-3.5 w-3.5 shrink-0 text-yellow-400 fill-yellow-400" />
+                <span>{pro._count.services} serviço{pro._count.services !== 1 ? 's' : ''} disponível{pro._count.services !== 1 ? 'is' : ''}</span>
+              </div>
+
+              <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+                <span className="text-xs text-gray-400">Agendamento online</span>
+                <span className="text-xs font-bold text-blue-600 flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Agendar <ExternalLink className="h-3 w-3" />
+                </span>
+              </div>
+            </div>
+          </Link>
         )
       })}
     </div>
@@ -152,47 +149,48 @@ export default function ProfissionaisPage({
   searchParams: { tipo?: string; cidade?: string; q?: string }
 }) {
   const { tipo, cidade, q } = searchParams
-
   const hasFilters = !!(tipo || cidade || q)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-700 to-blue-600 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-12 text-center">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Calendar className="h-7 w-7" />
-            <Link href="/" className="text-2xl font-bold tracking-tight hover:opacity-90">
-              AgendaFácil
-            </Link>
-          </div>
-          <h1 className="text-3xl font-bold mt-2">Encontre um profissional</h1>
-          <p className="text-blue-100 mt-2 text-sm">
-            Salões, clínicas, dentistas e muito mais — agende online em segundos
-          </p>
+    <div className="min-h-screen bg-white">
+      {/* Navbar */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="bg-blue-600 rounded-xl p-1.5">
+              <Calendar className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">AgendaFácil</span>
+          </Link>
+          <Link href="/para-profissionais" className="text-sm font-bold text-blue-600 hover:text-blue-700 hidden sm:block">
+            Para profissionais →
+          </Link>
+        </div>
+      </header>
+
+      {/* Search header */}
+      <div className="bg-white border-b border-gray-100 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-5">Encontre um profissional</h1>
+          <ProfissionaisSearch initialTipo={tipo} initialCidade={cidade} initialQ={q} />
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-        {/* Search + filters */}
-        <ProfissionaisSearch initialTipo={tipo} initialCidade={cidade} initialQ={q} />
-
-        {/* Results count indicator */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {hasFilters && (
           <p className="text-sm text-gray-500">
-            Mostrando resultados para
-            {q && <strong className="text-gray-700"> &quot;{q}&quot;</strong>}
+            Resultados para
+            {q && <strong className="text-gray-700"> &ldquo;{q}&rdquo;</strong>}
             {tipo && <span> · {BUSINESS_TYPE_LABELS[tipo] ?? tipo}</span>}
             {cidade && <span> · {cidade}</span>}
           </p>
         )}
 
-        {/* List */}
         <Suspense
           fallback={
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-48 rounded-xl bg-gray-200 animate-pulse" />
+                <div key={i} className="h-44 rounded-2xl bg-gray-100 animate-pulse" />
               ))}
             </div>
           }

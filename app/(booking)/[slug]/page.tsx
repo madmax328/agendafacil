@@ -358,7 +358,8 @@ function Step3Time({ slug, serviceId, selectedDate, selectedTime, onSelect, onNe
     load()
   }, [slug, serviceId, selectedDate])
 
-  const availableSlots = slots.filter((s) => s.available)
+  const hasAnySlot = slots.length > 0
+  const hasAvailable = slots.some((s) => s.available)
 
   return (
     <div className="space-y-4">
@@ -373,29 +374,50 @@ function Step3Time({ slug, serviceId, selectedDate, selectedTime, onSelect, onNe
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
         </div>
-      ) : availableSlots.length === 0 ? (
+      ) : !hasAnySlot || !hasAvailable ? (
         <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100">
           <Calendar className="h-10 w-10 mx-auto mb-3 text-gray-300" />
           <p className="text-sm text-gray-500">Nenhum horário disponível para este dia.</p>
           <p className="text-xs text-gray-400 mt-1">Tente outra data.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-          {availableSlots.map((slot) => (
-            <button
-              key={slot.time}
-              type="button"
-              onClick={() => onSelect(slot.time)}
-              className={`py-3 rounded-xl text-sm font-semibold transition-all border-2 ${
-                selectedTime === slot.time
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-100 bg-white text-gray-700 hover:border-blue-200'
-              }`}
-            >
-              {slot.time}
-            </button>
-          ))}
-        </div>
+        <>
+          {/* Legend */}
+          <div className="flex items-center gap-5 text-xs text-gray-500 pb-1">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded bg-green-100 border border-green-300" />
+              Disponível
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded bg-red-100 border border-red-200" />
+              Ocupado
+            </div>
+          </div>
+
+          {/* All slots — green available, red occupied */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {slots.map((slot) => {
+              const isSelected = selectedTime === slot.time
+              return (
+                <button
+                  key={slot.time}
+                  type="button"
+                  disabled={!slot.available}
+                  onClick={() => onSelect(slot.time)}
+                  className={`py-3 rounded-xl text-sm font-semibold transition-all border-2 ${
+                    !slot.available
+                      ? 'border-red-100 bg-red-50 text-red-300 cursor-not-allowed'
+                      : isSelected
+                      ? 'border-green-500 bg-green-500 text-white shadow-md shadow-green-200'
+                      : 'border-green-200 bg-green-50 text-green-700 hover:border-green-400 hover:bg-green-100'
+                  }`}
+                >
+                  {slot.time}
+                </button>
+              )
+            })}
+          </div>
+        </>
       )}
 
       <div className="flex gap-3">

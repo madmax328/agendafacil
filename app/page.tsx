@@ -29,30 +29,32 @@ const CATEGORIES = [
   { value: 'nutricionista', label: 'NUTRIÇÃO',     emoji: '🥗' },
 ]
 
-async function getFeaturedProfessionals(city?: string) {
+const PRO_SELECT = {
+  id: true, slug: true, name: true, businessName: true,
+  businessType: true, city: true, state: true, isFeatured: true,
+  _count: { select: { services: { where: { active: true } } } },
+} as const
+
+async function getFeaturedProfessionals(city?: string): Promise<{
+  professionals: Awaited<ReturnType<typeof prisma.professional.findMany<{ select: typeof PRO_SELECT }>>>
+  isLocal: boolean
+}> {
   if (city) {
     const local = await prisma.professional.findMany({
       where: { slug: { not: null }, city: { contains: city, mode: 'insensitive' } },
-      select: {
-        id: true, slug: true, name: true, businessName: true,
-        businessType: true, city: true, state: true, isFeatured: true,
-        _count: { select: { services: { where: { active: true } } } },
-      },
+      select: PRO_SELECT,
       orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
       take: 6,
     })
-    if (local.length >= 3) return local
+    if (local.length > 0) return { professionals: local, isLocal: true }
   }
-  return prisma.professional.findMany({
+  const all = await prisma.professional.findMany({
     where: { slug: { not: null } },
-    select: {
-      id: true, slug: true, name: true, businessName: true,
-      businessType: true, city: true, state: true, isFeatured: true,
-      _count: { select: { services: { where: { active: true } } } },
-    },
+    select: PRO_SELECT,
     orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
     take: 6,
   })
+  return { professionals: all, isLocal: false }
 }
 
 const TYPE_EMOJI: Record<string, string> = {
@@ -78,7 +80,7 @@ export default async function HomePage() {
   const headersList = await headers()
   const rawCity = headersList.get('x-vercel-ip-city') ?? ''
   const visitorCity = rawCity ? decodeURIComponent(rawCity) : undefined
-  const featured = await getFeaturedProfessionals(visitorCity)
+  const { professionals: featured, isLocal } = await getFeaturedProfessionals(visitorCity)
 
   return (
     <div className="min-h-screen bg-white">
@@ -241,10 +243,10 @@ export default async function HomePage() {
             <div className="flex items-end justify-between mb-8">
               <div>
                 <p className="text-sm font-semibold text-blue-600 mb-1">
-                  {visitorCity ? `📍 ${visitorCity}` : 'Em destaque'}
+                  {isLocal ? `📍 ${visitorCity}` : 'Em destaque'}
                 </p>
                 <h2 className="text-2xl font-extrabold text-gray-900">
-                  {visitorCity ? `Profissionais perto de você` : 'Profissionais em destaque'}
+                  {isLocal ? 'Profissionais perto de você' : 'Profissionais em destaque'}
                 </h2>
               </div>
               <Link href="/profissionais" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5 group">
