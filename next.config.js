@@ -12,6 +12,7 @@ const nextConfig = {
       "avatars.githubusercontent.com",
       "res.cloudinary.com",
       "images.unsplash.com",
+      "plus.unsplash.com",
     ],
   },
 };

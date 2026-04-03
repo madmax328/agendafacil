@@ -300,12 +300,13 @@ export default function ParaProfissionaisPage() {
                      />
                   ─────────────────────────────────────────────────────────────
                 */}
-                <div className="rounded-3xl overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-200 aspect-[4/5] flex items-center justify-center">
-                  <div className="text-center text-blue-400 p-8">
-                    <div className="text-8xl mb-4">👩‍💼</div>
-                    <p className="text-sm font-medium opacity-70">Aqui vai a foto do profissional</p>
-                    <p className="text-xs opacity-50 mt-1">Cole a URL da foto 3 do Unsplash</p>
-                  </div>
+                <div className="rounded-3xl overflow-hidden aspect-[4/5]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="https://plus.unsplash.com/premium_photo-1661521392942-50eb6b6a6c5e?q=80&w=1154&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="Profissional usando o AgendaFácil"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 {/* Floating browser mockup — overlaps the photo */}
                 <div className="absolute -bottom-6 -left-6 lg:-left-12 w-[85%] shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
@@ -364,47 +365,37 @@ export default function ParaProfissionaisPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                emoji: '✂️',
+                photoUrl: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                photoAlt: 'Profissional de salão de beleza',
                 title: 'Salão de Beleza',
-                photoBg: 'from-pink-200 to-rose-300',
-                border: 'border-rose-200',
+                border: 'border-rose-100',
                 tag: 'text-rose-600 bg-rose-100',
                 features: ['Agenda online 24h', 'Confirmações automáticas', 'Histórico de clientes', 'Dashboard de receita'],
                 desc: 'Controle total dos agendamentos, fidelize seus clientes e ganhe tempo automatizando sua gestão.',
-                /* TODO: photoUrl: 'COLE_URL_FOTO_1_AQUI' */
               },
               {
-                emoji: '🪒',
+                photoUrl: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                photoAlt: 'Barbeiro atendendo cliente',
                 title: 'Barbearia',
-                photoBg: 'from-slate-300 to-slate-400',
                 border: 'border-slate-200',
                 tag: 'text-slate-700 bg-slate-200',
                 features: ['Agendamento por serviço', 'Lembretes automáticos', 'Múltiplos profissionais', 'Pix integrado'],
                 desc: 'Libere tempo na sua rotina para atender mais clientes com agendamento online para barbearia.',
-                /* TODO: photoUrl: 'COLE_URL_FOTO_1_AQUI' (mesmo foto ou diferente) */
               },
               {
-                emoji: '💆',
+                photoUrl: 'https://plus.unsplash.com/premium_photo-1683134294916-473fc738750b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                photoAlt: 'Atendimento em clínica de estética',
                 title: 'Clínica e Saúde',
-                photoBg: 'from-blue-200 to-indigo-300',
-                border: 'border-indigo-200',
+                border: 'border-indigo-100',
                 tag: 'text-indigo-600 bg-indigo-100',
                 features: ['Consultas online', 'Confirmação por e-mail', 'Controle de pacientes', 'Agenda semanal'],
                 desc: 'Gerencie consultas, atraia mais pacientes e organize sua clínica com ferramentas profissionais.',
-                /* TODO: photoUrl: 'COLE_URL_FOTO_2_AQUI' */
               },
-            ].map(({ emoji, title, photoBg, border, tag, features, desc }) => (
-              <div key={title} className={`bg-white border ${border} rounded-3xl overflow-hidden flex flex-col shadow-sm`}>
-                {/*
-                  Para adicionar a foto real, substitui este bloco:
-                  <div className={`h-56 bg-gradient-to-br ${photoBg} ...`}>
-                  Por:
-                  <div className="h-56 relative overflow-hidden">
-                    <img src="URL_DA_FOTO" alt={title} className="w-full h-full object-cover" />
-                  </div>
-                */}
-                <div className={`h-56 bg-gradient-to-br ${photoBg} flex items-center justify-center relative overflow-hidden`}>
-                  <span className="text-7xl opacity-80 select-none">{emoji}</span>
+            ].map(({ photoUrl, photoAlt, title, border, tag, features, desc }) => (
+              <div key={title} className={`bg-white border ${border} rounded-3xl overflow-hidden flex flex-col shadow-sm hover:shadow-lg transition-shadow`}>
+                <div className="h-56 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={photoUrl} alt={photoAlt} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-8 flex flex-col flex-1">
                   <h3 className="text-xl font-extrabold text-slate-900 mb-3">{title}</h3>
