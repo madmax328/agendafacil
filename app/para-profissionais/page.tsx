@@ -211,7 +211,7 @@ export default function ParaProfissionaisPage() {
 
       {/* ── NAVBAR ── */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="bg-blue-600 rounded-lg p-1.5">
               <Calendar className="h-5 w-5 text-white" />
@@ -219,58 +219,63 @@ export default function ParaProfissionaisPage() {
             <span className="text-xl font-bold text-gray-900">AgendaFácil</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+            <a href="#negocios" className="hover:text-blue-600 transition-colors">Negócios</a>
             <a href="#funcionalidades" className="hover:text-blue-600 transition-colors">Funcionalidades</a>
             <a href="#planos" className="hover:text-blue-600 transition-colors">Planos</a>
             <a href="#depoimentos" className="hover:text-blue-600 transition-colors">Depoimentos</a>
-            <Link href="/" className="hover:text-blue-600 transition-colors">Para clientes</Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors hidden sm:block">
-              Entrar
+              Já sou cliente
             </Link>
             <Link
               href="/cadastro"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-md shadow-blue-600/25"
             >
-              Teste grátis
+              TESTE GRÁTIS
             </Link>
           </div>
         </div>
       </header>
 
       {/* ── HERO ── */}
-      <section className="bg-[#FAFAF9] overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+      <section className="bg-white overflow-hidden relative">
+        {/* Decorative background shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-blue-50 opacity-60" />
+          <div className="absolute top-1/2 -left-24 w-72 h-72 rounded-full bg-blue-50 opacity-40" />
+          <div className="absolute bottom-0 right-1/4 w-48 h-48 rounded-full bg-indigo-50 opacity-50" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 relative">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
             {/* Left col */}
             <div className="flex-1 text-center lg:text-left">
-              {/* Social proof pill */}
-              <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 text-sm font-medium text-blue-700 mb-8">
-                <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                +500 profissionais já usam o AgendaFácil
-              </div>
+              <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-6">
+                Para salões, barbearias, clínicas e muito mais
+              </p>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-6">
-                Sua agenda cheia.<br />
-                <span className="text-blue-600">Sem stress.</span>
+              <h1 className="font-black leading-[1.05] tracking-tight mb-6">
+                <span className="text-blue-600 text-5xl md:text-6xl lg:text-7xl block">Da correria do dia</span>
+                <span className="text-blue-600 text-5xl md:text-6xl lg:text-7xl block">ao controle total</span>
+                <span className="text-slate-900 text-4xl md:text-5xl lg:text-6xl block mt-1">o AgendaFácil simplifica.</span>
               </h1>
 
-              <p className="text-lg md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed">
-                Clientes marcam sozinhos 24h por dia. Confirmação automática por e-mail. Você para de perder tempo e dinheiro com no-shows.
+              <p className="text-lg md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 mb-10 leading-relaxed">
+                Dê adeus às mensagens para marcar horário, clientes que não aparecem e agenda no papel. Aqui a sua gestão acontece num piscar de olhos.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-6">
                 <Link
                   href="/cadastro"
-                  className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-4 rounded-xl text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20"
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30"
                 >
-                  Criar minha agenda grátis
+                  TESTE GRÁTIS
                   <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
                   href="#planos"
-                  className="w-full sm:w-auto border border-slate-200 bg-white hover:border-slate-300 text-slate-700 font-semibold px-8 py-4 rounded-xl text-base transition-colors flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto border-2 border-slate-200 bg-white hover:border-blue-300 text-slate-700 font-semibold px-8 py-4 rounded-2xl text-base transition-colors flex items-center justify-center gap-2"
                 >
                   Ver planos
                 </Link>
@@ -279,20 +284,6 @@ export default function ParaProfissionaisPage() {
               <p className="text-slate-400 text-sm">
                 ✓ Grátis para começar &nbsp;·&nbsp; ✓ Ativo em 10 minutos &nbsp;·&nbsp; ✓ Sem cartão de crédito
               </p>
-
-              {/* Mini stats */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-6 mt-10 pt-10 border-t border-slate-100">
-                {[
-                  { num: '70%', label: 'menos no-shows' },
-                  { num: '10min', label: 'para ativar' },
-                  { num: '24h', label: 'disponível' },
-                ].map(({ num, label }) => (
-                  <div key={label}>
-                    <p className="text-2xl font-extrabold text-slate-900">{num}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{label}</p>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Right col — browser mockup */}
@@ -303,15 +294,87 @@ export default function ParaProfissionaisPage() {
         </div>
       </section>
 
-      {/* ── LOGOS / TRUST BAR ── */}
-      <section className="border-y border-slate-100 py-5 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-xs font-medium uppercase tracking-wider text-slate-400 mb-4">
-            Usado por profissionais de todo o Brasil
+      {/* ── STATS ── */}
+      <section className="bg-white py-16 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <p className="text-center text-slate-400 text-sm font-semibold uppercase tracking-widest mb-10">
+            Feito para quem entende o mercado de beleza e saúde
           </p>
-          <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm font-semibold text-slate-400">
-            {['Salões de Beleza', 'Barbearias', 'Clínicas', 'Dentistas', 'Psicólogos', 'Personal Trainers', 'Esteticistas', 'Massagistas'].map(s => (
-              <span key={s}>{s}</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { num: '+500', label: 'profissionais ativos', color: 'bg-blue-100' },
+              { num: '70%', label: 'redução em no-shows', color: 'bg-green-100' },
+              { num: '10min', label: 'para ativar a agenda', color: 'bg-purple-100' },
+              { num: '24h', label: 'disponível para clientes', color: 'bg-orange-100' },
+            ].map(({ num, label, color }) => (
+              <div key={label} className="relative flex flex-col items-center">
+                <div className={`absolute -top-2 -left-2 w-14 h-14 ${color} rounded-full opacity-60`} />
+                <p className="relative text-4xl md:text-5xl font-black text-slate-900">{num}</p>
+                <p className="relative text-sm text-slate-500 mt-2 max-w-[110px]">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── NEGÓCIOS / BUSINESS TYPES ── */}
+      <section id="negocios" className="bg-slate-50 py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-4">
+            <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-3">Para todos os tipos de negócio</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">
+              O AgendaFácil é para o seu negócio
+            </h2>
+          </div>
+          <p className="text-center text-slate-500 text-lg mb-12 max-w-2xl mx-auto">
+            Sistema completo para salões de beleza, barbearias, clínicas de estética, studios e muito mais.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                emoji: '✂️',
+                title: 'Salão de Beleza',
+                bg: 'bg-gradient-to-br from-pink-50 to-rose-100',
+                border: 'border-rose-200',
+                tag: 'text-rose-600 bg-rose-100',
+                features: ['Agenda online 24h', 'Confirmações automáticas', 'Histórico de clientes', 'Dashboard de receita'],
+                desc: 'Controle total dos agendamentos, fidelize seus clientes e ganhe tempo automatizando sua gestão.',
+              },
+              {
+                emoji: '🪒',
+                title: 'Barbearia',
+                bg: 'bg-gradient-to-br from-slate-50 to-slate-100',
+                border: 'border-slate-200',
+                tag: 'text-slate-700 bg-slate-200',
+                features: ['Agendamento por serviço', 'Lembretes automáticos', 'Múltiplos profissionais', 'Pix integrado'],
+                desc: 'Libere tempo na sua rotina para atender mais clientes com agendamento online para barbearia.',
+              },
+              {
+                emoji: '💆',
+                title: 'Clínica e Saúde',
+                bg: 'bg-gradient-to-br from-blue-50 to-indigo-100',
+                border: 'border-indigo-200',
+                tag: 'text-indigo-600 bg-indigo-100',
+                features: ['Consultas online', 'Confirmação por e-mail', 'Controle de pacientes', 'Agenda semanal'],
+                desc: 'Gerencie consultas, atraia mais pacientes e organize sua clínica com ferramentas profissionais.',
+              },
+            ].map(({ emoji, title, bg, border, tag, features, desc }) => (
+              <div key={title} className={`${bg} border ${border} rounded-3xl p-8 flex flex-col`}>
+                <div className="text-5xl mb-5">{emoji}</div>
+                <h3 className="text-xl font-extrabold text-slate-900 mb-3">{title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed mb-6">{desc}</p>
+                <ul className="space-y-2 mb-8 flex-1">
+                  {features.map(f => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${tag}`}>✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/cadastro" className="text-blue-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+                  Criar minha agenda grátis <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -785,94 +848,112 @@ export default function ParaProfissionaisPage() {
       </section>
 
       {/* ── DEPOIMENTOS ── */}
-      <section id="depoimentos" className="py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-              Profissionais que transformaram a agenda
-            </h2>
-            <p className="text-slate-500 text-lg">Resultados reais de quem parou de perder tempo com agendamento manual</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                name: 'Ana Paula S.',
-                role: 'Cabeleireira',
-                city: 'São Paulo, SP',
-                avatar: 'AP',
-                bg: 'from-pink-400 to-rose-500',
-                text: 'Reduzi meus no-shows quase que completamente. Os lembretes automáticos por e-mail mudaram meu negócio. Não perco mais dinheiro por esquecimento de cliente.',
-                result: '↓ 70% no-shows',
-              },
-              {
-                name: 'Dr. Carlos M.',
-                role: 'Psicólogo',
-                city: 'Belo Horizonte, MG',
-                avatar: 'CM',
-                bg: 'from-blue-400 to-indigo-500',
-                text: 'Meus pacientes adoraram poder marcar consulta pelo celular a qualquer hora. É profissional, simples e confiável. Recomendo para qualquer clínica ou consultório.',
-                result: '+30% agendamentos',
-              },
-              {
-                name: 'Fernanda L.',
-                role: 'Esteticista',
-                city: 'Rio de Janeiro, RJ',
-                avatar: 'FL',
-                bg: 'from-emerald-400 to-teal-500',
-                text: 'Passava 2 horas por dia só respondendo mensagem para marcar horário. Agora é tudo automático. Tenho tempo para focar nos clientes — e na minha vida pessoal.',
-                result: '2h/dia economizadas',
-              },
-            ].map(({ name, role, city, avatar, bg, text, result }) => (
-              <div key={name} className="bg-slate-50 border border-slate-100 rounded-2xl p-7 flex flex-col">
-                {/* stars */}
-                <div className="flex gap-0.5 mb-5">
-                  {[1,2,3,4,5].map((i) => (
-                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-slate-700 text-sm leading-relaxed mb-6 flex-1">&ldquo;{text}&rdquo;</p>
-                {/* result badge */}
-                <div className="bg-green-50 border border-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 mb-5 w-fit">
-                  <TrendingUp className="h-3 w-3" />
-                  {result}
-                </div>
-                {/* person */}
-                <div className="flex items-center gap-3 pt-5 border-t border-slate-100">
-                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${bg} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
-                    {avatar}
+      <section id="depoimentos" className="py-20 bg-[#FDF6F0]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row gap-16 items-start">
+            {/* left: big heading */}
+            <div className="lg:w-72 shrink-0">
+              <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-4">Depoimentos</p>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+                Quem usa o AgendaFácil conta com ele.
+              </h2>
+              <div className="mt-8 space-y-4">
+                {[
+                  { num: '+500', label: 'profissionais ativos' },
+                  { num: '4.9★', label: 'avaliação média' },
+                  { num: '98%', label: 'recomendam' },
+                ].map(({ num, label }) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <span className="text-2xl font-black text-slate-900">{num}</span>
+                    <span className="text-sm text-slate-500">{label}</span>
                   </div>
-                  <div>
-                    <p className="font-semibold text-slate-900 text-sm">{name}</p>
-                    <p className="text-slate-400 text-xs">{role} · {city}</p>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
+            {/* right: testimonial cards */}
+            <div className="flex-1 space-y-5">
+              {[
+                {
+                  text: 'Reduzi meus no-shows quase completamente. Os lembretes automáticos por e-mail mudaram meu negócio. Não perco mais dinheiro por esquecimento de cliente. O sistema é simples e funcionou desde o primeiro dia.',
+                  name: 'Ana Paula Santos',
+                  biz: 'Salão da Ana Paula',
+                  role: 'Cabeleireira',
+                  city: 'São Paulo, SP',
+                  logo: 'AS',
+                  logoColor: 'bg-rose-500',
+                  result: '↓ 70% no-shows',
+                },
+                {
+                  text: 'Meus pacientes adoraram poder marcar consulta pelo celular a qualquer hora. É profissional, simples e confiável. Recomendo para qualquer clínica ou consultório que quer crescer sem complicação.',
+                  name: 'Dr. Carlos Mendes',
+                  biz: 'Consultório Dr. Carlos',
+                  role: 'Psicólogo',
+                  city: 'Belo Horizonte, MG',
+                  logo: 'CM',
+                  logoColor: 'bg-blue-600',
+                  result: '+30% agendamentos',
+                },
+                {
+                  text: 'Antes passava 2 horas por dia respondendo mensagem para marcar horário. Agora é tudo automático. Tenho tempo para focar nos clientes — e na minha vida pessoal. Valeu cada centavo.',
+                  name: 'Fernanda Lima',
+                  biz: 'Studio Fernanda Lima',
+                  role: 'Esteticista',
+                  city: 'Rio de Janeiro, RJ',
+                  logo: 'FL',
+                  logoColor: 'bg-emerald-600',
+                  result: '2h/dia economizadas',
+                },
+              ].map(({ text, name, biz, role, city, logo, logoColor, result }) => (
+                <div key={name} className="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+                  <div className="text-5xl text-blue-200 font-black leading-none mb-3">&ldquo;</div>
+                  <p className="text-slate-700 leading-relaxed mb-5">{text}</p>
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl ${logoColor} flex items-center justify-center text-white font-extrabold text-sm shrink-0`}>
+                        {logo}
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-900 text-sm">{name}</p>
+                        <p className="text-slate-400 text-xs">{biz} · {role} · {city}</p>
+                      </div>
+                    </div>
+                    <div className="bg-green-50 border border-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                      <TrendingUp className="h-3 w-3" />
+                      {result}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── CTA FINAL ── */}
-      <section className="bg-white py-24">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <div className="bg-slate-900 rounded-3xl py-16 px-8 md:px-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
-              Sua agenda cheia começa hoje.
-            </h2>
-            <p className="text-slate-400 text-lg mb-10 max-w-md mx-auto">
-              Crie sua conta em 2 minutos e tenha sua página de agendamento funcionando ainda hoje — de graça.
-            </p>
-            <Link
-              href="/cadastro"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-xl text-lg transition-colors shadow-lg shadow-blue-600/40"
-            >
-              Criar minha agenda grátis
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-            <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-slate-400 text-sm">
-              <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-green-400" /> Sem cartão de crédito</span>
-              <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-green-400" /> Ativo em 10 minutos</span>
-              <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-green-400" /> Cancele quando quiser</span>
+      <section className="bg-blue-600 py-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="text-center lg:text-left">
+              <h2 className="text-3xl md:text-4xl font-black text-white leading-tight mb-4">
+                A sua parceira dos<br />negócios de beleza e saúde.
+              </h2>
+              <p className="text-blue-100 text-lg max-w-lg">
+                Crie sua conta em 2 minutos e tenha sua página de agendamento funcionando ainda hoje — de graça.
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-4 shrink-0">
+              <Link
+                href="/cadastro"
+                className="bg-white hover:bg-blue-50 text-blue-600 font-black px-12 py-5 rounded-2xl text-xl transition-colors shadow-2xl shadow-blue-900/30 flex items-center gap-3"
+              >
+                TESTE GRÁTIS
+                <ArrowRight className="h-6 w-6" />
+              </Link>
+              <div className="flex flex-wrap items-center justify-center gap-5 text-blue-100 text-sm">
+                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-white" /> Sem cartão</span>
+                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-white" /> 10 minutos</span>
+                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-white" /> Cancele quando quiser</span>
+              </div>
             </div>
           </div>
         </div>
