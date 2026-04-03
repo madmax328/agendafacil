@@ -8,19 +8,151 @@ import {
   Star,
   Clock,
   Users,
-  Scissors,
-  Stethoscope,
-  Brain,
   Mail,
   ShieldCheck,
   TrendingUp,
-  Zap,
+  Bell,
+  Smartphone,
 } from 'lucide-react'
 
 export const metadata = {
   title: 'AgendaFácil para Profissionais – Sua agenda online em minutos',
   description:
     'Adeus no-show. Sua página de agendamento online em 10 minutos. Clientes marcam sozinhos, confirmações automáticas, zero papel.',
+}
+
+/* ─── tiny helpers ─────────────────────────────────── */
+
+function BrowserMockup() {
+  return (
+    <div className="w-full max-w-[560px] rounded-2xl shadow-2xl overflow-hidden border border-gray-200 bg-white select-none">
+      {/* browser chrome */}
+      <div className="bg-gray-100 border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+        <div className="flex gap-1.5">
+          <div className="w-3 h-3 rounded-full bg-red-400" />
+          <div className="w-3 h-3 rounded-full bg-yellow-400" />
+          <div className="w-3 h-3 rounded-full bg-green-400" />
+        </div>
+        <div className="flex-1 bg-white rounded-md px-3 py-1 text-xs text-gray-400 border border-gray-200">
+          agendafacil.com.br/dashboard
+        </div>
+      </div>
+      {/* app shell */}
+      <div className="flex" style={{ height: 340 }}>
+        {/* sidebar */}
+        <div className="w-14 bg-slate-900 flex flex-col items-center py-4 gap-5 shrink-0">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <Calendar className="w-4 h-4 text-white" />
+          </div>
+          {[Calendar, Users, BarChart3, CreditCard].map((Icon, i) => (
+            <div key={i} className={`w-8 h-8 rounded-lg flex items-center justify-center ${i === 0 ? 'bg-blue-600/20' : 'hover:bg-slate-700'}`}>
+              <Icon className={`w-4 h-4 ${i === 0 ? 'text-blue-400' : 'text-slate-500'}`} />
+            </div>
+          ))}
+        </div>
+        {/* main content */}
+        <div className="flex-1 bg-gray-50 overflow-hidden">
+          {/* top bar */}
+          <div className="bg-white border-b border-gray-100 px-4 py-2.5 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-gray-900">Hoje — Quinta, 3 de Abril</p>
+              <p className="text-xs text-gray-400">4 agendamentos</p>
+            </div>
+            <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold">A</div>
+          </div>
+          {/* stats row */}
+          <div className="grid grid-cols-3 gap-2 px-3 pt-3 pb-2">
+            {[
+              { label: 'Esta semana', value: '18' },
+              { label: 'Receita', value: 'R$1.240' },
+              { label: 'No-shows', value: '0' },
+            ].map(({ label, value }) => (
+              <div key={label} className="bg-white rounded-lg p-2 border border-gray-100">
+                <p className="text-xs text-gray-400">{label}</p>
+                <p className="text-sm font-bold text-gray-900">{value}</p>
+              </div>
+            ))}
+          </div>
+          {/* appointment list */}
+          <div className="px-3 space-y-1.5">
+            {[
+              { time: '09:00', name: 'Maria S.', service: 'Corte + Escova', color: 'bg-blue-500', done: true },
+              { time: '10:30', name: 'João P.', service: 'Barba completa', color: 'bg-purple-500', done: true },
+              { time: '14:00', name: 'Carla M.', service: 'Manicure', color: 'bg-green-500', done: false },
+              { time: '16:00', name: 'Pedro A.', service: 'Corte masculino', color: 'bg-orange-500', done: false },
+            ].map(({ time, name, service, color, done }) => (
+              <div key={time} className={`bg-white rounded-lg px-3 py-2 border border-gray-100 flex items-center gap-3 ${done ? 'opacity-50' : ''}`}>
+                <div className={`w-1 h-8 rounded-full ${color} shrink-0`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-gray-900 truncate">{name}</p>
+                  <p className="text-xs text-gray-400 truncate">{service}</p>
+                </div>
+                <p className="text-xs font-medium text-gray-500 shrink-0">{time}</p>
+                {done && <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                  <Check className="w-2.5 h-2.5 text-green-600" />
+                </div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PhoneMockup() {
+  return (
+    <div className="w-[220px] mx-auto rounded-[2rem] shadow-2xl overflow-hidden border-[6px] border-slate-800 bg-white select-none">
+      {/* notch */}
+      <div className="bg-slate-800 h-5 flex items-center justify-center">
+        <div className="w-16 h-2.5 bg-black rounded-full" />
+      </div>
+      {/* screen */}
+      <div className="bg-gray-50">
+        {/* header */}
+        <div className="bg-blue-600 px-4 py-4 text-white">
+          <p className="text-xs font-bold truncate">Salão da Ana Paula</p>
+          <p className="text-xs opacity-75 mt-0.5">Escolha um horário</p>
+        </div>
+        {/* service */}
+        <div className="px-3 py-2 bg-white border-b border-gray-100">
+          <p className="text-xs text-gray-400">Serviço selecionado</p>
+          <p className="text-xs font-semibold text-gray-900">Corte + Escova — R$80</p>
+        </div>
+        {/* calendar mini */}
+        <div className="px-3 py-2">
+          <p className="text-xs font-semibold text-gray-700 mb-2">Abril 2026</p>
+          <div className="grid grid-cols-7 gap-0.5 text-center text-xs">
+            {['D','S','T','Q','Q','S','S'].map((d, i) => (
+              <div key={i} className="text-gray-400 text-[9px] font-medium">{d}</div>
+            ))}
+            {[1,2,3,4,5,6,7,8,9,10,11,12,13,14].map((d) => (
+              <div key={d} className={`rounded text-[10px] py-0.5 font-medium ${d === 4 ? 'bg-blue-600 text-white' : d < 3 ? 'text-gray-300' : 'text-gray-700 hover:bg-blue-50'}`}>
+                {d}
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* time slots */}
+        <div className="px-3 pb-3">
+          <p className="text-xs font-semibold text-gray-700 mb-2">Horários disponíveis</p>
+          <div className="grid grid-cols-3 gap-1">
+            {['09:00','10:00','11:00','14:00','15:00','16:00'].map((t) => (
+              <button key={t} className={`text-[11px] font-medium py-1.5 rounded-md border ${t === '14:00' ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 text-gray-700'}`}>
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* cta */}
+        <div className="px-3 pb-4">
+          <div className="bg-blue-600 text-white text-xs font-bold text-center py-2.5 rounded-xl">
+            Confirmar agendamento
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function ParaProfissionaisPage() {
@@ -57,207 +189,340 @@ export default function ParaProfissionaisPage() {
       </header>
 
       {/* ── HERO ── */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-28 text-center relative">
+      <section className="bg-[#FAFAF9] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
-          {/* Social proof badge */}
-          <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-8">
-            <Star className="h-4 w-4 text-yellow-300 fill-yellow-300" />
-            Já são +500 profissionais organizados com o AgendaFácil
-          </div>
-
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-            Adeus no-show.
-            <br />
-            <span className="text-blue-200">Olá, agenda cheia.</span>
-          </h1>
-
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-4 leading-relaxed">
-            Seus clientes marcam horário sozinhos 24h por dia. Eles recebem confirmação por e-mail automaticamente. Você para de perder tempo e dinheiro.
-          </p>
-
-          <p className="text-blue-300 text-sm mb-10 font-medium">
-            Ativo em menos de 10 minutos • Sem cartão de crédito
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/cadastro"
-              className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50 font-bold px-8 py-4 rounded-xl text-lg transition-colors flex items-center justify-center gap-2 shadow-xl"
-            >
-              Criar minha agenda grátis
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Link
-              href="#planos"
-              className="w-full sm:w-auto border border-white/30 text-white hover:bg-white/10 font-semibold px-8 py-4 rounded-xl text-lg transition-colors flex items-center justify-center gap-2"
-            >
-              Ver planos
-            </Link>
-          </div>
-
-          {/* Tipos de negócio */}
-          <div className="mt-14 flex flex-wrap justify-center gap-3">
-            {[
-              { icon: Scissors, label: 'Salão de Beleza' },
-              { icon: Scissors, label: 'Barbearia' },
-              { icon: Stethoscope, label: 'Clínica' },
-              { icon: Stethoscope, label: 'Dentista' },
-              { icon: Brain, label: 'Psicólogo' },
-              { icon: Users, label: 'Personal Trainer' },
-            ].map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-4 py-2 text-sm">
-                <Icon className="h-3.5 w-3.5 text-blue-200" />
-                <span className="text-blue-100">{label}</span>
+            {/* Left col */}
+            <div className="flex-1 text-center lg:text-left">
+              {/* Social proof pill */}
+              <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 text-sm font-medium text-blue-700 mb-8">
+                <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                +500 profissionais já usam o AgendaFácil
               </div>
-            ))}
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-6">
+                Sua agenda cheia.<br />
+                <span className="text-blue-600">Sem stress.</span>
+              </h1>
+
+              <p className="text-lg md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed">
+                Clientes marcam sozinhos 24h por dia. Confirmação automática por e-mail. Você para de perder tempo e dinheiro com no-shows.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-6">
+                <Link
+                  href="/cadastro"
+                  className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-4 rounded-xl text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20"
+                >
+                  Criar minha agenda grátis
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+                <Link
+                  href="#planos"
+                  className="w-full sm:w-auto border border-slate-200 bg-white hover:border-slate-300 text-slate-700 font-semibold px-8 py-4 rounded-xl text-base transition-colors flex items-center justify-center gap-2"
+                >
+                  Ver planos
+                </Link>
+              </div>
+
+              <p className="text-slate-400 text-sm">
+                ✓ Grátis para começar &nbsp;·&nbsp; ✓ Ativo em 10 minutos &nbsp;·&nbsp; ✓ Sem cartão de crédito
+              </p>
+
+              {/* Mini stats */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-6 mt-10 pt-10 border-t border-slate-100">
+                {[
+                  { num: '70%', label: 'menos no-shows' },
+                  { num: '10min', label: 'para ativar' },
+                  { num: '24h', label: 'disponível' },
+                ].map(({ num, label }) => (
+                  <div key={label}>
+                    <p className="text-2xl font-extrabold text-slate-900">{num}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right col — browser mockup */}
+            <div className="flex-1 w-full flex justify-center lg:justify-end">
+              <BrowserMockup />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── NÚMEROS ── */}
-      <section className="border-b border-gray-100 py-12 bg-gray-50">
+      {/* ── LOGOS / TRUST BAR ── */}
+      <section className="border-y border-slate-100 py-5 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { number: '+500', label: 'profissionais ativos' },
-              { number: '70%', label: 'menos no-shows' },
-              { number: '10min', label: 'para ativar sua agenda' },
-              { number: '24h', label: 'seus clientes podem marcar' },
-            ].map(({ number, label }) => (
-              <div key={label}>
-                <p className="text-3xl font-bold text-blue-600">{number}</p>
-                <p className="text-sm text-gray-500 mt-1">{label}</p>
-              </div>
+          <p className="text-center text-xs font-medium uppercase tracking-wider text-slate-400 mb-4">
+            Usado por profissionais de todo o Brasil
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm font-semibold text-slate-400">
+            {['Salões de Beleza', 'Barbearias', 'Clínicas', 'Dentistas', 'Psicólogos', 'Personal Trainers', 'Esteticistas', 'Massagistas'].map(s => (
+              <span key={s}>{s}</span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── PROBLEMA ── */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Você tá esperando o quê?
-          </h2>
-          <p className="text-gray-500 mb-12 text-lg">Isso acontece todo dia com quem gerencia agenda pelo WhatsApp</p>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { emoji: '😤', title: 'Respondendo o dia todo', desc: '"Que horário tem?" às 22h. Fim de semana. Feriado. Sua vida pessoal virou atendimento.' },
-              { emoji: '😱', title: 'Cliente que não aparece', desc: 'Você reservou o horário, preparou tudo — e o cliente simplesmente não veio. Dinheiro no lixo.' },
-              { emoji: '😰', title: 'Agenda no papel', desc: 'Caderno, WhatsApp e cabeça ao mesmo tempo. Um erro e você double-boca dois clientes.' },
-            ].map(({ emoji, title, desc }) => (
-              <div key={title} className="bg-red-50 border border-red-100 rounded-2xl p-6 text-left">
-                <div className="text-3xl mb-3">{emoji}</div>
-                <h3 className="font-bold text-gray-900 mb-2">{title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SOLUÇÃO / FUNCIONALIDADES ── */}
-      <section id="funcionalidades" className="bg-blue-50 py-20">
+      {/* ── PROBLEMA → SOLUÇÃO ── */}
+      <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Sua agenda trabalha enquanto você atende
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+              Chega de perder dinheiro assim
             </h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-              Feito para profissionais brasileiros. Simples, rápido e sem complicação.
+            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+              Quem ainda gerencia a agenda pelo WhatsApp enfrenta isso todo dia
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
             {[
-              {
-                icon: Calendar,
-                color: 'bg-blue-100 text-blue-600',
-                title: 'Clientes que marcam sozinhos',
-                desc: 'Sua página de agendamento funciona 24h. O cliente escolhe o horário, você recebe a notificação — sem trocar uma mensagem.',
-              },
-              {
-                icon: Mail,
-                color: 'bg-green-100 text-green-600',
-                title: 'Confirmação que chega na hora',
-                desc: 'Assim que o cliente marca, ele recebe um e-mail de confirmação automático. Ninguém esquece, ninguém falta.',
-              },
-              {
-                icon: TrendingUp,
-                color: 'bg-purple-100 text-purple-600',
-                title: 'Agenda cheia, não cabeça cheia',
-                desc: 'Veja todos os agendamentos do dia numa tela só. Sem papel, sem WhatsApp, sem stress.',
-              },
-              {
-                icon: CreditCard,
-                color: 'bg-orange-100 text-orange-600',
-                title: 'Receba antes pelo Pix',
-                desc: 'Exija pagamento antecipado e acabe de vez com cancelamentos de última hora. Seu tempo tem valor.',
-              },
-              {
-                icon: Users,
-                color: 'bg-pink-100 text-pink-600',
-                title: 'Histórico completo dos clientes',
-                desc: 'Veja tudo que cada cliente já fez com você. Serviços, datas, observações — tudo num lugar só.',
-              },
-              {
-                icon: Clock,
-                color: 'bg-teal-100 text-teal-600',
-                title: 'Você decide quando atende',
-                desc: 'Configure seus horários por dia da semana. O sistema bloqueia o que estiver ocupado automaticamente.',
-              },
-            ].map(({ icon: Icon, color, title, desc }) => (
-              <div key={title} className="bg-white rounded-2xl p-6 shadow-sm border border-blue-100 flex gap-4">
-                <div className={`${color} rounded-xl p-3 h-fit shrink-0`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1.5">{title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-                </div>
+              { emoji: '📵', title: 'Respondendo fora do horário', desc: '"Que horário tem?" às 22h. Feriado. Final de semana. Sua vida pessoal virou atendimento 24h.' },
+              { emoji: '💸', title: 'Cliente que não aparece', desc: 'Você bloqueou o horário, preparou tudo — e o cliente simplesmente não foi. Dinheiro e tempo no lixo.' },
+              { emoji: '😵', title: 'Erro de agenda', desc: 'Caderno, WhatsApp e memória ao mesmo tempo. Uma distração e você marca dois clientes no mesmo horário.' },
+            ].map(({ emoji, title, desc }) => (
+              <div key={title} className="bg-slate-50 border border-slate-100 rounded-2xl p-7 text-left relative overflow-hidden">
+                <div className="text-4xl mb-4">{emoji}</div>
+                <h3 className="font-bold text-slate-900 mb-2 text-base">{title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
+          </div>
+
+          {/* arrow */}
+          <div className="text-center mb-12">
+            <div className="inline-flex flex-col items-center gap-2">
+              <div className="w-px h-8 bg-gradient-to-b from-slate-200 to-blue-600" />
+              <div className="bg-blue-600 text-white text-sm font-bold px-6 py-2.5 rounded-full">
+                Com o AgendaFácil, isso acaba
+              </div>
+              <div className="w-px h-8 bg-gradient-to-b from-blue-600 to-slate-200" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FUNCIONALIDADES — alternating ── */}
+      <section id="funcionalidades" className="bg-white pb-6">
+
+        {/* Feature 1 — Agendamento online */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-100">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 order-2 lg:order-1">
+              <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
+                <Smartphone className="h-3.5 w-3.5" />
+                Para o seu cliente
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
+                Seu cliente marca<br />sozinho, no celular
+              </h2>
+              <p className="text-slate-500 text-lg leading-relaxed mb-8">
+                Você tem uma página de agendamento profissional com o seu nome. O cliente acessa, escolhe o serviço, o horário e confirma — sem precisar falar com você.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  'Funciona 24h, inclusive de madrugada',
+                  'Compatível com qualquer celular',
+                  'Seu link personalizado: agendafacil.com/seu-nome',
+                  'Coloque no Instagram, WhatsApp ou cartão de visita',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-slate-600">
+                    <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex-1 order-1 lg:order-2 flex justify-center">
+              <PhoneMockup />
+            </div>
+          </div>
+        </div>
+
+        {/* Feature 2 — Dashboard */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-100">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 flex justify-center">
+              <div className="w-full max-w-md bg-slate-50 rounded-2xl border border-slate-100 p-6">
+                {/* mini dashboard view */}
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">Sua agenda hoje</p>
+                    <p className="text-xs text-slate-400">Quinta, 3 de Abril</p>
+                  </div>
+                  <div className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">4 clientes</div>
+                </div>
+                <div className="space-y-2">
+                  {[
+                    { t: '09:00', n: 'Maria Silva', s: 'Corte + Escova', v: 'R$80', c: 'bg-blue-500' },
+                    { t: '10:30', n: 'João Pedro', s: 'Barba completa', v: 'R$50', c: 'bg-purple-500' },
+                    { t: '14:00', n: 'Carla Matos', s: 'Manicure', v: 'R$45', c: 'bg-green-500' },
+                    { t: '16:00', n: 'Pedro Alves', s: 'Corte masculino', v: 'R$60', c: 'bg-orange-500' },
+                  ].map(({ t, n, s, v, c }) => (
+                    <div key={t} className="bg-white rounded-xl px-4 py-3 border border-slate-100 flex items-center gap-3">
+                      <div className={`w-1.5 h-10 rounded-full ${c} shrink-0`} />
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-900">{n}</p>
+                        <p className="text-xs text-slate-400">{s}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-bold text-slate-900">{v}</p>
+                        <p className="text-xs text-slate-400">{t}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="bg-white rounded-xl p-3 border border-slate-100 text-center">
+                    <p className="text-xs text-slate-400">Receita hoje</p>
+                    <p className="text-lg font-extrabold text-slate-900">R$235</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-3 border border-slate-100 text-center">
+                    <p className="text-xs text-slate-400">No-shows</p>
+                    <p className="text-lg font-extrabold text-green-600">0</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 bg-purple-50 text-purple-700 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
+                <BarChart3 className="h-3.5 w-3.5" />
+                Para você
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
+                Tudo na mesma tela,<br />sem confusão
+              </h2>
+              <p className="text-slate-500 text-lg leading-relaxed mb-8">
+                Veja todos os agendamentos do dia, a receita acumulada e o histórico de cada cliente — numa interface simples, que funciona no celular e no computador.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  'Dashboard com todos os agendamentos do dia',
+                  'Histórico completo de cada cliente',
+                  'Receita por período em tempo real',
+                  'Funciona no celular, tablet e computador',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-slate-600">
+                    <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Feature 3 — Email automático */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-100">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 order-2 lg:order-1">
+              <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
+                <Bell className="h-3.5 w-3.5" />
+                Automático
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
+                Confirmações e lembretes<br />sem você mover um dedo
+              </h2>
+              <p className="text-slate-500 text-lg leading-relaxed mb-8">
+                Assim que o cliente marca, ele já recebe a confirmação por e-mail. Com o plano Pro, ele ainda recebe um lembrete no dia anterior e outro 2 horas antes — eliminando os no-shows.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  'Confirmação automática imediata por e-mail',
+                  'Lembrete no dia anterior (plano Pro)',
+                  'Lembrete 2h antes do horário (plano Pro)',
+                  'Zero configuração — funciona sozinho',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-slate-600">
+                    <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex-1 order-1 lg:order-2 flex justify-center">
+              {/* email mockup */}
+              <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                <div className="bg-slate-100 px-4 py-2.5 flex items-center gap-2 text-xs text-slate-500">
+                  <Mail className="h-3.5 w-3.5" />
+                  <span className="font-medium">Caixa de entrada</span>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-start gap-3 mb-5">
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shrink-0">
+                      <Calendar className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">AgendaFácil</p>
+                      <p className="text-xs text-slate-400">noreply@agendafacil.com.br</p>
+                    </div>
+                  </div>
+                  <div className="bg-blue-600 rounded-xl p-4 text-white mb-4">
+                    <p className="text-xs font-bold mb-1">Agendamento confirmado! ✓</p>
+                    <div className="text-xs opacity-90 space-y-1">
+                      <p><strong>Serviço:</strong> Corte + Escova</p>
+                      <p><strong>Data:</strong> Sexta, 4 de Abril</p>
+                      <p><strong>Horário:</strong> 14:00</p>
+                      <p><strong>Local:</strong> Salão da Ana Paula</p>
+                    </div>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-800">
+                    <strong>Lembrete:</strong> Seu horário é amanhã às 14h. Até já!
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── COMO FUNCIONA ── */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Ativo em 10 minutos</h2>
-          <p className="text-gray-500 mb-12">Três passos e sua agenda já está funcionando</p>
-          <div className="grid md:grid-cols-3 gap-8">
+      <section className="bg-slate-900 py-20 text-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Ativo em 10 minutos</h2>
+          <p className="text-slate-400 mb-14 text-lg">Três passos e sua agenda já está funcionando</p>
+          <div className="grid md:grid-cols-3 gap-8 text-left">
             {[
-              { step: '1', title: 'Crie sua conta', desc: 'Cadastre-se gratuitamente. Configure seus serviços e horários em menos de 10 minutos.' },
-              { step: '2', title: 'Compartilhe seu link', desc: 'Envie agendafacil.com/seu-nome para seus clientes. Pode colocar no Instagram, cartão de visita, onde quiser.' },
-              { step: '3', title: 'Receba agendamentos', desc: 'Os clientes marcam sozinhos. Confirmação automática por e-mail. Você só aparece para atender.' },
+              { step: '01', title: 'Crie sua conta', desc: 'Cadastre-se de graça. Configure seus serviços e horários disponíveis. Tudo simples, sem treinamento.' },
+              { step: '02', title: 'Compartilhe seu link', desc: 'Você recebe agendafacil.com/seu-nome. Coloque no Instagram, cartão de visita, grupo do WhatsApp — em qualquer lugar.' },
+              { step: '03', title: 'Receba agendamentos', desc: 'Clientes marcam sozinhos. Você recebe a notificação, eles recebem a confirmação. Pronto.' },
             ].map(({ step, title, desc }) => (
-              <div key={step} className="text-center relative">
-                <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-4 shadow-lg shadow-blue-200">
-                  {step}
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">{title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+              <div key={step} className="relative">
+                <p className="text-6xl font-black text-slate-700 leading-none mb-4">{step}</p>
+                <h3 className="font-bold text-white text-lg mb-2">{title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-14">
+            <Link
+              href="/cadastro"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl text-base transition-colors shadow-lg shadow-blue-600/30"
+            >
+              Criar minha agenda agora
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+            <p className="text-slate-500 text-sm mt-3">Sem cartão de crédito</p>
           </div>
         </div>
       </section>
 
       {/* ── PLANOS ── */}
-      <section id="planos" className="bg-gray-50 py-20">
+      <section id="planos" className="bg-slate-50 py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Preço justo, sem surpresas</h2>
-            <p className="text-gray-500 text-lg">Comece grátis. Upgrade só quando precisar.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">Preço justo, sem surpresas</h2>
+            <p className="text-slate-500 text-lg">Comece grátis. Upgrade só quando precisar.</p>
           </div>
 
           {/* Trust line */}
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500 mb-12">
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-500 mb-12">
             {[
               { icon: ShieldCheck, text: 'Sem taxa de adesão' },
-              { icon: Zap, text: 'Cancele quando quiser' },
+              { icon: Clock, text: 'Cancele quando quiser' },
               { icon: BarChart3, text: 'Sem fidelidade' },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-1.5">
@@ -269,13 +534,13 @@ export default function ParaProfissionaisPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* FREE */}
-            <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 flex flex-col">
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col">
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Grátis</h3>
-                <p className="text-gray-500 text-sm mb-6">Para testar sem compromisso</p>
+                <h3 className="text-lg font-extrabold text-slate-900 mb-1">Grátis</h3>
+                <p className="text-slate-400 text-sm mb-6">Para testar sem compromisso</p>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">R$0</span>
-                  <span className="text-gray-400">/mês</span>
+                  <span className="text-4xl font-extrabold text-slate-900">R$0</span>
+                  <span className="text-slate-400 text-sm">/mês</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {[
@@ -287,31 +552,31 @@ export default function ParaProfissionaisPage() {
                     { label: 'Agendamentos ilimitados', ok: false },
                   ].map((f) => (
                     <li key={f.label} className="flex items-start gap-2 text-sm">
-                      <Check className={`h-4 w-4 mt-0.5 shrink-0 ${f.ok ? 'text-green-500' : 'text-gray-300'}`} />
-                      <span className={f.ok ? 'text-gray-700' : 'text-gray-400 line-through'}>{f.label}</span>
+                      <span className={`mt-0.5 shrink-0 font-bold text-base leading-none ${f.ok ? 'text-green-500' : 'text-slate-200'}`}>{f.ok ? '✓' : '×'}</span>
+                      <span className={f.ok ? 'text-slate-700' : 'text-slate-300'}>{f.label}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <Link href="/cadastro" className="block text-center border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-xl transition-colors mt-auto">
+              <Link href="/cadastro" className="block text-center border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-semibold py-3 rounded-xl transition-colors mt-auto">
                 Começar grátis
               </Link>
-              <p className="text-center text-xs text-gray-400 mt-2">Sem cartão de crédito</p>
+              <p className="text-center text-xs text-slate-400 mt-2">Sem cartão de crédito</p>
             </div>
 
             {/* STARTER */}
-            <div className="bg-white rounded-2xl border-2 border-blue-600 p-8 relative shadow-xl flex flex-col">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-5 py-1.5 rounded-full">
+            <div className="bg-slate-900 rounded-2xl p-8 relative shadow-2xl flex flex-col">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide">
                 MAIS POPULAR
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Starter</h3>
-                <p className="text-gray-500 text-sm mb-6">Para profissionais em crescimento</p>
+                <h3 className="text-lg font-extrabold text-white mb-1">Starter</h3>
+                <p className="text-slate-400 text-sm mb-6">Para profissionais em crescimento</p>
                 <div className="mb-1">
-                  <span className="text-4xl font-bold text-gray-900">R$39</span>
-                  <span className="text-gray-400">/mês</span>
+                  <span className="text-4xl font-extrabold text-white">R$39</span>
+                  <span className="text-slate-400 text-sm">/mês</span>
                 </div>
-                <p className="text-green-600 text-xs font-medium mb-6">Menos que 1 atendimento por mês</p>
+                <p className="text-green-400 text-xs font-semibold mb-6">Menos que 1 atendimento por mês</p>
                 <ul className="space-y-3 mb-8">
                   {[
                     'Até 200 agendamentos/mês',
@@ -321,80 +586,113 @@ export default function ParaProfissionaisPage() {
                     'Dashboard de estatísticas',
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                      <span className="text-gray-700">{f}</span>
+                      <span className="text-green-400 font-bold mt-0.5 shrink-0">✓</span>
+                      <span className="text-slate-300">{f}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <Link href="/cadastro" className="block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-colors mt-auto">
+              <Link href="/cadastro" className="block text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-colors mt-auto shadow-lg shadow-blue-600/30">
                 Começar agora
               </Link>
-              <p className="text-center text-xs text-gray-400 mt-2">Sem cartão de crédito · Cancele quando quiser</p>
+              <p className="text-center text-xs text-slate-500 mt-2">Sem cartão de crédito · Cancele quando quiser</p>
             </div>
 
             {/* PRO */}
-            <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 flex flex-col">
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col">
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Pro</h3>
-                <p className="text-gray-500 text-sm mb-6">Para clínicas e salões que não param</p>
+                <h3 className="text-lg font-extrabold text-slate-900 mb-1">Pro</h3>
+                <p className="text-slate-400 text-sm mb-6">Para clínicas e salões que não param</p>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">R$69</span>
-                  <span className="text-gray-400">/mês</span>
+                  <span className="text-4xl font-extrabold text-slate-900">R$69</span>
+                  <span className="text-slate-400 text-sm">/mês</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {[
                     'Agendamentos ilimitados',
                     'Tudo do Starter',
-                    'Lembrete e-mail dia anterior (J-1)',
-                    'Lembrete e-mail 2h antes (H-2)',
+                    'Lembrete e-mail dia anterior',
+                    'Lembrete e-mail 2h antes',
                     'Pix integrado',
                     'Analytics avançados',
                     'Suporte prioritário',
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                      <span className="text-gray-700">{f}</span>
+                      <span className="text-green-500 font-bold mt-0.5 shrink-0">✓</span>
+                      <span className="text-slate-700">{f}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <Link href="/cadastro" className="block text-center border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-xl transition-colors mt-auto">
+              <Link href="/cadastro" className="block text-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-colors mt-auto">
                 Assinar Pro
               </Link>
-              <p className="text-center text-xs text-gray-400 mt-2">Sem cartão de crédito · Cancele quando quiser</p>
+              <p className="text-center text-xs text-slate-400 mt-2">Sem cartão de crédito · Cancele quando quiser</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── DEPOIMENTOS ── */}
-      <section id="depoimentos" className="py-20">
+      <section id="depoimentos" className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
-            O que dizem os profissionais
-          </h2>
-          <p className="text-gray-500 text-center mb-12">Resultados reais de quem já largou a agenda no papel</p>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+              Profissionais que transformaram a agenda
+            </h2>
+            <p className="text-slate-500 text-lg">Resultados reais de quem parou de perder tempo com agendamento manual</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: 'Ana Paula S.', role: 'Cabeleireira, São Paulo', text: 'Reduzi meus no-shows em 70%! Os lembretes automáticos por e-mail mudaram meu negócio. Não perco mais dinheiro por esquecimento.' },
-              { name: 'Dr. Carlos M.', role: 'Psicólogo, Belo Horizonte', text: 'Meus pacientes adoraram poder marcar consulta pelo celular a qualquer hora. Profissional demais. Recomendo para qualquer clínica.' },
-              { name: 'Fernanda L.', role: 'Esteticista, Rio de Janeiro', text: 'Antes eu passava 2 horas por dia respondendo mensagem para marcar horário. Agora é tudo automático. Tenho minha vida de volta!' },
-            ].map(({ name, role, text }) => (
-              <div key={name} className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                <div className="flex mb-4">
+              {
+                name: 'Ana Paula S.',
+                role: 'Cabeleireira',
+                city: 'São Paulo, SP',
+                avatar: 'AP',
+                bg: 'from-pink-400 to-rose-500',
+                text: 'Reduzi meus no-shows quase que completamente. Os lembretes automáticos por e-mail mudaram meu negócio. Não perco mais dinheiro por esquecimento de cliente.',
+                result: '↓ 70% no-shows',
+              },
+              {
+                name: 'Dr. Carlos M.',
+                role: 'Psicólogo',
+                city: 'Belo Horizonte, MG',
+                avatar: 'CM',
+                bg: 'from-blue-400 to-indigo-500',
+                text: 'Meus pacientes adoraram poder marcar consulta pelo celular a qualquer hora. É profissional, simples e confiável. Recomendo para qualquer clínica ou consultório.',
+                result: '+30% agendamentos',
+              },
+              {
+                name: 'Fernanda L.',
+                role: 'Esteticista',
+                city: 'Rio de Janeiro, RJ',
+                avatar: 'FL',
+                bg: 'from-emerald-400 to-teal-500',
+                text: 'Passava 2 horas por dia só respondendo mensagem para marcar horário. Agora é tudo automático. Tenho tempo para focar nos clientes — e na minha vida pessoal.',
+                result: '2h/dia economizadas',
+              },
+            ].map(({ name, role, city, avatar, bg, text, result }) => (
+              <div key={name} className="bg-slate-50 border border-slate-100 rounded-2xl p-7 flex flex-col">
+                {/* stars */}
+                <div className="flex gap-0.5 mb-5">
                   {[1,2,3,4,5].map((i) => (
                     <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                   ))}
                 </div>
-                <p className="text-gray-700 text-sm leading-relaxed mb-5">&quot;{text}&quot;</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-sm">
-                    {name.charAt(0)}
+                <p className="text-slate-700 text-sm leading-relaxed mb-6 flex-1">&ldquo;{text}&rdquo;</p>
+                {/* result badge */}
+                <div className="bg-green-50 border border-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 mb-5 w-fit">
+                  <TrendingUp className="h-3 w-3" />
+                  {result}
+                </div>
+                {/* person */}
+                <div className="flex items-center gap-3 pt-5 border-t border-slate-100">
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${bg} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+                    {avatar}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{name}</p>
-                    <p className="text-gray-400 text-xs">{role}</p>
+                    <p className="font-semibold text-slate-900 text-sm">{name}</p>
+                    <p className="text-slate-400 text-xs">{role} · {city}</p>
                   </div>
                 </div>
               </div>
@@ -404,25 +702,28 @@ export default function ParaProfissionaisPage() {
       </section>
 
       {/* ── CTA FINAL ── */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-800 py-20 text-white text-center">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
-          <div className="text-4xl mb-4">📅</div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Sua agenda já pode estar cheia amanhã.
-          </h2>
-          <p className="text-blue-100 text-lg mb-10">
-            Crie sua conta em 2 minutos e tenha sua página de agendamento funcionando hoje.
-          </p>
-          <Link
-            href="/cadastro"
-            className="inline-flex items-center gap-2 bg-white text-blue-700 hover:bg-blue-50 font-bold px-10 py-4 rounded-xl text-lg transition-colors shadow-xl"
-          >
-            Criar minha agenda grátis
-            <ArrowRight className="h-5 w-5" />
-          </Link>
-          <p className="text-blue-200 text-sm mt-4">
-            Grátis para sempre · Sem cartão de crédito · Ativo em 10 minutos
-          </p>
+      <section className="bg-white py-24">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <div className="bg-slate-900 rounded-3xl py-16 px-8 md:px-16">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
+              Sua agenda cheia começa hoje.
+            </h2>
+            <p className="text-slate-400 text-lg mb-10 max-w-md mx-auto">
+              Crie sua conta em 2 minutos e tenha sua página de agendamento funcionando ainda hoje — de graça.
+            </p>
+            <Link
+              href="/cadastro"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-xl text-lg transition-colors shadow-lg shadow-blue-600/40"
+            >
+              Criar minha agenda grátis
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+            <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-slate-400 text-sm">
+              <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-green-400" /> Sem cartão de crédito</span>
+              <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-green-400" /> Ativo em 10 minutos</span>
+              <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-green-400" /> Cancele quando quiser</span>
+            </div>
+          </div>
         </div>
       </section>
 
