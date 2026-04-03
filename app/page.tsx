@@ -19,14 +19,14 @@ export const metadata = {
 }
 
 const CATEGORIES = [
-  { value: 'salao',        label: 'Salão',        emoji: '💇' },
-  { value: 'barbearia',    label: 'Barbearia',     emoji: '✂️' },
-  { value: 'dentista',     label: 'Dentista',      emoji: '🦷' },
-  { value: 'psicologo',    label: 'Psicólogo',     emoji: '🧠' },
-  { value: 'clinica',      label: 'Clínica',       emoji: '🏥' },
-  { value: 'estetica',     label: 'Estética',      emoji: '✨' },
-  { value: 'nutricionista',label: 'Nutrição',      emoji: '🥗' },
-  { value: 'personal',     label: 'Personal',      emoji: '💪' },
+  { value: 'salao',         label: 'CABELOS',      emoji: '💇' },
+  { value: 'barbearia',     label: 'BARBEARIA',    emoji: '✂️' },
+  { value: 'estetica',      label: 'ESTÉTICA',     emoji: '✨' },
+  { value: 'dentista',      label: 'DENTISTA',     emoji: '🦷' },
+  { value: 'psicologo',     label: 'PSICÓLOGO',    emoji: '🧠' },
+  { value: 'clinica',       label: 'CLÍNICA',      emoji: '🏥' },
+  { value: 'personal',      label: 'PERSONAL',     emoji: '💪' },
+  { value: 'nutricionista', label: 'NUTRIÇÃO',     emoji: '🥗' },
 ]
 
 async function getFeaturedProfessionals(city?: string) {
@@ -66,8 +66,6 @@ const TYPE_LABEL: Record<string, string> = {
   massagem: 'Massagem', nutricionista: 'Nutricionista',
   fisioterapia: 'Fisioterapia', personal: 'Personal Trainer', outros: 'Profissional',
 }
-
-// Colour per type for avatar background
 const TYPE_COLOR: Record<string, string> = {
   salao: 'bg-pink-100 text-pink-700', barbearia: 'bg-blue-100 text-blue-700',
   clinica: 'bg-green-100 text-green-700', dentista: 'bg-cyan-100 text-cyan-700',
@@ -104,7 +102,7 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/para-profissionais"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm"
+              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm"
             >
               Cadastre seu negócio
             </Link>
@@ -112,152 +110,140 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-blue-900">
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px'}} />
+      {/* ── HERO ── white, centered, like Trinks ── */}
+      <section className="bg-white pt-16 pb-8 overflow-hidden relative">
+        {/* Light decorative dots pattern */}
+        <div className="absolute inset-0 pointer-events-none opacity-30"
+          style={{ backgroundImage: 'radial-gradient(circle, #dbeafe 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-28">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left — copy */}
-            <div>
-              <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 text-sm font-medium text-blue-200 mb-6">
-                <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
-                Agendamento online em segundos
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-5">
-                Reserve com os
-                <br />
-                <span className="text-blue-300">melhores perto</span>
-                <br />
-                de você
-              </h1>
-              <p className="text-lg text-blue-100/80 mb-8 leading-relaxed">
-                Salões, clínicas, dentistas e muito mais.
-                Escolha o horário, confirme em segundos — sem ligar, sem esperar.
-              </p>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
+            Encontre e{' '}
+            <strong className="font-extrabold text-blue-600">agende</strong>{' '}
+            serviços de{' '}
+            <strong className="font-extrabold">beleza e bem-estar.</strong>
+            <br className="hidden sm:block" />
+            <span className="text-gray-500 font-normal text-2xl sm:text-3xl md:text-4xl">
+              A qualquer hora, de qualquer lugar.
+            </span>
+          </h1>
 
-              {/* Search */}
-              <form action="/profissionais" method="get" className="flex flex-col sm:flex-row gap-2.5">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-gray-400 pointer-events-none h-[18px] w-[18px]" />
-                  <input
-                    name="q"
-                    type="text"
-                    placeholder="Serviço ou profissional..."
-                    className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-lg"
-                  />
-                </div>
-                <div className="relative sm:w-40">
-                  <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400 pointer-events-none" />
-                  <input
-                    name="cidade"
-                    type="text"
-                    placeholder="Cidade..."
-                    defaultValue={visitorCity ?? ''}
-                    className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-white text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-lg"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors shadow-lg shrink-0"
-                >
-                  Buscar
-                </button>
-              </form>
-
-              {/* Trust signals */}
-              <div className="flex flex-wrap gap-5 mt-6">
-                {[
-                  { icon: CheckCircle2, text: 'Sem criar conta' },
-                  { icon: Clock, text: 'Disponível 24h' },
-                  { icon: Shield, text: 'Confirmação por e-mail' },
-                ].map(({ icon: Icon, text }) => (
-                  <div key={text} className="flex items-center gap-1.5 text-sm text-blue-200/70">
-                    <Icon className="h-4 w-4 text-blue-400" />
-                    {text}
-                  </div>
-                ))}
-              </div>
+          {/* Search bar */}
+          <form action="/profissionais" method="get"
+            className="flex flex-col sm:flex-row gap-2 bg-white border-2 border-gray-200 rounded-2xl p-2 shadow-xl shadow-gray-100 max-w-2xl mx-auto">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-gray-400 pointer-events-none h-[18px] w-[18px]" />
+              <input
+                name="q"
+                type="text"
+                placeholder="Estabelecimento ou serviço"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none"
+              />
             </div>
-
-            {/* Right — mock booking card */}
-            <div className="hidden md:block">
-              <div className="bg-white rounded-2xl shadow-2xl p-5 max-w-sm ml-auto border border-white/10">
-                {/* Header */}
-                <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                  <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center text-lg">💇</div>
-                  <div>
-                    <p className="font-bold text-gray-900 text-sm">Studio Beleza Silva</p>
-                    <p className="text-xs text-gray-400">Salão de Beleza · São Paulo</p>
-                  </div>
-                  <div className="ml-auto flex items-center gap-1 text-xs text-yellow-600 font-semibold bg-yellow-50 px-2 py-1 rounded-full">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />4.9
-                  </div>
-                </div>
-                {/* Services */}
-                <div className="py-3 space-y-2">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Serviços</p>
-                  {[
-                    { name: 'Corte + Escova', time: '60 min', price: 'R$ 80' },
-                    { name: 'Coloração', time: '120 min', price: 'R$ 180' },
-                  ].map((s, i) => (
-                    <div key={s.name} className={`flex items-center justify-between p-2.5 rounded-xl text-sm ${i === 0 ? 'bg-blue-50 border-2 border-blue-200' : 'border border-gray-100'}`}>
-                      <span className={`font-medium ${i === 0 ? 'text-blue-700' : 'text-gray-600'}`}>{s.name}</span>
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <span>{s.time}</span>
-                        <span className="font-semibold text-gray-700">{s.price}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {/* Slots */}
-                <div className="pt-2">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Horários de amanhã</p>
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {['09:00','10:00','11:00','14:00','15:00','16:00','17:00'].map((t, i) => (
-                      <div key={t} className={`py-2 rounded-lg text-xs font-semibold text-center ${i === 2 ? 'bg-blue-600 text-white shadow' : 'bg-gray-50 text-gray-600'}`}>{t}</div>
-                    ))}
-                    <div className="py-2 rounded-lg text-xs font-semibold text-center bg-red-50 text-red-300 line-through">18:00</div>
-                  </div>
-                </div>
-                <button className="w-full mt-4 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow">
-                  Confirmar agendamento ✓
-                </button>
-              </div>
+            <div className="hidden sm:block w-px bg-gray-200 my-1" />
+            <div className="relative sm:w-44">
+              <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400 pointer-events-none" />
+              <input
+                name="cidade"
+                type="text"
+                placeholder="Onde gostaria de agendar?"
+                defaultValue={visitorCity ?? ''}
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none"
+              />
             </div>
+            <button
+              type="submit"
+              className="bg-gray-900 hover:bg-gray-800 text-white font-bold px-8 py-3 rounded-xl transition-colors shrink-0 text-sm tracking-wide"
+            >
+              BUSCAR
+            </button>
+          </form>
+
+          {/* Trust signals */}
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-sm text-gray-400">
+            {[
+              { icon: CheckCircle2, text: 'Sem criar conta' },
+              { icon: Clock, text: 'Disponível 24h' },
+              { icon: Shield, text: 'Confirmação por e-mail' },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-1.5">
+                <Icon className="h-4 w-4 text-blue-500" />
+                {text}
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── CATEGORIAS ── */}
-      <section className="py-10 bg-white border-b border-gray-100">
+      {/* ── CATEGORIAS — horizontal text links like Trinks ── */}
+      <section className="border-y border-gray-100 bg-white py-4">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+          <div className="flex items-center justify-center flex-wrap gap-x-8 gap-y-3">
             {CATEGORIES.map((cat) => (
               <Link
                 key={cat.value}
                 href={`/profissionais?tipo=${cat.value}`}
-                className="group flex flex-col items-center gap-2 py-4 px-2 rounded-2xl hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
+                className="text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors tracking-wider py-1 border-b-2 border-transparent hover:border-blue-600"
               >
-                <span className="text-2xl">{cat.emoji}</span>
-                <span className="text-xs font-medium text-gray-500 group-hover:text-blue-600 transition-colors text-center leading-tight">{cat.label}</span>
+                {cat.label}
               </Link>
             ))}
           </div>
         </div>
       </section>
 
+      {/* ── PHOTO STRIP — warm background + real photos like Trinks ── */}
+      <section className="bg-[#FEF3EC] py-16 overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            {/* Left photo */}
+            <div className="w-full md:w-72 h-56 md:h-72 rounded-3xl overflow-hidden shadow-xl shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Profissional de beleza"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {/* Center text */}
+            <div className="flex-1 text-center px-4">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight mb-4">
+                Agende online nos melhores espaços de beleza e bem-estar.
+              </h2>
+              <p className="text-gray-500 text-base mb-6">
+                Profissionais verificados, horários em tempo real, confirmação automática.
+              </p>
+              <Link
+                href="/profissionais"
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-md shadow-blue-200 text-sm"
+              >
+                Explorar profissionais
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            {/* Right photo */}
+            <div className="w-full md:w-72 h-56 md:h-72 rounded-3xl overflow-hidden shadow-xl shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://plus.unsplash.com/premium_photo-1683134294916-473fc738750b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Serviço de spa e bem-estar"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── PROFISSIONAIS EM DESTAQUE ── */}
       {featured.length > 0 && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-8">
               <div>
                 <p className="text-sm font-semibold text-blue-600 mb-1">
                   {visitorCity ? `📍 ${visitorCity}` : 'Em destaque'}
                 </p>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-extrabold text-gray-900">
                   {visitorCity ? `Profissionais perto de você` : 'Profissionais em destaque'}
                 </h2>
               </div>
@@ -276,10 +262,10 @@ export default async function HomePage() {
                   <Link
                     key={pro.id}
                     href={`/${pro.slug}`}
-                    className="group bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-md hover:border-blue-200 hover:-translate-y-0.5 transition-all"
+                    className="group bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-lg hover:border-blue-200 hover:-translate-y-0.5 transition-all"
                   >
                     <div className="flex items-start gap-3.5">
-                      <div className={`${color} w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 font-medium`}>
+                      <div className={`${color} w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0`}>
                         {emoji}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -288,9 +274,7 @@ export default async function HomePage() {
                             {pro.businessName || pro.name || 'Sem nome'}
                           </p>
                           {pro.isFeatured && (
-                            <span className="shrink-0 text-[10px] font-bold bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full">
-                              ⭐
-                            </span>
+                            <span className="shrink-0 text-[10px] font-bold bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full">⭐</span>
                           )}
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5">{typeLabel}</p>
@@ -319,30 +303,28 @@ export default async function HomePage() {
       )}
 
       {/* ── COMO FUNCIONA ── */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50 border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <p className="text-sm font-semibold text-blue-600 mb-2">Simples e rápido</p>
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Agende em menos de 1 minuto</h2>
+          <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-3">Simples e rápido</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-3">Agende em menos de 1 minuto</h2>
           <p className="text-gray-500 mb-14">Sem criar conta, sem baixar app</p>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { num: '1', emoji: '🔍', title: 'Encontre o profissional', desc: 'Busque por tipo de serviço ou cidade. Veja disponibilidade em tempo real.' },
-              { num: '2', emoji: '📅', title: 'Escolha data e horário', desc: 'Selecione o dia e a hora que preferir. Sem precisar ligar ou esperar resposta.' },
-              { num: '3', emoji: '✅', title: 'Receba a confirmação', desc: 'Confirmação imediata por e-mail. O profissional fica avisado automaticamente.' },
-            ].map(({ num, emoji, title, desc }) => (
-              <div key={num} className="relative text-center p-6 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-blue-50 hover:border-blue-200 transition-all group">
-                <div className="text-4xl mb-4">{emoji}</div>
-                <div className="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  {num}
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">{title}</h3>
+              { step: '01', emoji: '🔍', title: 'Encontre o profissional', desc: 'Busque por tipo de serviço ou cidade. Veja disponibilidade em tempo real.' },
+              { step: '02', emoji: '📅', title: 'Escolha data e horário', desc: 'Selecione o dia e a hora que preferir. Sem precisar ligar ou esperar resposta.' },
+              { step: '03', emoji: '✅', title: 'Receba a confirmação', desc: 'Confirmação imediata por e-mail. O profissional fica avisado automaticamente.' },
+            ].map(({ step, emoji, title, desc }) => (
+              <div key={step} className="bg-white text-center p-8 rounded-2xl border border-gray-100 shadow-sm">
+                <p className="text-5xl font-black text-gray-100 leading-none mb-3">{step}</p>
+                <div className="text-4xl mb-4 -mt-2">{emoji}</div>
+                <h3 className="font-extrabold text-gray-900 mb-2">{title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
           <Link
             href="/profissionais"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-xl transition-colors mt-12 shadow-lg shadow-blue-200"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-colors mt-12 shadow-lg shadow-blue-200"
           >
             Encontrar profissional agora
             <ArrowRight className="h-5 w-5" />
@@ -351,27 +333,27 @@ export default async function HomePage() {
       </section>
 
       {/* ── CTA PARA PROFISSIONAIS ── */}
-      <section className="bg-gradient-to-r from-slate-900 to-blue-950 py-16">
+      <section className="bg-blue-600 py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-center md:text-left">
-              <p className="text-blue-400 text-sm font-semibold mb-2">Você é profissional?</p>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+              <p className="text-blue-200 text-sm font-bold uppercase tracking-widest mb-2">Você é profissional?</p>
+              <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
                 Tenha sua agenda online em 10 minutos
               </h3>
-              <p className="text-gray-400 text-sm max-w-md">
+              <p className="text-blue-100 text-sm max-w-md">
                 Clientes marcam sozinhos 24h. Confirmação automática por e-mail. Começa grátis, sem cartão.
               </p>
             </div>
             <div className="flex flex-col items-center gap-3 shrink-0">
               <Link
                 href="/para-profissionais"
-                className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-xl transition-colors flex items-center gap-2 shadow-lg text-lg whitespace-nowrap"
+                className="bg-white hover:bg-blue-50 text-blue-600 font-extrabold px-8 py-4 rounded-xl transition-colors flex items-center gap-2 shadow-xl text-base whitespace-nowrap"
               >
                 Criar minha agenda grátis
                 <ArrowRight className="h-5 w-5" />
               </Link>
-              <p className="text-gray-500 text-xs">Sem cartão de crédito · Ativo em 10 min</p>
+              <p className="text-blue-200 text-xs">Sem cartão de crédito · Ativo em 10 min</p>
             </div>
           </div>
         </div>
