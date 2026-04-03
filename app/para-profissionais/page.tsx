@@ -25,74 +25,114 @@ export const metadata = {
 
 function BrowserMockup() {
   return (
-    <div className="w-full max-w-[560px] rounded-2xl shadow-2xl overflow-hidden border border-gray-200 bg-white select-none">
+    <div className="w-full max-w-[600px] rounded-2xl shadow-2xl overflow-hidden border border-gray-200 bg-white select-none">
       {/* browser chrome */}
-      <div className="bg-gray-100 border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+      <div className="bg-gray-100 border-b border-gray-200 px-4 py-2.5 flex items-center gap-3">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-400" />
           <div className="w-3 h-3 rounded-full bg-yellow-400" />
           <div className="w-3 h-3 rounded-full bg-green-400" />
         </div>
-        <div className="flex-1 bg-white rounded-md px-3 py-1 text-xs text-gray-400 border border-gray-200">
+        <div className="flex-1 bg-white rounded-md px-3 py-1 text-xs text-gray-400 border border-gray-200 font-mono">
           agendafacil.com.br/dashboard
         </div>
       </div>
       {/* app shell */}
-      <div className="flex" style={{ height: 340 }}>
-        {/* sidebar */}
-        <div className="w-14 bg-slate-900 flex flex-col items-center py-4 gap-5 shrink-0">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <Calendar className="w-4 h-4 text-white" />
-          </div>
-          {[Calendar, Users, BarChart3, CreditCard].map((Icon, i) => (
-            <div key={i} className={`w-8 h-8 rounded-lg flex items-center justify-center ${i === 0 ? 'bg-blue-600/20' : 'hover:bg-slate-700'}`}>
-              <Icon className={`w-4 h-4 ${i === 0 ? 'text-blue-400' : 'text-slate-500'}`} />
+      <div className="flex" style={{ height: 380 }}>
+        {/* sidebar — matches real layout exactly */}
+        <div className="w-52 bg-[#2563EB] flex flex-col shrink-0">
+          {/* logo */}
+          <div className="flex items-center gap-2 px-4 py-4 border-b border-blue-500/40">
+            <div className="bg-white/20 rounded-lg p-1.5">
+              <Calendar className="w-4 h-4 text-white" />
             </div>
-          ))}
+            <span className="text-sm font-bold text-white">AgendaFácil</span>
+          </div>
+          {/* nav */}
+          <nav className="flex-1 px-3 py-3 space-y-0.5">
+            <p className="px-2 pb-1.5 text-[9px] font-semibold uppercase tracking-wider text-blue-300">Menu principal</p>
+            {[
+              { icon: BarChart3, label: 'Dashboard', active: true },
+              { icon: Calendar, label: 'Agenda', active: false },
+              { icon: Users, label: 'Clientes', active: false },
+              { icon: TrendingUp, label: 'Serviços', active: false },
+              { icon: ShieldCheck, label: 'Configurações', active: false },
+              { icon: CreditCard, label: 'Assinatura', active: false },
+            ].map(({ icon: Icon, label, active }) => (
+              <div key={label} className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium ${active ? 'bg-white/20 text-white' : 'text-blue-200'}`}>
+                <Icon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-blue-300'}`} />
+                <span>{label}</span>
+              </div>
+            ))}
+          </nav>
+          {/* user */}
+          <div className="px-3 py-3 border-t border-blue-500/40">
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg">
+              <div className="w-7 h-7 rounded-full bg-blue-400 ring-2 ring-white/30 flex items-center justify-center text-white text-xs font-bold shrink-0">AP</div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-white truncate">Ana Paula</p>
+                <p className="text-[9px] text-blue-200">Plano Starter</p>
+              </div>
+            </div>
+          </div>
         </div>
-        {/* main content */}
-        <div className="flex-1 bg-gray-50 overflow-hidden">
+
+        {/* main content — matches real dashboard exactly */}
+        <div className="flex-1 bg-gray-50 overflow-hidden flex flex-col">
           {/* top bar */}
-          <div className="bg-white border-b border-gray-100 px-4 py-2.5 flex items-center justify-between">
+          <div className="bg-white border-b border-gray-100 px-4 py-2.5 flex items-center justify-between shrink-0">
             <div>
-              <p className="text-xs font-semibold text-gray-900">Hoje — Quinta, 3 de Abril</p>
-              <p className="text-xs text-gray-400">4 agendamentos</p>
+              <p className="text-xs font-bold text-gray-900">Olá, Ana Paula!</p>
+              <p className="text-[10px] text-gray-400">Bem-vinda ao seu painel</p>
             </div>
-            <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold">A</div>
+            <div className="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1">
+              <span className="text-base leading-none">+</span> Novo agendamento
+            </div>
           </div>
-          {/* stats row */}
-          <div className="grid grid-cols-3 gap-2 px-3 pt-3 pb-2">
+          {/* booking link banner */}
+          <div className="mx-3 mt-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2 shrink-0">
+            <div className="text-[9px] font-semibold text-blue-700">Seu link:</div>
+            <code className="text-[9px] text-blue-800 bg-white border border-blue-200 rounded px-1.5 py-0.5">agendafacil.com.br/ana-paula</code>
+          </div>
+          {/* stat cards */}
+          <div className="grid grid-cols-4 gap-2 px-3 pt-2 shrink-0">
             {[
-              { label: 'Esta semana', value: '18' },
-              { label: 'Receita', value: 'R$1.240' },
-              { label: 'No-shows', value: '0' },
-            ].map(({ label, value }) => (
+              { label: 'Hoje', value: '4', color: 'text-blue-600', bg: 'bg-blue-50' },
+              { label: 'Receita mês', value: 'R$1.240', color: 'text-green-600', bg: 'bg-green-50' },
+              { label: 'Clientes', value: '48', color: 'text-purple-600', bg: 'bg-purple-50' },
+              { label: 'Presença', value: '96%', color: 'text-orange-600', bg: 'bg-orange-50' },
+            ].map(({ label, value, color, bg }) => (
               <div key={label} className="bg-white rounded-lg p-2 border border-gray-100">
-                <p className="text-xs text-gray-400">{label}</p>
-                <p className="text-sm font-bold text-gray-900">{value}</p>
+                <p className="text-[9px] text-gray-400 mb-0.5">{label}</p>
+                <p className={`text-sm font-extrabold ${color}`}>{value}</p>
               </div>
             ))}
           </div>
-          {/* appointment list */}
-          <div className="px-3 space-y-1.5">
-            {[
-              { time: '09:00', name: 'Maria S.', service: 'Corte + Escova', color: 'bg-blue-500', done: true },
-              { time: '10:30', name: 'João P.', service: 'Barba completa', color: 'bg-purple-500', done: true },
-              { time: '14:00', name: 'Carla M.', service: 'Manicure', color: 'bg-green-500', done: false },
-              { time: '16:00', name: 'Pedro A.', service: 'Corte masculino', color: 'bg-orange-500', done: false },
-            ].map(({ time, name, service, color, done }) => (
-              <div key={time} className={`bg-white rounded-lg px-3 py-2 border border-gray-100 flex items-center gap-3 ${done ? 'opacity-50' : ''}`}>
-                <div className={`w-1 h-8 rounded-full ${color} shrink-0`} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-900 truncate">{name}</p>
-                  <p className="text-xs text-gray-400 truncate">{service}</p>
-                </div>
-                <p className="text-xs font-medium text-gray-500 shrink-0">{time}</p>
-                {done && <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                  <Check className="w-2.5 h-2.5 text-green-600" />
-                </div>}
+          {/* appointments */}
+          <div className="px-3 pt-2 flex-1 overflow-hidden">
+            <div className="bg-white rounded-lg border border-gray-100">
+              <div className="px-3 py-2 border-b border-gray-50 flex items-center justify-between">
+                <p className="text-[10px] font-bold text-gray-900">Próximos agendamentos</p>
+                <p className="text-[9px] text-blue-600 font-medium">Ver todos →</p>
               </div>
-            ))}
+              {[
+                { initials: 'MS', name: 'Maria Silva', service: 'Corte + Escova', time: '09:00', color: 'bg-blue-100 text-blue-700', badge: 'bg-green-100 text-green-700', status: 'Confirmado' },
+                { initials: 'JP', name: 'João Pedro', service: 'Barba completa', time: '10:30', color: 'bg-purple-100 text-purple-700', badge: 'bg-green-100 text-green-700', status: 'Confirmado' },
+                { initials: 'CM', name: 'Carla Matos', service: 'Manicure', time: '14:00', color: 'bg-pink-100 text-pink-700', badge: 'bg-blue-100 text-blue-700', status: 'Pendente' },
+              ].map(({ initials, name, service, time, color, badge, status }) => (
+                <div key={name} className="flex items-center gap-2.5 px-3 py-2 border-b border-gray-50 last:border-0">
+                  <div className={`w-6 h-6 rounded-full ${color} flex items-center justify-center text-[9px] font-bold shrink-0`}>{initials}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold text-gray-900 truncate">{name}</p>
+                    <p className="text-[9px] text-gray-400 truncate">{service}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-[9px] text-gray-500">{time}</p>
+                    <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${badge}`}>{status}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -102,52 +142,62 @@ function BrowserMockup() {
 
 function PhoneMockup() {
   return (
-    <div className="w-[220px] mx-auto rounded-[2rem] shadow-2xl overflow-hidden border-[6px] border-slate-800 bg-white select-none">
+    <div className="w-[200px] mx-auto rounded-[2.5rem] shadow-2xl overflow-hidden border-[7px] border-slate-800 bg-white select-none">
       {/* notch */}
       <div className="bg-slate-800 h-5 flex items-center justify-center">
-        <div className="w-16 h-2.5 bg-black rounded-full" />
+        <div className="w-14 h-2 bg-black rounded-full" />
       </div>
-      {/* screen */}
-      <div className="bg-gray-50">
-        {/* header */}
-        <div className="bg-blue-600 px-4 py-4 text-white">
-          <p className="text-xs font-bold truncate">Salão da Ana Paula</p>
-          <p className="text-xs opacity-75 mt-0.5">Escolha um horário</p>
+      {/* screen — matches real booking page */}
+      <div className="bg-gradient-to-b from-blue-50 to-gray-50">
+        {/* professional header card */}
+        <div className="mx-2 mt-2 bg-white rounded-xl border border-gray-100 p-2.5 flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+            <span className="text-blue-600 font-extrabold text-sm">A</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-gray-900 truncate">Salão da Ana Paula</p>
+            <p className="text-[8px] text-gray-500">Salão de Beleza</p>
+            <p className="text-[8px] text-gray-400">📍 São Paulo, SP</p>
+          </div>
         </div>
-        {/* service */}
-        <div className="px-3 py-2 bg-white border-b border-gray-100">
-          <p className="text-xs text-gray-400">Serviço selecionado</p>
-          <p className="text-xs font-semibold text-gray-900">Corte + Escova — R$80</p>
+        {/* step indicator */}
+        <div className="flex justify-center gap-1 py-2">
+          {[1,2,3,4,5].map((s) => (
+            <div key={s} className={`h-1.5 rounded-full ${s === 1 ? 'w-5 bg-blue-600' : 'w-2 bg-gray-200'}`} />
+          ))}
         </div>
-        {/* calendar mini */}
-        <div className="px-3 py-2">
-          <p className="text-xs font-semibold text-gray-700 mb-2">Abril 2026</p>
-          <div className="grid grid-cols-7 gap-0.5 text-center text-xs">
-            {['D','S','T','Q','Q','S','S'].map((d, i) => (
-              <div key={i} className="text-gray-400 text-[9px] font-medium">{d}</div>
-            ))}
-            {[1,2,3,4,5,6,7,8,9,10,11,12,13,14].map((d) => (
-              <div key={d} className={`rounded text-[10px] py-0.5 font-medium ${d === 4 ? 'bg-blue-600 text-white' : d < 3 ? 'text-gray-300' : 'text-gray-700 hover:bg-blue-50'}`}>
-                {d}
+        {/* step content card */}
+        <div className="mx-2 mb-2 bg-white rounded-xl border border-gray-100 p-3">
+          <p className="text-[10px] font-bold text-gray-900 mb-0.5">Escolha o serviço</p>
+          <p className="text-[8px] text-gray-400 mb-2.5">Selecione o que deseja agendar</p>
+          {/* service cards */}
+          <div className="space-y-1.5">
+            <div className="border-2 border-blue-500 bg-blue-50 rounded-xl p-2.5 flex items-start justify-between">
+              <div>
+                <p className="text-[10px] font-semibold text-gray-900">Corte + Escova</p>
+                <div className="flex gap-2 mt-1">
+                  <span className="text-[8px] text-gray-500">⏱ 60 min</span>
+                  <span className="text-[8px] font-bold text-gray-700">R$80</span>
+                </div>
               </div>
-            ))}
+              <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center shrink-0 mt-0.5">
+                <Check className="w-2.5 h-2.5 text-white" />
+              </div>
+            </div>
+            <div className="border border-gray-100 bg-white rounded-xl p-2.5 flex items-start justify-between">
+              <div>
+                <p className="text-[10px] font-semibold text-gray-900">Manicure</p>
+                <div className="flex gap-2 mt-1">
+                  <span className="text-[8px] text-gray-500">⏱ 45 min</span>
+                  <span className="text-[8px] font-bold text-gray-700">R$45</span>
+                </div>
+              </div>
+              <div className="w-4 h-4 rounded-full border-2 border-gray-300 shrink-0 mt-0.5" />
+            </div>
           </div>
-        </div>
-        {/* time slots */}
-        <div className="px-3 pb-3">
-          <p className="text-xs font-semibold text-gray-700 mb-2">Horários disponíveis</p>
-          <div className="grid grid-cols-3 gap-1">
-            {['09:00','10:00','11:00','14:00','15:00','16:00'].map((t) => (
-              <button key={t} className={`text-[11px] font-medium py-1.5 rounded-md border ${t === '14:00' ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 text-gray-700'}`}>
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
-        {/* cta */}
-        <div className="px-3 pb-4">
-          <div className="bg-blue-600 text-white text-xs font-bold text-center py-2.5 rounded-xl">
-            Confirmar agendamento
+          {/* cta */}
+          <div className="bg-blue-600 text-white text-[10px] font-bold text-center py-2 rounded-xl mt-2.5">
+            Continuar
           </div>
         </div>
       </div>
@@ -263,6 +313,107 @@ export default function ParaProfissionaisPage() {
             {['Salões de Beleza', 'Barbearias', 'Clínicas', 'Dentistas', 'Psicólogos', 'Personal Trainers', 'Esteticistas', 'Massagistas'].map(s => (
               <span key={s}>{s}</span>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FULL-WIDTH PRODUCT HERO ── */}
+      <section className="bg-slate-900 py-20 overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+              Tudo que você precisa, numa tela só
+            </h2>
+            <p className="text-slate-400 text-lg max-w-xl mx-auto">
+              Agenda, clientes, receita e confirmações — em qualquer dispositivo, a qualquer hora.
+            </p>
+          </div>
+          {/* laptop frame */}
+          <div className="relative mx-auto max-w-4xl">
+            {/* screen */}
+            <div className="bg-gray-800 rounded-t-2xl pt-3 px-3">
+              <div className="bg-gray-700 rounded-t-xl flex items-center gap-2 px-4 py-2 mb-0">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+                <div className="flex-1 bg-gray-600 rounded px-3 py-1 text-xs text-gray-400 font-mono text-center">
+                  agendafacil.com.br/agenda
+                </div>
+              </div>
+              {/* app content */}
+              <div className="flex bg-white" style={{ height: 320 }}>
+                {/* sidebar */}
+                <div className="w-48 bg-[#2563EB] flex flex-col shrink-0">
+                  <div className="flex items-center gap-2 px-4 py-4 border-b border-blue-500/40">
+                    <div className="bg-white/20 rounded-lg p-1.5"><Calendar className="w-4 h-4 text-white" /></div>
+                    <span className="text-sm font-bold text-white">AgendaFácil</span>
+                  </div>
+                  <nav className="flex-1 px-3 py-3 space-y-0.5">
+                    {[
+                      { icon: BarChart3, label: 'Dashboard', active: false },
+                      { icon: Calendar, label: 'Agenda', active: true },
+                      { icon: Users, label: 'Clientes', active: false },
+                      { icon: TrendingUp, label: 'Serviços', active: false },
+                    ].map(({ icon: Icon, label, active }) => (
+                      <div key={label} className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium ${active ? 'bg-white/20 text-white' : 'text-blue-200'}`}>
+                        <Icon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-blue-300'}`} />
+                        <span>{label}</span>
+                      </div>
+                    ))}
+                  </nav>
+                  <div className="px-3 py-3 border-t border-blue-500/40">
+                    <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg">
+                      <div className="w-7 h-7 rounded-full bg-blue-400 ring-2 ring-white/30 flex items-center justify-center text-white text-xs font-bold shrink-0">AP</div>
+                      <div><p className="text-xs font-semibold text-white">Ana Paula</p><p className="text-[9px] text-blue-200">Starter</p></div>
+                    </div>
+                  </div>
+                </div>
+                {/* agenda content */}
+                <div className="flex-1 bg-gray-50 overflow-hidden flex flex-col">
+                  <div className="bg-white border-b border-gray-100 px-5 py-3 flex items-center justify-between shrink-0">
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">Agenda</p>
+                      <p className="text-xs text-gray-400">Quinta, 3 de Abril de 2026</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 font-medium">‹ Hoje ›</div>
+                      <div className="bg-blue-600 text-white rounded-lg px-3 py-1.5 text-xs font-bold">+ Novo</div>
+                    </div>
+                  </div>
+                  {/* time blocks */}
+                  <div className="flex-1 overflow-hidden px-4 pt-3">
+                    <div className="space-y-2">
+                      {[
+                        { time: '09:00', name: 'Maria Silva', service: 'Corte + Escova', dur: 60, color: 'bg-blue-500', badge: 'bg-green-100 text-green-700', status: 'Confirmado', value: 'R$80' },
+                        { time: '10:30', name: 'João Pedro', service: 'Barba completa', dur: 45, color: 'bg-purple-500', badge: 'bg-green-100 text-green-700', status: 'Confirmado', value: 'R$50' },
+                        { time: '14:00', name: 'Carla Matos', service: 'Manicure', dur: 45, color: 'bg-pink-500', badge: 'bg-blue-100 text-blue-700', status: 'Pendente', value: 'R$45' },
+                        { time: '16:00', name: 'Pedro Alves', service: 'Corte masculino', dur: 30, color: 'bg-orange-500', badge: 'bg-blue-100 text-blue-700', status: 'Pendente', value: 'R$60' },
+                      ].map(({ time, name, service, color, badge, status, value }) => (
+                        <div key={name} className="bg-white rounded-xl border border-gray-100 flex items-center gap-3 px-4 py-2.5 hover:shadow-sm transition-shadow">
+                          <div className={`w-1.5 h-10 rounded-full ${color} shrink-0`} />
+                          <div className="w-10 shrink-0 text-center">
+                            <p className="text-xs font-bold text-gray-900">{time}</p>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-gray-900">{name}</p>
+                            <p className="text-xs text-gray-400">{service}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-xs font-bold text-gray-900">{value}</p>
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${badge}`}>{status}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* laptop base */}
+            <div className="bg-gray-700 h-4 rounded-b-lg" />
+            <div className="bg-gray-600 h-2 rounded-b-xl mx-8" />
           </div>
         </div>
       </section>

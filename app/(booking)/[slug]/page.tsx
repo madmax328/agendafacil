@@ -758,7 +758,14 @@ export default function BookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-50">
+    <div className="min-h-screen bg-gray-50">
+      {/* top brand bar */}
+      <div className="bg-[#2563EB] py-2 text-center">
+        <p className="text-xs text-blue-200 font-medium">
+          Agendamento pelo{' '}
+          <span className="text-white font-bold">AgendaFácil</span>
+        </p>
+      </div>
       <div className="max-w-lg mx-auto px-4 py-6 pb-16">
         {pageLoading ? (
           <PageSkeleton />
@@ -777,24 +784,26 @@ export default function BookingPage() {
         ) : professional ? (
           <div className="space-y-6">
             {/* Professional header */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl font-bold text-blue-600">
-                  {professional.businessName.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-lg font-bold text-gray-900 truncate">
-                  {professional.businessName}
-                </h1>
-                <p className="text-sm text-gray-500">
-                  {BUSINESS_TYPE_LABELS[professional.businessType] ?? professional.businessType}
-                </p>
-                {(professional.city || professional.state) && (
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    📍 {[professional.city, professional.state].filter(Boolean).join(' – ')}
+            <div className="bg-[#2563EB] rounded-2xl shadow-sm p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl font-extrabold text-white">
+                    {professional.businessName.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-lg font-extrabold text-white truncate">
+                    {professional.businessName}
+                  </h1>
+                  <p className="text-sm text-blue-200">
+                    {BUSINESS_TYPE_LABELS[professional.businessType] ?? professional.businessType}
                   </p>
-                )}
+                  {(professional.city || professional.state) && (
+                    <p className="text-xs text-blue-300 mt-0.5">
+                      📍 {[professional.city, professional.state].filter(Boolean).join(' – ')}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 

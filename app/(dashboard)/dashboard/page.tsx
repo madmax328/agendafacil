@@ -313,6 +313,58 @@ export default async function DashboardPage() {
         />
       </div>
 
+      {/* Today's schedule — visual timeline strip */}
+      {upcomingAppointments.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-base font-bold text-gray-900">Agenda de hoje</p>
+              <p className="text-xs text-muted-foreground">
+                {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+              </p>
+            </div>
+            <Button asChild variant="ghost" size="sm" className="gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+              <Link href="/agenda">Ver agenda <ChevronRight className="h-4 w-4" /></Link>
+            </Button>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {upcomingAppointments.map((appt, i) => {
+              const colors = [
+                { bar: 'bg-blue-500', bg: 'bg-blue-50', text: 'text-blue-700', initials: 'bg-blue-100 text-blue-700' },
+                { bar: 'bg-purple-500', bg: 'bg-purple-50', text: 'text-purple-700', initials: 'bg-purple-100 text-purple-700' },
+                { bar: 'bg-pink-500', bg: 'bg-pink-50', text: 'text-pink-700', initials: 'bg-pink-100 text-pink-700' },
+                { bar: 'bg-orange-500', bg: 'bg-orange-50', text: 'text-orange-700', initials: 'bg-orange-100 text-orange-700' },
+                { bar: 'bg-teal-500', bg: 'bg-teal-50', text: 'text-teal-700', initials: 'bg-teal-100 text-teal-700' },
+              ]
+              const c = colors[i % colors.length]
+              const initials = appt.customer.name.split(' ').slice(0,2).map((n: string) => n[0]).join('').toUpperCase()
+              return (
+                <Link
+                  key={appt.id}
+                  href={`/agenda/${appt.id}`}
+                  className={`shrink-0 w-44 ${c.bg} rounded-xl p-4 border border-transparent hover:shadow-md transition-shadow`}
+                >
+                  <div className={`w-1.5 h-6 rounded-full ${c.bar} mb-3`} />
+                  <p className={`text-xs font-bold ${c.text}`}>{formatTime(appt.scheduledAt)}</p>
+                  <div className={`w-9 h-9 rounded-full ${c.initials} flex items-center justify-center font-bold text-sm mt-2 mb-1`}>
+                    {initials}
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900 truncate">{appt.customer.name}</p>
+                  <p className="text-xs text-gray-500 truncate mt-0.5">{appt.service.name}</p>
+                </Link>
+              )
+            })}
+            <Link
+              href="/agenda/novo"
+              className="shrink-0 w-44 bg-gray-50 rounded-xl p-4 border-2 border-dashed border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-colors flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-blue-500"
+            >
+              <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-xl font-bold">+</div>
+              <p className="text-xs font-medium text-center">Novo agendamento</p>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Upcoming appointments list */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-4">
