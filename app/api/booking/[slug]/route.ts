@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { addMinutes, format, parseISO, setHours, setMinutes, eachMinuteOfInterval } from 'date-fns'
 import { sendConfirmacaoEmail } from '@/lib/email'
 
+export const dynamic = 'force-dynamic'
+
 // ── GET: public info + available time slots ────────────────────────────────────
 
 export async function GET(
@@ -39,17 +41,20 @@ export async function GET(
 
   // Base response (no date requested)
   if (!dateParam || !serviceId) {
-    return NextResponse.json({
-      professional: {
-        name: professional.name,
-        businessName: professional.businessName,
-        businessType: professional.businessType,
-        address: professional.address,
-        city: professional.city,
-        state: professional.state,
+    return NextResponse.json(
+      {
+        professional: {
+          name: professional.name,
+          businessName: professional.businessName,
+          businessType: professional.businessType,
+          address: professional.address,
+          city: professional.city,
+          state: professional.state,
+        },
+        services: professional.services,
       },
-      services: professional.services,
-    })
+      { headers: { 'Cache-Control': 'no-store, must-revalidate' } },
+    )
   }
 
   // Return time slots for a specific date + service
@@ -111,7 +116,7 @@ export async function GET(
     }
   })
 
-  return NextResponse.json({ slots })
+  return NextResponse.json({ slots }, { headers: { 'Cache-Control': 'no-store, must-revalidate' } })
 }
 
 // ── POST: create booking from public page ──────────────────────────────────────
@@ -246,5 +251,5 @@ export async function POST(
     await sendConfirmacaoEmail({ ...confirmacaoData, clientEmail: customer.email })
   }
 
-  return NextResponse.json(appointment, { status: 201 })
+  return NextResponse.json(appointment, { status: 201, headers: { 'Cache-Control': 'no-store' } })
 }

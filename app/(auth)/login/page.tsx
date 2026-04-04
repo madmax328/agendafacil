@@ -3,7 +3,7 @@
 import { Suspense, useState, type FormEvent } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, Mail, Calendar } from 'lucide-react'
+import { Loader2, Mail, Lock, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/use-toast'
 // Componente separado pois usa useSearchParams (exige Suspense boundary)
 function LoginForm() {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
   const router = useRouter()
@@ -55,10 +56,10 @@ function LoginForm() {
   async function handleEmailSignIn(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    if (!email.trim()) {
+    if (!email.trim() || !password) {
       toast({
-        title: 'E-mail obrigatório',
-        description: 'Por favor, informe seu endereço de e-mail.',
+        title: 'E-mail e senha obrigatórios',
+        description: 'Por favor, informe seu e-mail e senha.',
         variant: 'destructive',
       })
       return
@@ -66,23 +67,19 @@ function LoginForm() {
 
     try {
       setLoadingEmail(true)
-      const result = await signIn('email', {
+      const result = await signIn('credentials', {
         email: email.trim().toLowerCase(),
+        password,
         redirect: false,
         callbackUrl,
       })
 
       if (result?.error) {
-        toast({
-          title: 'Erro ao enviar e-mail',
-          description: 'Não foi possível enviar o link de acesso. Verifique o e-mail e tente novamente.',
-          variant: 'destructive',
-        })
+        toast({ title: 'E-mail ou senha incorretos', variant: 'destructive' })
         setLoadingEmail(false)
-        return
+      } else {
+        router.push(callbackUrl)
       }
-
-      router.push('/verificar-email')
     } catch {
       toast({
         title: 'Erro inesperado',
@@ -154,6 +151,26 @@ function LoginForm() {
           </div>
         </div>
 
+        <div className="space-y-1.5">
+          <Label htmlFor="password" className="text-gray-700 font-medium">
+            Senha
+          </Label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              id="password"
+              type="password"
+              placeholder="Sua senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pl-9 h-11 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+              autoComplete="current-password"
+              disabled={loadingGoogle || loadingEmail}
+              required
+            />
+          </div>
+        </div>
+
         <Button
           type="submit"
           className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors"
@@ -162,10 +179,10 @@ function LoginForm() {
           {loadingEmail ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              Enviando link...
+              Entrando...
             </>
           ) : (
-            'Entrar com e-mail'
+            'Entrar'
           )}
         </Button>
       </form>

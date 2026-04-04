@@ -16,6 +16,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { useParams } from 'next/navigation'
+import { useToast } from '@/components/ui/use-toast'
 import {
   format,
   addMonths,
@@ -346,6 +347,7 @@ function Step3Time({ slug, serviceId, selectedDate, selectedTime, onSelect, onNe
         const dateStr = format(selectedDate, 'yyyy-MM-dd')
         const res = await fetch(
           `/api/booking/${slug}?serviceId=${serviceId}&date=${dateStr}`,
+          { cache: 'no-store' },
         )
         if (res.ok) {
           const data = await res.json()
@@ -374,7 +376,7 @@ function Step3Time({ slug, serviceId, selectedDate, selectedTime, onSelect, onNe
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
         </div>
-      ) : !hasAnySlot || !hasAvailable ? (
+      ) : !hasAnySlot ? (
         <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100">
           <Calendar className="h-10 w-10 mx-auto mb-3 text-gray-300" />
           <p className="text-sm text-gray-500">Nenhum horário disponível para este dia.</p>
@@ -594,11 +596,9 @@ function Step5Confirmation({ service, date, time, clientInfo, professional, onNe
         <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4">
           <CheckCircle2 className="h-10 w-10 text-green-500" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900">Agendamento confirmado!</h2>
+        <h2 className="text-xl font-bold text-gray-900">Agendamento recebido!</h2>
         <p className="text-sm text-gray-500 mt-1">
-          {clientInfo.email
-            ? `Confirmação enviada para ${clientInfo.email}`
-            : 'Anote os detalhes abaixo para não esquecer.'}
+          Aguardando confirmação do profissional. Você será notificado em breve.
         </p>
       </div>
 
@@ -692,6 +692,7 @@ function PageSkeleton() {
 export default function BookingPage() {
   const params = useParams()
   const slug = params.slug as string
+  const { toast } = useToast()
 
   const [step, setStep] = useState<Step>(1)
   const [professional, setProfessional] = useState<Professional | null>(null)
@@ -760,7 +761,14 @@ export default function BookingPage() {
       }
       setStep(5)
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Erro ao confirmar agendamento. Tente novamente.')
+      const msg = err instanceof Error ? err.message : 'Erro ao confirmar agendamento'
+      if (msg.includes('indisponível') || msg.includes('409')) {
+        toast({ title: 'Horário não disponível', description: 'Este horário foi reservado. Escolha outro.', variant: 'destructive' })
+        setSelectedTime(null)
+        setStep(3)
+      } else {
+        toast({ title: msg, variant: 'destructive' })
+      }
     } finally {
       setBookingLoading(false)
     }
