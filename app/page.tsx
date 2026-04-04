@@ -99,8 +99,11 @@ export default async function HomePage() {
             <Link href="/para-profissionais" className="hover:text-gray-900 transition-colors">Para profissionais</Link>
           </nav>
           <div className="flex items-center gap-3">
+            <Link href="/cliente/login" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors hidden sm:block">
+              Minhas reservas
+            </Link>
             <Link href="/login" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors hidden sm:block">
-              Entrar
+              Entrar (pro)
             </Link>
             <Link
               href="/para-profissionais"

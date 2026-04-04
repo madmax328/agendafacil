@@ -660,6 +660,13 @@ function Step5Confirmation({ service, date, time, clientInfo, professional, onNe
         )}
       </div>
 
+      <a
+        href="/cliente/cadastro"
+        className="block w-full py-3.5 rounded-2xl bg-blue-600 text-white font-semibold text-center hover:bg-blue-700 transition-colors"
+      >
+        Criar conta para gerenciar reservas
+      </a>
+
       <button
         type="button"
         onClick={onNewBooking}
@@ -742,16 +749,17 @@ export default function BookingPage() {
     if (!selectedService || !selectedDate || !selectedTime) return
     setBookingLoading(true)
     try {
-      const [hours, minutes] = selectedTime.split(':').map(Number)
-      const scheduledAt = new Date(selectedDate)
-      scheduledAt.setHours(hours, minutes, 0, 0)
+      // Send as local wall-clock time (no UTC conversion) so the server sees
+      // the same hour the client selected, regardless of timezone.
+      const dateStr = format(selectedDate, 'yyyy-MM-dd')
+      const scheduledAtStr = `${dateStr}T${selectedTime}:00`
 
       const res = await fetch(`/api/booking/${slug}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           serviceId: selectedService.id,
-          scheduledAt: scheduledAt.toISOString(),
+          scheduledAt: scheduledAtStr,
           customer: clientInfo,
         }),
       })
