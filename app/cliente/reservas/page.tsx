@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Calendar, LogOut, Clock, MapPin, AlertCircle } from 'lucide-react'
+import Link from 'next/link'
+import { Loader2, Calendar, LogOut, Clock, MapPin, AlertCircle, Home } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { formatCurrency } from '@/lib/utils'
@@ -127,14 +128,20 @@ export default function ClienteReservasPage() {
               {customer && <p className="text-xs text-gray-500">{customer.name}</p>}
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            Sair
-          </button>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 transition-colors">
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline">Início</span>
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              Sair
+            </button>
+          </div>
         </div>
       </div>
 

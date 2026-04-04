@@ -15,6 +15,7 @@ import {
   X,
   LogOut,
   ChevronRight,
+  Globe,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -163,6 +164,17 @@ function Sidebar({ onClose }: SidebarProps) {
           )
         })}
       </nav>
+
+      {/* Back to public site */}
+      <div className="px-3 pb-2">
+        <Link
+          href="/"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-200 hover:bg-white/10 hover:text-white transition-colors text-sm"
+        >
+          <Globe className="h-4 w-4" />
+          <span>Ver site público</span>
+        </Link>
+      </div>
 
       {/* User info at bottom */}
       <div className="px-3 py-4 border-t border-blue-500/40">
