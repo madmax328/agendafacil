@@ -3,22 +3,21 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model Professional {
-  id            String    @id @default(cuid())
+  id            String    @id @default(cuid()) @map("_id")
   name          String?   @default("")
   email         String    @unique
-  emailVerified DateTime?           // obrigatório para o PrismaAdapter (NextAuth)
+  emailVerified DateTime?
   image         String?
   phone         String?
   slug          String?   @unique
   businessName  String    @default("")
   businessType  String    @default("outros")
-  pixKey         String?
+  pixKey        String?
   plan          Plan      @default(FREE)
   planExpiresAt DateTime?
   stripeCustomerId     String?
@@ -39,7 +38,7 @@ model Professional {
 }
 
 model Service {
-  id             String   @id @default(cuid())
+  id             String   @id @default(cuid()) @map("_id")
   professionalId String
   name           String
   duration       Int
@@ -49,12 +48,12 @@ model Service {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  professional   Professional  @relation(fields: [professionalId], references: [id], onDelete: Cascade)
   appointments   Appointment[]
 }
 
 model Customer {
-  id             String   @id @default(cuid())
+  id             String   @id @default(cuid()) @map("_id")
   professionalId String
   name           String
   phone          String
@@ -63,14 +62,14 @@ model Customer {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  professional   Professional  @relation(fields: [professionalId], references: [id], onDelete: Cascade)
   appointments   Appointment[]
 
   @@unique([professionalId, phone])
 }
 
 model Appointment {
-  id             String            @id @default(cuid())
+  id             String            @id @default(cuid()) @map("_id")
   professionalId String
   customerId     String
   serviceId      String
@@ -90,7 +89,7 @@ model Appointment {
 }
 
 model Availability {
-  id             String  @id @default(cuid())
+  id             String  @id @default(cuid()) @map("_id")
   professionalId String
   dayOfWeek      Int
   startTime      String
@@ -104,18 +103,18 @@ model Availability {
 
 // NextAuth models
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
+  id                String  @id @default(cuid()) @map("_id")
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user Professional @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -123,14 +122,16 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(cuid()) @map("_id")
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         Professional @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user Professional @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
+  id         String   @id @default(cuid()) @map("_id")
   identifier String
   token      String   @unique
   expires    DateTime
