@@ -136,6 +136,18 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } },
 ) {
+  try {
+  return await handlePost(req, params)
+  } catch (err) {
+    console.error('[Booking POST] Unhandled error:', err)
+    return NextResponse.json({ error: 'Erro interno. Tente novamente.' }, { status: 500 })
+  }
+}
+
+async function handlePost(
+  req: NextRequest,
+  params: { slug: string },
+) {
   const professional = await prisma.professional.findUnique({
     where: { slug: params.slug },
     select: {
@@ -253,3 +265,4 @@ export async function POST(
 
   return NextResponse.json(appointment, { status: 201, headers: { 'Cache-Control': 'no-store' } })
 }
+
