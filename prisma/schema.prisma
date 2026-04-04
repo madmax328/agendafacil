@@ -13,6 +13,7 @@ model Professional {
   email         String    @unique
   emailVerified DateTime?
   image         String?
+  password      String?
   phone         String?
   slug          String?   @unique
   businessName  String    @default("")
@@ -59,6 +60,8 @@ model Customer {
   phone          String
   email          String?
   notes          String?
+  password       String?
+  clientToken    String?  @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -77,6 +80,7 @@ model Appointment {
   endsAt         DateTime
   status         AppointmentStatus @default(PENDING)
   notes          String?
+  clientAccountId String?
   paymentStatus  PaymentStatus     @default(UNPAID)
   reminderDayBefore Boolean        @default(false)
   reminderTwoHours  Boolean        @default(false)
@@ -137,6 +141,16 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model ClientAccount {
+  id        String   @id @default(cuid()) @map("_id")
+  name      String
+  email     String   @unique
+  phone     String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Plan {

@@ -3,7 +3,7 @@
 import { Suspense, useState, type FormEvent } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, Mail, Calendar, ArrowLeft } from 'lucide-react'
+import { Loader2, Mail, Calendar, ArrowLeft, Lock, User } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,10 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
 
 function CadastroForm() {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
   const router = useRouter()
@@ -33,30 +36,43 @@ function CadastroForm() {
 
   async function handleEmailSignUp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!email.trim()) return
+    if (!name.trim() || !email.trim() || !password) return
+    if (password !== confirmPassword) {
+      toast({ title: 'As senhas não coincidem', variant: 'destructive' })
+      return
+    }
+    if (password.length < 6) {
+      toast({ title: 'A senha deve ter pelo menos 6 caracteres', variant: 'destructive' })
+      return
+    }
     try {
       setLoadingEmail(true)
-      const result = await signIn('email', {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email: email.trim().toLowerCase(), password }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast({ title: data.error || 'Erro ao criar conta', variant: 'destructive' })
+        setLoadingEmail(false)
+        return
+      }
+      // Auto login after registration
+      const result = await signIn('credentials', {
         email: email.trim().toLowerCase(),
+        password,
         redirect: false,
         callbackUrl,
       })
       if (result?.error) {
-        toast({
-          title: 'Erro ao enviar e-mail',
-          description: 'Verifique o endereço e tente novamente.',
-          variant: 'destructive',
-        })
-        setLoadingEmail(false)
-        return
+        toast({ title: 'Conta criada! Faça login.', description: 'Vá para a página de login.' })
+        router.push('/login')
+      } else {
+        router.push(callbackUrl)
       }
-      router.push('/verificar-email')
     } catch {
-      toast({
-        title: 'Erro ao enviar e-mail',
-        description: 'Serviço de e-mail não configurado. Contate o suporte.',
-        variant: 'destructive',
-      })
+      toast({ title: 'Erro ao criar conta', variant: 'destructive' })
       setLoadingEmail(false)
     }
   }
@@ -87,6 +103,23 @@ function CadastroForm() {
 
       <form onSubmit={handleEmailSignUp} className="space-y-4">
         <div className="space-y-1.5">
+          <Label htmlFor="name" className="text-gray-700 font-medium">Nome completo</Label>
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              id="name"
+              type="text"
+              placeholder="Seu nome"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="pl-9 h-11 border-gray-200"
+              autoComplete="name"
+              disabled={loadingGoogle || loadingEmail}
+              required
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
           <Label htmlFor="email" className="text-gray-700 font-medium">Seu melhor e-mail</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -103,14 +136,49 @@ function CadastroForm() {
             />
           </div>
         </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="password" className="text-gray-700 font-medium">Senha</Label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              id="password"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pl-9 h-11 border-gray-200"
+              autoComplete="new-password"
+              disabled={loadingGoogle || loadingEmail}
+              required
+              minLength={6}
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Confirmar senha</Label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Repita a senha"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="pl-9 h-11 border-gray-200"
+              autoComplete="new-password"
+              disabled={loadingGoogle || loadingEmail}
+              required
+            />
+          </div>
+        </div>
         <Button
           type="submit"
           className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
           disabled={loadingGoogle || loadingEmail}
         >
           {loadingEmail
-            ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Enviando link...</>
-            : 'Criar conta com e-mail'}
+            ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Criando conta...</>
+            : 'Criar conta'}
         </Button>
       </form>
 
