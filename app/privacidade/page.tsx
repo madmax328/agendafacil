@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { Calendar } from 'lucide-react'
 
 export const metadata = {
-  title: 'Política de Privacidade | AgendaFácil',
-  description: 'Como o AgendaFácil coleta, usa e protege seus dados pessoais.',
+  title: 'Política de Privacidade | Markou',
+  description: 'Como o Markou coleta, usa e protege seus dados pessoais.',
 }
 
 export default function PrivacidadePage() {
@@ -16,7 +16,7 @@ export default function PrivacidadePage() {
             <div className="bg-blue-600 rounded-lg p-1.5">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">AgendaFácil</span>
+            <span className="text-xl font-bold text-gray-900">Markou</span>
           </Link>
           <Link href="/" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">
             ← Voltar
@@ -33,7 +33,7 @@ export default function PrivacidadePage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">1. Introdução</h2>
             <p>
-              O AgendaFácil está comprometido com a proteção da privacidade dos seus usuários. Esta
+              O Markou está comprometido com a proteção da privacidade dos seus usuários. Esta
               Política descreve como coletamos, usamos, armazenamos e protegemos seus dados pessoais,
               em conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018).
             </p>
@@ -52,7 +52,7 @@ export default function PrivacidadePage() {
               </li>
               <li>
                 <strong>Dados de pagamento:</strong> processados de forma segura via Stripe. O
-                AgendaFácil não armazena dados de cartão de crédito.
+                Markou não armazena dados de cartão de crédito.
               </li>
               <li>
                 <strong>Dados de navegação:</strong> endereço IP, tipo de navegador, páginas visitadas
@@ -123,8 +123,8 @@ export default function PrivacidadePage() {
             </ul>
             <p className="mt-3">
               Para exercer seus direitos, entre em contato pelo e-mail:{' '}
-              <a href="mailto:privacidade@agendafacil.com.br" className="text-blue-600 hover:underline">
-                privacidade@agendafacil.com.br
+              <a href="mailto:privacidade@markou.app" className="text-blue-600 hover:underline">
+                privacidade@markou.app
               </a>
             </p>
           </section>
@@ -141,7 +141,7 @@ export default function PrivacidadePage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">9. Menores de Idade</h2>
             <p>
-              O AgendaFácil não é direcionado a menores de 18 anos. Não coletamos intencionalmente
+              O Markou não é direcionado a menores de 18 anos. Não coletamos intencionalmente
               dados de menores. Caso identifiquemos tal situação, os dados serão excluídos imediatamente.
             </p>
           </section>
@@ -158,8 +158,8 @@ export default function PrivacidadePage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">11. Encarregado de Dados (DPO)</h2>
             <p>
               Nosso Encarregado de Proteção de Dados pode ser contatado em:{' '}
-              <a href="mailto:privacidade@agendafacil.com.br" className="text-blue-600 hover:underline">
-                privacidade@agendafacil.com.br
+              <a href="mailto:privacidade@markou.app" className="text-blue-600 hover:underline">
+                privacidade@markou.app
               </a>
             </p>
           </section>
@@ -167,7 +167,7 @@ export default function PrivacidadePage() {
       </div>
 
       <footer className="border-t border-gray-200 mt-12 py-6 text-center text-xs text-gray-400">
-        © {new Date().getFullYear()} AgendaFácil –{' '}
+        © {new Date().getFullYear()} Markou –{' '}
         <Link href="/termos" className="hover:text-gray-600 underline">Termos de Uso</Link>
       </footer>
     </div>

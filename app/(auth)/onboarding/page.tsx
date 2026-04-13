@@ -545,7 +545,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-600">AgendaFácil</h1>
+          <h1 className="text-3xl font-bold text-blue-600">Markou</h1>
           <p className="mt-2 text-gray-600">
             Vamos configurar sua conta em poucos passos
           </p>

@@ -19,7 +19,7 @@ export default function VerificarEmailPage() {
                 <Calendar className="h-6 w-6 text-white" />
               </div>
               <span className="text-2xl font-bold text-white tracking-tight">
-                AgendaFácil
+                Markou
               </span>
             </div>
           </div>
@@ -82,7 +82,7 @@ export default function VerificarEmailPage() {
         <p className="text-center text-sm text-gray-500 mt-6">
           Precisa de ajuda?{' '}
           <a
-            href="mailto:suporte@agendafacil.com.br"
+            href="mailto:suporte@markou.app"
             className="text-blue-600 hover:underline font-medium"
           >
             Fale com nosso suporte

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 
 export const metadata = {
-  title: 'AgendaFácil para Profissionais – Sua agenda online em minutos',
+  title: 'Markou para Profissionais – Sua agenda online em minutos',
   description:
     'Adeus no-show. Sua página de agendamento online em 10 minutos. Clientes marcam sozinhos, confirmações automáticas, zero papel.',
 }
@@ -34,7 +34,7 @@ function BrowserMockup() {
           <div className="w-3 h-3 rounded-full bg-green-400" />
         </div>
         <div className="flex-1 bg-white rounded-md px-3 py-1 text-xs text-gray-400 border border-gray-200 font-mono">
-          agendafacil.com.br/dashboard
+          markou.app/dashboard
         </div>
       </div>
       {/* app shell */}
@@ -46,7 +46,7 @@ function BrowserMockup() {
             <div className="bg-white/20 rounded-lg p-1.5">
               <Calendar className="w-4 h-4 text-white" />
             </div>
-            <span className="text-sm font-bold text-white">AgendaFácil</span>
+            <span className="text-sm font-bold text-white">Markou</span>
           </div>
           {/* nav */}
           <nav className="flex-1 px-3 py-3 space-y-0.5">
@@ -92,7 +92,7 @@ function BrowserMockup() {
           {/* booking link banner */}
           <div className="mx-3 mt-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2 shrink-0">
             <div className="text-[9px] font-semibold text-blue-700">Seu link:</div>
-            <code className="text-[9px] text-blue-800 bg-white border border-blue-200 rounded px-1.5 py-0.5">agendafacil.com.br/ana-paula</code>
+            <code className="text-[9px] text-blue-800 bg-white border border-blue-200 rounded px-1.5 py-0.5">markou.app/ana-paula</code>
           </div>
           {/* stat cards */}
           <div className="grid grid-cols-4 gap-2 px-3 pt-2 shrink-0">
@@ -216,7 +216,7 @@ export default function ParaProfissionaisPage() {
             <div className="bg-blue-600 rounded-lg p-1.5">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">AgendaFácil</span>
+            <span className="text-xl font-bold text-gray-900">Markou</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
             <a href="#negocios" className="hover:text-blue-600 transition-colors">Negócios</a>
@@ -257,7 +257,7 @@ export default function ParaProfissionaisPage() {
               <h1 className="font-black leading-[1.05] tracking-tight mb-6">
                 <span className="text-blue-600 text-5xl md:text-6xl lg:text-7xl block">Da correria do dia</span>
                 <span className="text-blue-600 text-5xl md:text-6xl lg:text-7xl block">ao controle total</span>
-                <span className="text-slate-900 text-4xl md:text-5xl lg:text-6xl block mt-1">o AgendaFácil simplifica.</span>
+                <span className="text-slate-900 text-4xl md:text-5xl lg:text-6xl block mt-1">o Markou simplifica.</span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 mb-10 leading-relaxed">
@@ -295,7 +295,7 @@ export default function ParaProfissionaisPage() {
                   2. Cola este código no lugar:
                      <img
                        src="COLE_A_URL_DA_FOTO_AQUI"
-                       alt="Profissional usando o AgendaFácil"
+                       alt="Profissional usando o Markou"
                        className="w-full h-full object-cover"
                      />
                   ─────────────────────────────────────────────────────────────
@@ -304,7 +304,7 @@ export default function ParaProfissionaisPage() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="https://plus.unsplash.com/premium_photo-1661521392942-50eb6b6a6c5e?q=80&w=1154&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt="Profissional usando o AgendaFácil"
+                    alt="Profissional usando o Markou"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -347,7 +347,7 @@ export default function ParaProfissionaisPage() {
           <div className="text-center mb-4">
             <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-3">Para todos os tipos de negócio</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">
-              O AgendaFácil é para o seu negócio
+              O Markou é para o seu negócio
             </h2>
           </div>
           <p className="text-center text-slate-500 text-lg mb-12 max-w-2xl mx-auto">
@@ -440,7 +440,7 @@ export default function ParaProfissionaisPage() {
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
                 <div className="flex-1 bg-gray-600 rounded px-3 py-1 text-xs text-gray-400 font-mono text-center">
-                  agendafacil.com.br/agenda
+                  markou.app/agenda
                 </div>
               </div>
               {/* app content */}
@@ -449,7 +449,7 @@ export default function ParaProfissionaisPage() {
                 <div className="w-48 bg-[#2563EB] flex flex-col shrink-0">
                   <div className="flex items-center gap-2 px-4 py-4 border-b border-blue-500/40">
                     <div className="bg-white/20 rounded-lg p-1.5"><Calendar className="w-4 h-4 text-white" /></div>
-                    <span className="text-sm font-bold text-white">AgendaFácil</span>
+                    <span className="text-sm font-bold text-white">Markou</span>
                   </div>
                   <nav className="flex-1 px-3 py-3 space-y-0.5">
                     {[
@@ -549,7 +549,7 @@ export default function ParaProfissionaisPage() {
             <div className="inline-flex flex-col items-center gap-2">
               <div className="w-px h-8 bg-gradient-to-b from-slate-200 to-blue-600" />
               <div className="bg-blue-600 text-white text-sm font-bold px-6 py-2.5 rounded-full">
-                Com o AgendaFácil, isso acaba
+                Com o Markou, isso acaba
               </div>
               <div className="w-px h-8 bg-gradient-to-b from-blue-600 to-slate-200" />
             </div>
@@ -578,7 +578,7 @@ export default function ParaProfissionaisPage() {
                 {[
                   'Funciona 24h, inclusive de madrugada',
                   'Compatível com qualquer celular',
-                  'Seu link personalizado: agendafacil.com/seu-nome',
+                  'Seu link personalizado: markou.com/seu-nome',
                   'Coloque no Instagram, WhatsApp ou cartão de visita',
                 ].map(item => (
                   <li key={item} className="flex items-start gap-3 text-sm text-slate-600">
@@ -708,8 +708,8 @@ export default function ParaProfissionaisPage() {
                       <Calendar className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">AgendaFácil</p>
-                      <p className="text-xs text-slate-400">noreply@agendafacil.com.br</p>
+                      <p className="text-xs font-bold text-slate-900">Markou</p>
+                      <p className="text-xs text-slate-400">noreply@markou.app</p>
                     </div>
                   </div>
                   <div className="bg-blue-600 rounded-xl p-4 text-white mb-4">
@@ -739,7 +739,7 @@ export default function ParaProfissionaisPage() {
           <div className="grid md:grid-cols-3 gap-8 text-left">
             {[
               { step: '01', title: 'Crie sua conta', desc: 'Cadastre-se de graça. Configure seus serviços e horários disponíveis. Tudo simples, sem treinamento.' },
-              { step: '02', title: 'Compartilhe seu link', desc: 'Você recebe agendafacil.com/seu-nome. Coloque no Instagram, cartão de visita, grupo do WhatsApp — em qualquer lugar.' },
+              { step: '02', title: 'Compartilhe seu link', desc: 'Você recebe markou.com/seu-nome. Coloque no Instagram, cartão de visita, grupo do WhatsApp — em qualquer lugar.' },
               { step: '03', title: 'Receba agendamentos', desc: 'Clientes marcam sozinhos. Você recebe a notificação, eles recebem a confirmação. Pronto.' },
             ].map(({ step, title, desc }) => (
               <div key={step} className="relative">
@@ -893,7 +893,7 @@ export default function ParaProfissionaisPage() {
             <div className="lg:w-72 shrink-0">
               <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-4">Depoimentos</p>
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
-                Quem usa o AgendaFácil conta com ele.
+                Quem usa o Markou conta com ele.
               </h2>
               <div className="mt-8 space-y-4">
                 {[
@@ -1004,9 +1004,9 @@ export default function ParaProfissionaisPage() {
             <div className="bg-blue-600 rounded-lg p-1">
               <Calendar className="h-4 w-4 text-white" />
             </div>
-            <span className="font-semibold text-white">AgendaFácil</span>
+            <span className="font-semibold text-white">Markou</span>
           </Link>
-          <p>© {new Date().getFullYear()} AgendaFácil. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} Markou. Todos os direitos reservados.</p>
           <div className="flex gap-6">
             <Link href="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
             <Link href="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>

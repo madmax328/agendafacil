@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { ProfissionaisSearch } from './search'
 
 export const metadata = {
-  title: 'Encontrar Profissionais | AgendaFácil',
+  title: 'Encontrar Profissionais | Markou',
   description: 'Encontre salões de beleza, clínicas, dentistas e outros profissionais perto de você e agende online.',
 }
 
@@ -160,7 +160,7 @@ export default function ProfissionaisPage({
             <div className="bg-blue-600 rounded-xl p-1.5">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">AgendaFácil</span>
+            <span className="text-xl font-bold text-gray-900">Markou</span>
           </Link>
           <Link href="/para-profissionais" className="text-sm font-bold text-blue-600 hover:text-blue-700 hidden sm:block">
             Para profissionais →

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 
 export const metadata = {
-  title: 'AgendaFácil – Agende Online com os Melhores Profissionais',
+  title: 'Markou – Agende Online com os Melhores Profissionais',
   description:
     'Encontre salões, clínicas, dentistas, psicólogos e muito mais perto de você. Agende online 24h, sem precisar ligar ou mandar mensagem.',
 }
@@ -92,7 +92,7 @@ export default async function HomePage() {
             <div className="bg-blue-600 rounded-xl p-1.5 shadow-sm shadow-blue-200">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900 tracking-tight">AgendaFácil</span>
+            <span className="text-xl font-bold text-gray-900 tracking-tight">Markou</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
             <Link href="/profissionais" className="hover:text-gray-900 transition-colors">Explorar</Link>
@@ -371,9 +371,9 @@ export default async function HomePage() {
             <div className="bg-blue-600 rounded-xl p-1">
               <Calendar className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-white">AgendaFácil</span>
+            <span className="font-bold text-white">Markou</span>
           </div>
-          <p className="text-gray-600">© {new Date().getFullYear()} AgendaFácil. Todos os direitos reservados.</p>
+          <p className="text-gray-600">© {new Date().getFullYear()} Markou. Todos os direitos reservados.</p>
           <div className="flex gap-6">
             <Link href="/termos" className="hover:text-white transition-colors">Termos</Link>
             <Link href="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>

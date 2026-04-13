@@ -110,7 +110,7 @@ export default async function DashboardPage() {
     select: { slug: true, businessName: true },
   })
   const slug = professional?.slug ?? null
-  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://agendafacil.com.br'
+  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://markou.app'
   const bookingUrl = slug ? `${baseUrl}/${slug}` : null
 
   const now = new Date()

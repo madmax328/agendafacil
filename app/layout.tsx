@@ -12,8 +12,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'AgendaFácil – Agendamento Online para Profissionais',
-    template: '%s | AgendaFácil',
+    default: 'Markou – Agendamento Online para Profissionais',
+    template: '%s | Markou',
   },
   description:
     'Simplifique sua agenda. Aceite agendamentos online 24h, envie lembretes automáticos e gerencie seus clientes com facilidade.',
@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     'clínica',
     'gestão de clientes',
   ],
-  authors: [{ name: 'AgendaFácil' }],
-  creator: 'AgendaFácil',
+  authors: [{ name: 'Markou' }],
+  creator: 'Markou',
   metadataBase: new URL(
-    process.env.NEXTAUTH_URL ?? 'https://agendafacil.com.br'
+    process.env.NEXTAUTH_URL ?? 'https://markou.app'
   ),
   icons: {
     icon: '/icon.svg',
@@ -38,15 +38,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    url: 'https://agendafacil.com.br',
-    siteName: 'AgendaFácil',
-    title: 'AgendaFácil – Agendamento Online para Profissionais',
+    url: 'https://markou.app',
+    siteName: 'Markou',
+    title: 'Markou – Agendamento Online para Profissionais',
     description:
       'Simplifique sua agenda. Aceite agendamentos online 24h, envie lembretes automáticos e gerencie seus clientes com facilidade.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AgendaFácil – Agendamento Online para Profissionais',
+    title: 'Markou – Agendamento Online para Profissionais',
     description:
       'Simplifique sua agenda. Aceite agendamentos online 24h, envie lembretes automáticos e gerencie seus clientes com facilidade.',
   },

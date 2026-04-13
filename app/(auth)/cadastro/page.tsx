@@ -202,7 +202,7 @@ export default function CadastroPage() {
               <div className="bg-white/20 rounded-xl p-2">
                 <Calendar className="h-7 w-7 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-white tracking-tight">AgendaFácil</h1>
+              <h1 className="text-3xl font-bold text-white tracking-tight">Markou</h1>
             </div>
             <p className="text-blue-100 text-sm mt-1">Comece a usar de graça hoje mesmo</p>
           </div>

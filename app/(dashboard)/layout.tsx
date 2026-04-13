@@ -111,7 +111,7 @@ function Sidebar({ onClose }: SidebarProps) {
           <div className="bg-white/20 rounded-lg p-1.5 group-hover:bg-white/30 transition-colors">
             <Calendar className="h-5 w-5 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight">AgendaFácil</span>
+          <span className="text-xl font-bold tracking-tight">Markou</span>
         </Link>
         {/* Mobile close button */}
         {onClose && (
@@ -260,7 +260,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
             <span className="font-bold text-base tracking-tight">
-              AgendaFácil
+              Markou
             </span>
           </div>
           {/* Spacer to visually center the logo */}

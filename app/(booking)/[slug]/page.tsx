@@ -801,7 +801,7 @@ export default function BookingPage() {
       <div className="bg-[#2563EB] py-2 text-center">
         <p className="text-xs text-blue-200 font-medium">
           Agendamento pelo{' '}
-          <span className="text-white font-bold">AgendaFácil</span>
+          <span className="text-white font-bold">Markou</span>
         </p>
       </div>
       <div className="max-w-lg mx-auto px-4 py-6 pb-16">
@@ -911,7 +911,7 @@ export default function BookingPage() {
             {/* Footer */}
             <p className="text-center text-xs text-gray-400">
               Agendamento online por{' '}
-              <span className="font-semibold text-blue-500">AgendaFácil</span>
+              <span className="font-semibold text-blue-500">Markou</span>
             </p>
           </div>
         ) : null}

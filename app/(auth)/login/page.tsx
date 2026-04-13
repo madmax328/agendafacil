@@ -214,7 +214,7 @@ export default function LoginPage() {
                 <Calendar className="h-7 w-7 text-white" />
               </div>
               <h1 className="text-3xl font-bold text-white tracking-tight">
-                AgendaFácil
+                Markou
               </h1>
             </div>
             <p className="text-blue-100 text-sm mt-1">
