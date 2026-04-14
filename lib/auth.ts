@@ -49,6 +49,19 @@ export const authOptions: NextAuthOptions = {
 
   session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 }, // 30 days
 
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax' as const,
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60,
+      },
+    },
+  },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user?.id) token.id = user.id

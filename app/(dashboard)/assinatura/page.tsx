@@ -1,7 +1,8 @@
 'use client'
 
-import { type ReactNode, useState, useTransition } from 'react'
+import { type ReactNode, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import {
   Check,
   Zap,
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
+
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -208,8 +210,7 @@ function PlanCard({ plan, isCurrentPlan, onUpgrade, loading }: PlanCardProps) {
 
 export default function AssinaturaPage() {
   const { data: session } = useSession()
-  const [isPending, startTransition] = useTransition()
-  const [loadingPlan, setLoadingPlan] = useState<PlanId | null>(null)
+  const router = useRouter()
   const [billingLoading, setBillingLoading] = useState(false)
   const { toast } = useToast()
 
@@ -217,23 +218,8 @@ export default function AssinaturaPage() {
   const isPaidPlan = currentPlan === 'STARTER' || currentPlan === 'PRO'
 
   function handleUpgrade(planId: PlanId) {
-    setLoadingPlan(planId)
-    startTransition(async () => {
-      try {
-        const res = await fetch('/api/payments/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan: planId }),
-        })
-        if (!res.ok) throw new Error()
-        const { url } = await res.json()
-        if (url) window.location.href = url
-      } catch {
-        toast({ title: 'Erro ao redirecionar para pagamento', variant: 'destructive' })
-      } finally {
-        setLoadingPlan(null)
-      }
-    })
+    if (planId === 'FREE') return
+    router.push(`/assinar/${planId.toLowerCase()}`)
   }
 
   async function handleBillingPortal() {
@@ -308,7 +294,7 @@ export default function AssinaturaPage() {
             plan={plan}
             isCurrentPlan={currentPlan === plan.id}
             onUpgrade={handleUpgrade}
-            loading={loadingPlan === plan.id && isPending}
+            loading={false}
           />
         ))}
       </div>

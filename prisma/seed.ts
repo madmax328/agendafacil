@@ -254,6 +254,7 @@ async function main() {
         address: `Rua ${pick(LAST_NAMES)}, ${Math.floor(Math.random() * 2000) + 1}`,
         plan: 'FREE',
         isFeatured,
+        isDemo: true,
       },
     })
 

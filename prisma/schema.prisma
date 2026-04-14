@@ -27,6 +27,7 @@ model Professional {
   city          String?
   state         String?
   isFeatured    Boolean   @default(false)
+  isDemo        Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

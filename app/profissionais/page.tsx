@@ -72,9 +72,10 @@ async function ProfissionaisList({
       city: true,
       state: true,
       image: true,
+      isDemo: true,
       _count: { select: { services: { where: { active: true } } } },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ isDemo: 'asc' }, { createdAt: 'desc' }],
     take: 60,
   })
 
@@ -108,9 +109,16 @@ async function ProfissionaisList({
                   {emoji}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-gray-900 truncate leading-tight group-hover:text-blue-700 transition-colors">
-                    {pro.businessName || pro.name || 'Sem nome'}
-                  </h3>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-gray-900 truncate leading-tight group-hover:text-blue-700 transition-colors">
+                      {pro.businessName || pro.name || 'Sem nome'}
+                    </h3>
+                    {pro.isDemo && (
+                      <span className="shrink-0 text-[10px] font-semibold bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">
+                        Demo
+                      </span>
+                    )}
+                  </div>
                   <span className="inline-block mt-1 text-xs font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                     {label}
                   </span>

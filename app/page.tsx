@@ -31,7 +31,7 @@ const CATEGORIES = [
 
 const PRO_SELECT = {
   id: true, slug: true, name: true, businessName: true,
-  businessType: true, city: true, state: true, isFeatured: true,
+  businessType: true, city: true, state: true, isFeatured: true, isDemo: true,
   _count: { select: { services: { where: { active: true } } } },
 } as const
 
@@ -43,7 +43,7 @@ async function getFeaturedProfessionals(city?: string): Promise<{
     const local = await prisma.professional.findMany({
       where: { slug: { not: null }, city: { contains: city, mode: 'insensitive' } },
       select: PRO_SELECT,
-      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ isFeatured: 'desc' }, { isDemo: 'asc' }, { createdAt: 'desc' }],
       take: 6,
     })
     if (local.length > 0) return { professionals: local, isLocal: true }
@@ -51,7 +51,7 @@ async function getFeaturedProfessionals(city?: string): Promise<{
   const all = await prisma.professional.findMany({
     where: { slug: { not: null } },
     select: PRO_SELECT,
-    orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+    orderBy: [{ isFeatured: 'desc' }, { isDemo: 'asc' }, { createdAt: 'desc' }],
     take: 6,
   })
   return { professionals: all, isLocal: false }

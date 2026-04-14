@@ -22,6 +22,7 @@ export async function GET(
       address: true,
       city: true,
       state: true,
+      isDemo: true,
       services: {
         where: { active: true },
         select: { id: true, name: true, duration: true, price: true, description: true },
@@ -36,6 +37,7 @@ export async function GET(
   }
 
   const { searchParams } = new URL(req.url)
+
   const dateParam = searchParams.get('date')
   const serviceId = searchParams.get('serviceId')
 
@@ -50,6 +52,7 @@ export async function GET(
           address: professional.address,
           city: professional.city,
           state: professional.state,
+          isDemo: professional.isDemo,
         },
         services: professional.services,
       },
@@ -158,11 +161,19 @@ async function handlePost(
       city: true,
       state: true,
       plan: true,
+      isDemo: true,
     },
   })
 
   if (!professional) {
     return NextResponse.json({ error: 'Profissional não encontrado' }, { status: 404 })
+  }
+
+  if (professional.isDemo) {
+    return NextResponse.json(
+      { error: 'Este é um perfil de demonstração. Agendamentos não estão disponíveis.' },
+      { status: 403 },
+    )
   }
 
   let body: unknown

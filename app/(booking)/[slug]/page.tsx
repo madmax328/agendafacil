@@ -51,6 +51,14 @@ interface Professional {
   address: string | null
   city: string | null
   state: string | null
+  isDemo: boolean
+}
+
+interface LoggedInClient {
+  id: string
+  name: string
+  email: string
+  phone: string
 }
 
 interface TimeSlot {
@@ -334,9 +342,11 @@ interface Step3Props {
   onSelect: (t: string) => void
   onNext: () => void
   onBack: () => void
+  confirmLabel?: string
+  confirmLoading?: boolean
 }
 
-function Step3Time({ slug, serviceId, selectedDate, selectedTime, onSelect, onNext, onBack }: Step3Props) {
+function Step3Time({ slug, serviceId, selectedDate, selectedTime, onSelect, onNext, onBack, confirmLabel = 'Continuar', confirmLoading = false }: Step3Props) {
   const [slots, setSlots] = useState<TimeSlot[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -433,10 +443,11 @@ function Step3Time({ slug, serviceId, selectedDate, selectedTime, onSelect, onNe
         <button
           type="button"
           onClick={onNext}
-          disabled={!selectedTime}
-          className="flex-1 py-3.5 rounded-2xl bg-blue-600 text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+          disabled={!selectedTime || confirmLoading}
+          className="flex-1 py-3.5 rounded-2xl bg-blue-600 text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
         >
-          Continuar
+          {confirmLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {confirmLabel}
         </button>
       </div>
     </div>
@@ -587,9 +598,10 @@ interface Step5Props {
   clientInfo: ClientInfo
   professional: Professional
   onNewBooking: () => void
+  isClientLoggedIn?: boolean
 }
 
-function Step5Confirmation({ service, date, time, clientInfo, professional, onNewBooking }: Step5Props) {
+function Step5Confirmation({ service, date, time, clientInfo, professional, onNewBooking, isClientLoggedIn }: Step5Props) {
   return (
     <div className="text-center space-y-6">
       <div className="flex flex-col items-center">
@@ -660,12 +672,21 @@ function Step5Confirmation({ service, date, time, clientInfo, professional, onNe
         )}
       </div>
 
-      <a
-        href="/cliente/cadastro"
-        className="block w-full py-3.5 rounded-2xl bg-blue-600 text-white font-semibold text-center hover:bg-blue-700 transition-colors"
-      >
-        Criar conta para gerenciar reservas
-      </a>
+      {isClientLoggedIn ? (
+        <a
+          href="/cliente"
+          className="block w-full py-3.5 rounded-2xl bg-blue-600 text-white font-semibold text-center hover:bg-blue-700 transition-colors"
+        >
+          Ver minhas reservas
+        </a>
+      ) : (
+        <a
+          href="/cliente/cadastro"
+          className="block w-full py-3.5 rounded-2xl bg-blue-600 text-white font-semibold text-center hover:bg-blue-700 transition-colors"
+        >
+          Criar conta para gerenciar reservas
+        </a>
+      )}
 
       <button
         type="button"
@@ -707,6 +728,7 @@ export default function BookingPage() {
   const [pageLoading, setPageLoading] = useState(true)
   const [pageError, setPageError] = useState<string | null>(null)
   const [bookingLoading, setBookingLoading] = useState(false)
+  const [loggedInClient, setLoggedInClient] = useState<LoggedInClient | null>(null)
 
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
@@ -717,15 +739,24 @@ export default function BookingPage() {
     setPageLoading(true)
     setPageError(null)
     try {
-      const res = await fetch(`/api/booking/${slug}`)
-      if (res.status === 404) {
+      const [bookingRes, meRes] = await Promise.all([
+        fetch(`/api/booking/${slug}`),
+        fetch('/api/cliente/me'),
+      ])
+      if (bookingRes.status === 404) {
         setPageError('Profissional não encontrado.')
         return
       }
-      if (!res.ok) throw new Error()
-      const data = await res.json()
+      if (!bookingRes.ok) throw new Error()
+      const data = await bookingRes.json()
       setProfessional(data.professional)
       setServices(data.services)
+
+      if (meRes.ok) {
+        const me: LoggedInClient = await meRes.json()
+        setLoggedInClient(me)
+        setClientInfo({ name: me.name, phone: me.phone, email: me.email })
+      }
     } catch {
       setPageError('Erro ao carregar página. Tente novamente.')
     } finally {
@@ -845,68 +876,102 @@ export default function BookingPage() {
               </div>
             </div>
 
+            {/* Logged in as banner */}
+            {loggedInClient && (
+              <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-2xl px-4 py-3">
+                <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                <p className="text-sm text-green-800">
+                  Agendando como <span className="font-semibold">{loggedInClient.name}</span>
+                </p>
+              </div>
+            )}
+
+            {/* Demo notice */}
+            {professional.isDemo && (
+              <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+                <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">Perfil de demonstração</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    Este é um perfil de exemplo. Agendamentos não estão disponíveis.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Step indicator */}
-            {step < 5 && (
+            {step < 5 && !professional.isDemo && (
               <div className="flex justify-center">
                 <StepIndicator current={step} />
               </div>
             )}
 
             {/* Step content */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-              {step === 1 && (
-                <Step1Services
-                  services={services}
-                  selectedService={selectedService}
-                  onSelect={setSelectedService}
-                  onNext={() => setStep(2)}
-                />
-              )}
+            {!professional.isDemo && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                {step === 1 && (
+                  <Step1Services
+                    services={services}
+                    selectedService={selectedService}
+                    onSelect={setSelectedService}
+                    onNext={() => setStep(2)}
+                  />
+                )}
 
-              {step === 2 && selectedService && (
-                <Step2Date
-                  selectedDate={selectedDate}
-                  onSelect={setSelectedDate}
-                  onNext={() => setStep(3)}
-                  onBack={() => setStep(1)}
-                  slug={slug}
-                  serviceId={selectedService.id}
-                />
-              )}
+                {step === 2 && selectedService && (
+                  <Step2Date
+                    selectedDate={selectedDate}
+                    onSelect={setSelectedDate}
+                    onNext={() => setStep(3)}
+                    onBack={() => setStep(1)}
+                    slug={slug}
+                    serviceId={selectedService.id}
+                  />
+                )}
 
-              {step === 3 && selectedService && selectedDate && (
-                <Step3Time
-                  slug={slug}
-                  serviceId={selectedService.id}
-                  selectedDate={selectedDate}
-                  selectedTime={selectedTime}
-                  onSelect={setSelectedTime}
-                  onNext={() => setStep(4)}
-                  onBack={() => setStep(2)}
-                />
-              )}
+                {step === 3 && selectedService && selectedDate && (
+                  <Step3Time
+                    slug={slug}
+                    serviceId={selectedService.id}
+                    selectedDate={selectedDate}
+                    selectedTime={selectedTime}
+                    onSelect={setSelectedTime}
+                    onNext={() => {
+                      if (loggedInClient) {
+                        handleConfirm()
+                      } else {
+                        setStep(4)
+                      }
+                    }}
+                    onBack={() => setStep(2)}
+                    confirmLabel={loggedInClient ? 'Confirmar agendamento' : 'Continuar'}
+                    confirmLoading={loggedInClient ? bookingLoading : false}
+                  />
+                )}
 
-              {step === 4 && (
-                <Step4ClientInfo
-                  info={clientInfo}
-                  onChange={setClientInfo}
-                  onNext={handleConfirm}
-                  onBack={() => setStep(3)}
-                  loading={bookingLoading}
-                />
-              )}
+                {step === 4 && (
+                  <Step4ClientInfo
+                    info={clientInfo}
+                    onChange={setClientInfo}
+                    onNext={handleConfirm}
+                    onBack={() => setStep(3)}
+                    loading={bookingLoading}
+                  />
+                )}
 
-              {step === 5 && selectedService && selectedDate && selectedTime && (
-                <Step5Confirmation
-                  service={selectedService}
-                  date={selectedDate}
-                  time={selectedTime}
-                  clientInfo={clientInfo}
-                  professional={professional}
-                  onNewBooking={resetBooking}
-                />
-              )}
-            </div>
+                {step === 5 && selectedService && selectedDate && selectedTime && (
+                  <Step5Confirmation
+                    service={selectedService}
+                    date={selectedDate}
+                    time={selectedTime}
+                    clientInfo={clientInfo}
+                    professional={professional}
+                    onNewBooking={resetBooking}
+                    isClientLoggedIn={!!loggedInClient}
+                  />
+                )}
+              </div>
+            )}
 
             {/* Footer */}
             <p className="text-center text-xs text-gray-400">
