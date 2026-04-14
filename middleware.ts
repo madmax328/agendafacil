@@ -20,6 +20,7 @@ export const config = {
     '/clientes/:path*',
     '/servicos/:path*',
     '/configuracoes/:path*',
+    '/relatorios/:path*',
     '/assinatura/:path*',
     '/onboarding',
   ],

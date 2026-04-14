@@ -10,7 +10,8 @@ export async function GET(req: NextRequest) {
   const customer = verifyCustomerToken(token)
   if (!customer) return NextResponse.json({ error: 'Token inválido' }, { status: 401 })
 
-  // Find all appointments where customer email matches
+  // Primary: find appointments directly linked to this ClientAccount
+  // Fallback: find via Customer records that share the same email
   const customerRecords = await prisma.customer.findMany({
     where: { email: customer.email },
     select: { id: true },
@@ -19,8 +20,11 @@ export async function GET(req: NextRequest) {
 
   const appointments = await prisma.appointment.findMany({
     where: {
-      customerId: { in: customerIds },
       status: { not: 'CANCELLED' },
+      OR: [
+        { clientAccountId: customer.id },
+        ...(customerIds.length > 0 ? [{ customerId: { in: customerIds } }] : []),
+      ],
     },
     include: {
       service: { select: { name: true, duration: true, price: true } },
@@ -29,5 +33,13 @@ export async function GET(req: NextRequest) {
     orderBy: { scheduledAt: 'desc' },
   })
 
-  return NextResponse.json(appointments)
+  // De-duplicate in case both conditions match the same appointment
+  const seen = new Set<string>()
+  const unique = appointments.filter(a => {
+    if (seen.has(a.id)) return false
+    seen.add(a.id)
+    return true
+  })
+
+  return NextResponse.json(unique)
 }

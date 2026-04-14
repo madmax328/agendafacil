@@ -65,6 +65,8 @@ export const authOptions: NextAuthOptions = {
         path: '/',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60,
+        // Allow cookie to work for both markou.app and www.markou.app
+        domain: process.env.NODE_ENV === 'production' ? '.markou.app' : undefined,
       },
     },
   },
@@ -81,13 +83,14 @@ export const authOptions: NextAuthOptions = {
         try {
           const pro = await prisma.professional.findUnique({
             where: { id: token.id as string },
-            select: { plan: true, slug: true, businessName: true, businessType: true },
+            select: { plan: true, slug: true, businessName: true, businessType: true, planExpiresAt: true },
           })
           if (pro) {
             session.user.plan = pro.plan as Plan
             session.user.slug = pro.slug ?? undefined
             session.user.businessName = pro.businessName
             session.user.businessType = pro.businessType
+            session.user.planExpiresAt = pro.planExpiresAt?.toISOString() ?? null
           }
         } catch {
           // DB error — keep session alive with cached token data

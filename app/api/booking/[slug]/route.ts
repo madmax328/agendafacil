@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { addMinutes, format, parseISO, setHours, setMinutes, eachMinuteOfInterval } from 'date-fns'
 import { sendConfirmacaoEmail } from '@/lib/email'
+import { verifyCustomerToken } from '@/lib/auth-customer'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +24,8 @@ export async function GET(
       city: true,
       state: true,
       isDemo: true,
+      pixKey: true,
+      plan: true,
       services: {
         where: { active: true },
         select: { id: true, name: true, duration: true, price: true, description: true },
@@ -53,6 +56,8 @@ export async function GET(
           city: professional.city,
           state: professional.state,
           isDemo: professional.isDemo,
+          pixKey: professional.plan === 'PRO' ? (professional.pixKey ?? null) : null,
+          plan: professional.plan,
         },
         services: professional.services,
       },
@@ -162,6 +167,7 @@ async function handlePost(
       state: true,
       plan: true,
       isDemo: true,
+      pixKey: true,
     },
   })
 
@@ -244,6 +250,10 @@ async function handlePost(
     },
   })
 
+  // Link to ClientAccount if client is logged in
+  const clienteToken = req.cookies.get('cliente_token')?.value
+  const clientAccount = clienteToken ? verifyCustomerToken(clienteToken) : null
+
   const appointment = await prisma.appointment.create({
     data: {
       professionalId: professional.id,
@@ -253,6 +263,7 @@ async function handlePost(
       endsAt,
       notes: data.notes,
       status: 'PENDING',
+      ...(clientAccount ? { clientAccountId: clientAccount.id } : {}),
     },
     include: { customer: true, service: true },
   })

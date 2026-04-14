@@ -34,6 +34,8 @@ interface Professional {
   city: string | null
   state: string | null
   isDemo: boolean
+  pixKey: string | null
+  plan: string
 }
 
 interface LoggedInClient {
@@ -500,6 +502,28 @@ function Step5Confirmation({
           </div>
         ))}
       </div>
+
+      {/* Pix payment info (PRO plan only) */}
+      {professional.plan === 'PRO' && professional.pixKey && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
+          <p className="text-xs font-bold text-green-700 uppercase tracking-wide mb-2">💸 Pague via Pix</p>
+          <p className="text-sm text-green-800 mb-1">
+            Para adiantar o pagamento, transfira o valor de{' '}
+            <strong>{formatCurrency(service.price)}</strong> para:
+          </p>
+          <div className="flex items-center justify-between bg-white border border-green-200 rounded-xl px-3 py-2 mt-2">
+            <span className="text-sm font-mono font-semibold text-gray-800 truncate">{professional.pixKey}</span>
+            <button
+              type="button"
+              onClick={() => navigator.clipboard?.writeText(professional.pixKey!)}
+              className="text-xs text-green-600 font-semibold ml-2 hover:text-green-800 shrink-0"
+            >
+              Copiar
+            </button>
+          </div>
+          <p className="text-xs text-green-600 mt-2">O profissional confirmará após receber o pagamento.</p>
+        </div>
+      )}
 
       {isClientLoggedIn ? (
         <a href="/cliente/reservas" className="block w-full py-4 rounded-2xl bg-blue-600 text-white font-bold text-sm text-center hover:bg-blue-700 transition-colors">

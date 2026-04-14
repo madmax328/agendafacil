@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import {
@@ -9,12 +9,16 @@ import {
   Crown,
   Sparkles,
   Loader2,
-  ExternalLink,
   CreditCard,
+  AlertCircle,
+  CalendarClock,
+  XCircle,
+  RefreshCcw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-
+import { format, parseISO } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -109,46 +113,29 @@ const PLANS: PlanConfig[] = [
 
 // ── Plan Card ──────────────────────────────────────────────────────────────────
 
-interface PlanCardProps {
+function PlanCard({ plan, isCurrentPlan, onUpgrade, loading }: {
   plan: PlanConfig
   isCurrentPlan: boolean
   onUpgrade: (planId: PlanId) => void
   loading: boolean
-}
-
-function PlanCard({ plan, isCurrentPlan, onUpgrade, loading }: PlanCardProps) {
+}) {
   return (
-    <div
-      className={`relative flex flex-col rounded-2xl border-2 p-6 transition-shadow ${plan.color} ${
-        plan.highlight ? 'shadow-lg shadow-blue-100' : 'shadow-sm'
-      }`}
-    >
+    <div className={`relative flex flex-col rounded-2xl border-2 p-6 transition-shadow ${plan.color} ${plan.highlight ? 'shadow-lg shadow-blue-100' : 'shadow-sm'}`}>
       {plan.highlight && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full">
-            Mais popular
-          </span>
+          <span className="bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full">Mais popular</span>
         </div>
       )}
-
-      {/* Header */}
       <div className="flex items-start justify-between mb-4">
-        <div
-          className={`w-12 h-12 rounded-xl flex items-center justify-center ${plan.badgeColor}`}
-        >
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${plan.badgeColor}`}>
           {plan.icon}
         </div>
         {isCurrentPlan && (
-          <span className="text-xs font-semibold px-3 py-1 bg-green-100 text-green-700 rounded-full">
-            Plano atual
-          </span>
+          <span className="text-xs font-semibold px-3 py-1 bg-green-100 text-green-700 rounded-full">Plano atual</span>
         )}
       </div>
-
       <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
       <p className="text-sm text-gray-500 mt-1 mb-4">{plan.description}</p>
-
-      {/* Price */}
       <div className="mb-6">
         {plan.price === null ? (
           <span className="text-3xl font-bold text-gray-900">Grátis</span>
@@ -160,35 +147,20 @@ function PlanCard({ plan, isCurrentPlan, onUpgrade, loading }: PlanCardProps) {
           </div>
         )}
       </div>
-
-      {/* Features */}
       <ul className="space-y-3 mb-8 flex-1">
         {plan.features.map((feature, i) => (
           <li key={i} className="flex items-center gap-2.5">
-            <div
-              className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
-                feature.available ? 'bg-green-100' : 'bg-gray-100'
-              }`}
-            >
-              <Check
-                className={`h-3 w-3 ${feature.available ? 'text-green-600' : 'text-gray-300'}`}
-              />
+            <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${feature.available ? 'bg-green-100' : 'bg-gray-100'}`}>
+              <Check className={`h-3 w-3 ${feature.available ? 'text-green-600' : 'text-gray-300'}`} />
             </div>
-            <span
-              className={`text-sm ${feature.available ? 'text-gray-700' : 'text-gray-400 line-through'}`}
-            >
+            <span className={`text-sm ${feature.available ? 'text-gray-700' : 'text-gray-400 line-through'}`}>
               {feature.label}
             </span>
           </li>
         ))}
       </ul>
-
-      {/* CTA */}
       {isCurrentPlan ? (
-        <button
-          disabled
-          className="w-full py-3 rounded-xl text-sm font-semibold bg-gray-100 text-gray-400 cursor-default"
-        >
+        <button disabled className="w-full py-3 rounded-xl text-sm font-semibold bg-gray-100 text-gray-400 cursor-default">
           Seu plano atual
         </button>
       ) : (
@@ -211,79 +183,153 @@ function PlanCard({ plan, isCurrentPlan, onUpgrade, loading }: PlanCardProps) {
 export default function AssinaturaPage() {
   const { data: session } = useSession()
   const router = useRouter()
-  const [billingLoading, setBillingLoading] = useState(false)
   const { toast } = useToast()
+
+  const [cancelLoading, setCancelLoading] = useState(false)
+  const [subInfo, setSubInfo] = useState<{ cancelAtPeriodEnd: boolean; planExpiresAt: string | null } | null>(null)
+  const [subInfoLoading, setSubInfoLoading] = useState(false)
 
   const currentPlan: PlanId = (session?.user?.plan as PlanId) ?? 'FREE'
   const isPaidPlan = currentPlan === 'STARTER' || currentPlan === 'PRO'
+  const currentPlanConfig = PLANS.find((p) => p.id === currentPlan)!
+
+  useEffect(() => {
+    if (!isPaidPlan) return
+    setSubInfoLoading(true)
+    fetch('/api/payments/subscription')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setSubInfo(d) })
+      .finally(() => setSubInfoLoading(false))
+  }, [isPaidPlan])
 
   function handleUpgrade(planId: PlanId) {
     if (planId === 'FREE') return
     router.push(`/assinar/${planId.toLowerCase()}`)
   }
 
-  async function handleBillingPortal() {
-    setBillingLoading(true)
+  async function handleCancelToggle() {
+    if (!subInfo) return
+    const action = subInfo.cancelAtPeriodEnd ? 'reactivate' : 'cancel'
+    setCancelLoading(true)
     try {
-      const res = await fetch('/api/payments/portal', { method: 'POST' })
+      const res = await fetch('/api/payments/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      })
       if (!res.ok) throw new Error()
-      const { url } = await res.json()
-      if (url) window.location.href = url
+      const data = await res.json()
+      setSubInfo(prev => prev ? { ...prev, cancelAtPeriodEnd: data.cancelAtPeriodEnd } : prev)
+      toast({
+        title: action === 'cancel'
+          ? 'Assinatura cancelada ao final do período'
+          : 'Assinatura reativada',
+      })
     } catch {
-      toast({ title: 'Erro ao abrir portal de cobrança', variant: 'destructive' })
+      toast({ title: 'Erro ao atualizar assinatura', variant: 'destructive' })
     } finally {
-      setBillingLoading(false)
+      setCancelLoading(false)
     }
   }
 
-  const currentPlanConfig = PLANS.find((p) => p.id === currentPlan)!
+  const nextBillingDate = subInfo?.planExpiresAt
+    ? format(parseISO(subInfo.planExpiresAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+    : (session?.user?.planExpiresAt
+        ? format(parseISO(session.user.planExpiresAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+        : null)
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Assinatura</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Escolha o plano ideal para o seu negócio
-        </p>
+        <p className="text-sm text-gray-500 mt-1">Escolha o plano ideal para o seu negócio</p>
       </div>
 
       {/* Current plan banner */}
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
-        <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center ${currentPlanConfig.badgeColor}`}
-        >
-          {currentPlanConfig.icon}
-        </div>
-        <div className="flex-1">
-          <p className="text-sm text-gray-500">Plano atual</p>
-          <p className="text-lg font-bold text-gray-900">
-            {currentPlanConfig.name}
-            {currentPlanConfig.price && (
-              <span className="text-sm font-normal text-gray-500 ml-2">
-                — R$ {currentPlanConfig.price}/mês
-              </span>
-            )}
-          </p>
-        </div>
+      <div className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${currentPlanConfig.badgeColor}`}>
+            {currentPlanConfig.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-500">Plano atual</p>
+            <p className="text-lg font-bold text-gray-900">
+              {currentPlanConfig.name}
+              {currentPlanConfig.price && (
+                <span className="text-sm font-normal text-gray-500 ml-2">— R$ {currentPlanConfig.price}/mês</span>
+              )}
+            </p>
 
-        {isPaidPlan && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleBillingPortal}
-            disabled={billingLoading}
-            className="gap-2 self-start sm:self-auto"
-          >
-            {billingLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CreditCard className="h-4 w-4" />
+            {/* Billing details */}
+            {isPaidPlan && (
+              <div className="mt-3 space-y-2">
+                {subInfoLoading ? (
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Carregando dados da assinatura...
+                  </div>
+                ) : (
+                  <>
+                    {nextBillingDate && (
+                      <div className={`flex items-center gap-2 text-sm ${subInfo?.cancelAtPeriodEnd ? 'text-red-600' : 'text-gray-600'}`}>
+                        {subInfo?.cancelAtPeriodEnd ? (
+                          <>
+                            <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
+                            <span>Acesso até <strong>{nextBillingDate}</strong> — cancelamento agendado</span>
+                          </>
+                        ) : (
+                          <>
+                            <CalendarClock className="h-4 w-4 text-blue-500 shrink-0" />
+                            <span>Próxima cobrança em <strong>{nextBillingDate}</strong></span>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCancelToggle}
+                      disabled={cancelLoading}
+                      className={`gap-2 mt-1 ${subInfo?.cancelAtPeriodEnd ? 'border-green-300 text-green-700 hover:bg-green-50' : 'border-red-200 text-red-600 hover:bg-red-50'}`}
+                    >
+                      {cancelLoading ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : subInfo?.cancelAtPeriodEnd ? (
+                        <RefreshCcw className="h-3.5 w-3.5" />
+                      ) : (
+                        <XCircle className="h-3.5 w-3.5" />
+                      )}
+                      {subInfo?.cancelAtPeriodEnd ? 'Reativar assinatura' : 'Cancelar assinatura'}
+                    </Button>
+                  </>
+                )}
+              </div>
             )}
-            Gerenciar cobrança
-            <ExternalLink className="h-3.5 w-3.5 text-gray-400" />
-          </Button>
-        )}
+          </div>
+
+          {/* Manage payment method */}
+          {isPaidPlan && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/payments/portal', { method: 'POST' })
+                  if (!res.ok) throw new Error()
+                  const { url } = await res.json()
+                  if (url) window.location.href = url
+                } catch {
+                  toast({ title: 'Erro ao abrir portal de pagamento', variant: 'destructive' })
+                }
+              }}
+              className="gap-2 self-start shrink-0"
+            >
+              <CreditCard className="h-4 w-4" />
+              Alterar cartão
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Plan cards */}
@@ -299,18 +345,18 @@ export default function AssinaturaPage() {
         ))}
       </div>
 
-      {/* FAQ / info */}
+      {/* FAQ */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 className="text-base font-semibold text-gray-900 mb-4">Perguntas frequentes</h3>
         <div className="space-y-4">
           {[
             {
               q: 'Posso cancelar a qualquer momento?',
-              a: 'Sim. Você pode cancelar sua assinatura a qualquer momento pelo portal de cobrança. O acesso continua até o final do período pago.',
+              a: 'Sim. O cancelamento é agendado para o final do período já pago — você mantém acesso até lá.',
             },
             {
               q: 'O que acontece se eu ultrapassar o limite do plano Grátis?',
-              a: 'Novos agendamentos serão bloqueados até o início do mês seguinte ou até você fazer upgrade para um plano pago.',
+              a: 'Novos agendamentos serão bloqueados até o início do mês seguinte ou até você fazer upgrade.',
             },
             {
               q: 'Como funciona o pagamento?',
@@ -318,7 +364,7 @@ export default function AssinaturaPage() {
             },
             {
               q: 'Posso mudar de plano a qualquer momento?',
-              a: 'Sim. Upgrades têm efeito imediato (com cobrança proporcional). Downgrades entram em vigor no próximo ciclo de cobrança.',
+              a: 'Sim. Upgrades têm efeito imediato (com cobrança proporcional). Downgrades entram em vigor no próximo ciclo.',
             },
           ].map(({ q, a }, i) => (
             <div key={i} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">

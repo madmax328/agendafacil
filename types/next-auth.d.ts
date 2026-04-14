@@ -13,6 +13,7 @@ declare module 'next-auth' {
       slug?: string
       businessName?: string
       businessType?: string
+      planExpiresAt?: string | null
     }
   }
 }

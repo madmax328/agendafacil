@@ -16,6 +16,7 @@ import {
   LogOut,
   ChevronRight,
   Globe,
+  BarChart2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -53,6 +54,11 @@ const navItems: NavItem[] = [
     href: '/configuracoes',
     label: 'Configurações',
     icon: Settings,
+  },
+  {
+    href: '/relatorios',
+    label: 'Relatórios',
+    icon: BarChart2,
   },
   {
     href: '/assinatura',
