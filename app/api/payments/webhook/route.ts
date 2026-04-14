@@ -58,10 +58,13 @@ export async function POST(req: NextRequest) {
           break
         }
 
+        const customerId = subscription.customer as string
+
         await prisma.professional.update({
           where: { id: professionalId },
           data: {
             plan,
+            stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
             planExpiresAt: new Date(subscription.current_period_end * 1000),
           },
