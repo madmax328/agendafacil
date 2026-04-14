@@ -47,7 +47,11 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 }, // 30 days
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60,      // JWT valid for 30 days
+    updateAge: 24 * 60 * 60,         // Refresh cookie at most once per day
+  },
 
   cookies: {
     sessionToken: {
@@ -74,17 +78,19 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string
-
-        const pro = await prisma.professional.findUnique({
-          where: { id: token.id as string },
-          select: { plan: true, slug: true, businessName: true, businessType: true },
-        })
-
-        if (pro) {
-          session.user.plan = pro.plan as Plan
-          session.user.slug = pro.slug ?? undefined
-          session.user.businessName = pro.businessName
-          session.user.businessType = pro.businessType
+        try {
+          const pro = await prisma.professional.findUnique({
+            where: { id: token.id as string },
+            select: { plan: true, slug: true, businessName: true, businessType: true },
+          })
+          if (pro) {
+            session.user.plan = pro.plan as Plan
+            session.user.slug = pro.slug ?? undefined
+            session.user.businessName = pro.businessName
+            session.user.businessType = pro.businessType
+          }
+        } catch {
+          // DB error — keep session alive with cached token data
         }
       }
       return session

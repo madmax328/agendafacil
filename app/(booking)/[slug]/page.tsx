@@ -323,10 +323,10 @@ function Step3Time({
               onClick={() => onSelect(slot.time)}
               className={`py-3 rounded-xl text-sm font-bold transition-all ${
                 !slot.available
-                  ? 'bg-gray-50 text-gray-300 line-through cursor-not-allowed'
+                  ? 'bg-red-50 border-2 border-red-100 text-red-300 line-through cursor-not-allowed'
                   : sel
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
-                  : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-400 hover:text-blue-600'
+                  ? 'bg-green-500 border-2 border-green-500 text-white shadow-md shadow-green-200'
+                  : 'bg-green-50 border-2 border-green-200 text-green-700 hover:border-green-400 hover:bg-green-100'
               }`}
             >
               {slot.time}
@@ -502,7 +502,7 @@ function Step5Confirmation({
       </div>
 
       {isClientLoggedIn ? (
-        <a href="/cliente" className="block w-full py-4 rounded-2xl bg-blue-600 text-white font-bold text-sm text-center hover:bg-blue-700 transition-colors">
+        <a href="/cliente/reservas" className="block w-full py-4 rounded-2xl bg-blue-600 text-white font-bold text-sm text-center hover:bg-blue-700 transition-colors">
           Ver minhas reservas
         </a>
       ) : (
