@@ -99,7 +99,7 @@ export function Sidebar() {
           href="/dashboard"
           className="text-xl font-bold tracking-tight text-white hover:opacity-90 transition-opacity"
         >
-          AgendaFácil
+          Markou
         </Link>
       </div>
 
