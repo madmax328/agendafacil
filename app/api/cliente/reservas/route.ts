@@ -10,36 +10,39 @@ export async function GET(req: NextRequest) {
   const customer = verifyCustomerToken(token)
   if (!customer) return NextResponse.json({ error: 'Token inválido' }, { status: 401 })
 
-  // Primary: find appointments directly linked to this ClientAccount
-  // Fallback: find via Customer records that share the same email
+  const include = {
+    service: { select: { name: true, duration: true, price: true } },
+    professional: { select: { businessName: true, city: true, state: true, address: true, phone: true } },
+  } as const
+
+  // Query 1: appointments linked to Customer records that share this email (original logic)
   const customerRecords = await prisma.customer.findMany({
     where: { email: customer.email },
     select: { id: true },
   })
   const customerIds = customerRecords.map(c => c.id)
 
-  const appointments = await prisma.appointment.findMany({
-    where: {
-      status: { not: 'CANCELLED' },
-      OR: [
-        { clientAccountId: customer.id },
-        ...(customerIds.length > 0 ? [{ customerId: { in: customerIds } }] : []),
-      ],
-    },
-    include: {
-      service: { select: { name: true, duration: true, price: true } },
-      professional: { select: { businessName: true, city: true, state: true, address: true, phone: true } },
-    },
+  const byEmail = customerIds.length > 0
+    ? await prisma.appointment.findMany({
+        where: { customerId: { in: customerIds }, status: { not: 'CANCELLED' } },
+        include,
+        orderBy: { scheduledAt: 'desc' },
+      })
+    : []
+
+  // Query 2: appointments linked directly via clientAccountId (new bookings)
+  const byAccount = await prisma.appointment.findMany({
+    where: { clientAccountId: customer.id, status: { not: 'CANCELLED' } },
+    include,
     orderBy: { scheduledAt: 'desc' },
   })
 
-  // De-duplicate in case both conditions match the same appointment
-  const seen = new Set<string>()
-  const unique = appointments.filter(a => {
-    if (seen.has(a.id)) return false
-    seen.add(a.id)
-    return true
-  })
+  // Merge and de-duplicate by appointment id
+  const seen = new Set(byEmail.map(a => a.id))
+  const merged = [
+    ...byEmail,
+    ...byAccount.filter(a => !seen.has(a.id)),
+  ].sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())
 
-  return NextResponse.json(unique)
+  return NextResponse.json(merged)
 }
