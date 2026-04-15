@@ -51,6 +51,7 @@ export default function ClienteReservasPage() {
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
+  const [apiError, setApiError] = useState<string | null>(null)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
   const router = useRouter()
   const { toast } = useToast()
@@ -70,6 +71,9 @@ export default function ClienteReservasPage() {
         if (reservasRes.ok) {
           const data = await reservasRes.json()
           setAppointments(data)
+        } else {
+          const err = await reservasRes.json().catch(() => ({}))
+          setApiError(`Erro ${reservasRes.status}: ${err.error ?? 'Falha ao carregar reservas'}`)
         }
       } catch {
         router.push('/cliente/login')
@@ -152,8 +156,16 @@ export default function ClienteReservasPage() {
           <p>Alterações em agendamentos só são permitidas até 24h antes. Após isso, entre em contato com o profissional.</p>
         </div>
 
+        {/* API error banner */}
+        {apiError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-2 text-sm text-red-700">
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <p>{apiError}</p>
+          </div>
+        )}
+
         {/* Appointments list */}
-        {appointments.length === 0 ? (
+        {appointments.length === 0 && !apiError ? (
           <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
             <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-200" />
             <p className="text-gray-500 font-medium">Nenhum agendamento encontrado</p>

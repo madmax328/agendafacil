@@ -17,8 +17,15 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(account)
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(_req: NextRequest) {
   const res = NextResponse.json({ ok: true })
-  res.cookies.delete('cliente_token')
+  res.cookies.set('cliente_token', '', {
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+    domain: process.env.NODE_ENV === 'production' ? '.markou.app' : undefined,
+    maxAge: 0,
+  })
   return res
 }

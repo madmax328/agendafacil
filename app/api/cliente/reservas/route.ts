@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
       : Promise.resolve([]),
     // New bookings: appointments linked directly via clientAccountId
     prisma.appointment.findMany({
-      where: { clientAccountId: customer.id, status: { not: 'CANCELLED' } },
+      where: { clientAccountId: customer.id, status: { in: ['PENDING', 'CONFIRMED', 'COMPLETED'] } },
       include,
       orderBy: { scheduledAt: 'desc' },
     }),
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
   const byCustomer = customerIds.length > 0
     ? await prisma.appointment.findMany({
-        where: { customerId: { in: customerIds }, status: { not: 'CANCELLED' } },
+        where: { customerId: { in: customerIds }, status: { in: ['PENDING', 'CONFIRMED', 'COMPLETED'] } },
         include,
         orderBy: { scheduledAt: 'desc' },
       })
