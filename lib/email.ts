@@ -7,7 +7,7 @@ function getClient() {
 }
 
 function getFrom() {
-  return process.env.RESEND_FROM_EMAIL ?? 'AgendaFácil <noreply@agendafacil.com.br>'
+  return process.env.RESEND_FROM_EMAIL ?? 'Markou <noreply@markou.app>'
 }
 
 // ── Templates ──────────────────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ function confirmacaoHtml(p: ConfirmacaoParams): string {
           <p style="margin:0;color:#6b7280;font-size:13px">Se precisar cancelar ou reagendar, entre em contacto directamente com o estabelecimento.</p>
         </td></tr>
         <tr><td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb">
-          <p style="margin:0;color:#9ca3af;font-size:12px">AgendaFácil — Sistema de Agendamento Online</p>
+          <p style="margin:0;color:#9ca3af;font-size:12px">Markou — Sistema de Agendamento Online</p>
         </td></tr>
       </table>
     </td></tr>
@@ -120,7 +120,7 @@ function lembreteHtml(p: LembreteParams, tipo: 'J-1' | 'H-2'): string {
           <p style="margin:0;color:#6b7280;font-size:13px">Se precisar cancelar ou reagendar, entre em contacto directamente com o estabelecimento.</p>
         </td></tr>
         <tr><td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb">
-          <p style="margin:0;color:#9ca3af;font-size:12px">AgendaFácil — Sistema de Agendamento Online</p>
+          <p style="margin:0;color:#9ca3af;font-size:12px">Markou — Sistema de Agendamento Online</p>
         </td></tr>
       </table>
     </td></tr>
