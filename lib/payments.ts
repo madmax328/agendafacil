@@ -9,13 +9,13 @@ export const PLANS = {
   STARTER: {
     name: 'Starter',
     priceId: process.env.STRIPE_STARTER_PRICE_ID!,
-    price: 99,
+    price: 39,
     currency: 'brl',
   },
   PRO: {
     name: 'Pro',
     priceId: process.env.STRIPE_PRO_PRICE_ID!,
-    price: 199,
+    price: 69,
     currency: 'brl',
   },
 }
