@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     const professionalIds = [...new Set(appointments.map(a => a.professionalId))]
     const professionals = await prisma.professional.findMany({
       where: { id: { in: professionalIds } },
-      select: { id: true, businessName: true, city: true, state: true, address: true, phone: true },
+      select: { id: true, businessName: true, city: true, state: true, address: true, phone: true, slug: true },
     })
     const proMap = new Map(professionals.map(p => [p.id, p]))
 
