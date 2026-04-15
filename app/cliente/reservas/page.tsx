@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Loader2, Calendar, LogOut, Clock, MapPin, AlertCircle,
-  ChevronRight, ArrowUpDown, CheckCircle2,
+  ChevronRight, ArrowUpDown, CheckCircle2, Copy, Check, QrCode,
 } from 'lucide-react'
 import { format, isPast } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -25,6 +25,8 @@ interface Appointment {
     address: string | null
     phone: string | null
     slug: string | null
+    plan: string
+    pixKey: string | null
   }
 }
 
@@ -34,7 +36,7 @@ interface Customer {
   name: string
 }
 
-type SortKey = 'date-desc' | 'date-asc' | 'status'
+type SortKey = 'date-desc' | 'date-asc'
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   PENDING:   { label: 'Aguardando', className: 'bg-yellow-100 text-yellow-800 border border-yellow-200' },
@@ -43,12 +45,53 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   COMPLETED: { label: 'Concluído',  className: 'bg-blue-100 text-blue-800 border border-blue-200' },
 }
 
-const STATUS_ORDER: Record<string, number> = { CONFIRMED: 0, PENDING: 1, COMPLETED: 2, CANCELLED: 3 }
+const STATUS_FILTERS = [
+  { key: 'ALL',       label: 'Todos' },
+  { key: 'PENDING',   label: 'Aguardando' },
+  { key: 'CONFIRMED', label: 'Confirmado' },
+  { key: 'COMPLETED', label: 'Concluído' },
+]
 
 function canCancel(scheduledAt: string): boolean {
   const deadline = new Date(scheduledAt)
   deadline.setHours(deadline.getHours() - 24)
   return deadline > new Date()
+}
+
+function PixBlock({ pixKey }: { pixKey: string }) {
+  const [copied, setCopied] = useState(false)
+  const { toast } = useToast()
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(pixKey)
+      setCopied(true)
+      toast({ title: 'Chave Pix copiada!' })
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast({ title: 'Não foi possível copiar', variant: 'destructive' })
+    }
+  }
+
+  return (
+    <div className="bg-green-50 border border-green-200 rounded-xl p-3 space-y-1.5">
+      <div className="flex items-center gap-1.5 text-xs font-semibold text-green-800">
+        <QrCode className="h-3.5 w-3.5" />
+        Pague via Pix
+      </div>
+      <div className="flex items-center gap-2">
+        <p className="flex-1 text-xs font-mono text-green-900 break-all">{pixKey}</p>
+        <button
+          type="button"
+          onClick={copy}
+          className="shrink-0 p-1.5 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-colors"
+          title="Copiar chave Pix"
+        >
+          {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+        </button>
+      </div>
+    </div>
+  )
 }
 
 export default function ClienteReservasPage() {
@@ -58,6 +101,7 @@ export default function ClienteReservasPage() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
   const [sort, setSort] = useState<SortKey>('date-desc')
+  const [statusFilter, setStatusFilter] = useState<string>('ALL')
   const router = useRouter()
   const { toast } = useToast()
 
@@ -85,12 +129,12 @@ export default function ClienteReservasPage() {
   }, [router])
 
   const sorted = useMemo(() => {
-    const list = [...appointments]
-    if (sort === 'date-asc')  list.sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+    let list = [...appointments]
+    if (statusFilter !== 'ALL') list = list.filter(a => a.status === statusFilter)
     if (sort === 'date-desc') list.sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())
-    if (sort === 'status')    list.sort((a, b) => (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9))
+    if (sort === 'date-asc')  list.sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
     return list
-  }, [appointments, sort])
+  }, [appointments, sort, statusFilter])
 
   async function handleLogout() {
     await fetch('/api/cliente/me', { method: 'DELETE' })
@@ -175,29 +219,55 @@ export default function ClienteReservasPage() {
           </p>
         )}
 
-        {/* Sort controls */}
+        {/* Sort + filter controls */}
         {appointments.length > 0 && (
-          <div className="flex items-center gap-2">
-            <ArrowUpDown className="h-4 w-4 text-gray-400 shrink-0" />
-            <span className="text-xs text-gray-500 font-medium">Ordenar:</span>
-            {([
-              { key: 'date-desc', label: 'Mais recentes' },
-              { key: 'date-asc',  label: 'Mais antigos' },
-              { key: 'status',    label: 'Por status' },
-            ] as { key: SortKey; label: string }[]).map(({ key, label }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setSort(key)}
-                className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
-                  sort === key
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-300'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="space-y-2">
+            {/* Sort */}
+            <div className="flex items-center gap-2">
+              <ArrowUpDown className="h-4 w-4 text-gray-400 shrink-0" />
+              <span className="text-xs text-gray-500 font-medium">Ordenar:</span>
+              {([
+                { key: 'date-desc' as SortKey, label: 'Mais recentes' },
+                { key: 'date-asc'  as SortKey, label: 'Mais antigos' },
+              ]).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSort(key)}
+                  className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
+                    sort === key
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-300'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Status filter */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-gray-500 font-medium">Status:</span>
+              {STATUS_FILTERS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setStatusFilter(key)}
+                  className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
+                    statusFilter === key
+                      ? 'bg-gray-800 text-white'
+                      : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-400'
+                  }`}
+                >
+                  {label}
+                  {key !== 'ALL' && (
+                    <span className="ml-1 opacity-60">
+                      ({appointments.filter(a => a.status === key).length})
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -219,14 +289,29 @@ export default function ClienteReservasPage() {
         {sorted.length === 0 && !apiError && (
           <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
             <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-200" />
-            <p className="text-gray-500 font-medium">Nenhum agendamento encontrado</p>
-            <p className="text-sm text-gray-400 mt-1">Seus agendamentos aparecerão aqui.</p>
-            <Link
-              href="/"
-              className="mt-5 inline-block px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
-            >
-              Encontrar profissionais
-            </Link>
+            {statusFilter !== 'ALL' ? (
+              <>
+                <p className="text-gray-500 font-medium">Nenhum agendamento com este status</p>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('ALL')}
+                  className="mt-4 text-sm text-blue-600 hover:underline font-medium"
+                >
+                  Ver todos
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-500 font-medium">Nenhum agendamento encontrado</p>
+                <p className="text-sm text-gray-400 mt-1">Seus agendamentos aparecerão aqui.</p>
+                <Link
+                  href="/"
+                  className="mt-5 inline-block px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Encontrar profissionais
+                </Link>
+              </>
+            )}
           </div>
         )}
 
@@ -241,49 +326,33 @@ export default function ClienteReservasPage() {
             <div
               key={appt.id}
               className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-all ${
-                past ? 'border-gray-100 opacity-70' : 'border-gray-200 hover:border-blue-200 hover:shadow-md'
+                past ? 'border-gray-100 opacity-70' : 'border-gray-200 hover:shadow-md'
               }`}
             >
-              {/* Card header — click to go to professional */}
-              {appt.professional.slug ? (
-                <Link
-                  href={`/${appt.professional.slug}`}
-                  className="flex items-center justify-between p-4 pb-3 hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="min-w-0">
-                    <p className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+              {/* Card header — professional info (name is a link to their page) */}
+              <div className="flex items-center justify-between p-4 pb-3">
+                <div className="min-w-0">
+                  {appt.professional.slug ? (
+                    <Link
+                      href={`/${appt.professional.slug}`}
+                      className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate block"
+                    >
                       {appt.professional.businessName}
-                    </p>
-                    {(appt.professional.city || appt.professional.state) && (
-                      <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                        <MapPin className="h-3 w-3 shrink-0" />
-                        {[appt.professional.city, appt.professional.state].filter(Boolean).join(' – ')}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0 ml-3">
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusInfo.className}`}>
-                      {statusInfo.label}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-blue-400 transition-colors" />
-                  </div>
-                </Link>
-              ) : (
-                <div className="flex items-center justify-between p-4 pb-3">
-                  <div className="min-w-0">
+                    </Link>
+                  ) : (
                     <p className="font-bold text-gray-900 truncate">{appt.professional.businessName}</p>
-                    {(appt.professional.city || appt.professional.state) && (
-                      <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                        <MapPin className="h-3 w-3 shrink-0" />
-                        {[appt.professional.city, appt.professional.state].filter(Boolean).join(' – ')}
-                      </p>
-                    )}
-                  </div>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ml-3 ${statusInfo.className}`}>
-                    {statusInfo.label}
-                  </span>
+                  )}
+                  {(appt.professional.city || appt.professional.state) && (
+                    <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                      <MapPin className="h-3 w-3 shrink-0" />
+                      {[appt.professional.city, appt.professional.state].filter(Boolean).join(' – ')}
+                    </p>
+                  )}
                 </div>
-              )}
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ml-3 ${statusInfo.className}`}>
+                  {statusInfo.label}
+                </span>
+              </div>
 
               {/* Card body */}
               <div className="px-4 pb-4 space-y-3">
@@ -304,17 +373,35 @@ export default function ClienteReservasPage() {
                   </div>
                 </div>
 
-                {showCancel && (
-                  <button
-                    type="button"
-                    onClick={() => handleCancel(appt.id)}
-                    disabled={cancellingId === appt.id}
-                    className="w-full py-2 rounded-xl border border-red-200 text-red-600 text-sm font-semibold hover:bg-red-50 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
-                  >
-                    {cancellingId === appt.id && <Loader2 className="h-4 w-4 animate-spin" />}
-                    Cancelar agendamento
-                  </button>
+                {/* Pix block — PRO professionals with pixKey */}
+                {appt.professional.plan === 'PRO' && appt.professional.pixKey && (
+                  <PixBlock pixKey={appt.professional.pixKey} />
                 )}
+
+                {/* Action buttons */}
+                <div className={`grid gap-2 ${appt.professional.slug && showCancel ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                  {appt.professional.slug && (
+                    <Link
+                      href={`/${appt.professional.slug}`}
+                      className="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-blue-200 text-blue-600 text-sm font-semibold hover:bg-blue-50 transition-colors"
+                    >
+                      Reservar novamente
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  )}
+
+                  {showCancel && (
+                    <button
+                      type="button"
+                      onClick={() => handleCancel(appt.id)}
+                      disabled={cancellingId === appt.id}
+                      className="py-2 rounded-xl border border-red-200 text-red-600 text-sm font-semibold hover:bg-red-50 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                    >
+                      {cancellingId === appt.id && <Loader2 className="h-4 w-4 animate-spin" />}
+                      Cancelar
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )
