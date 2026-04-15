@@ -23,6 +23,8 @@ export async function GET(
       address: true,
       city: true,
       state: true,
+      phone: true,
+      image: true,
       isDemo: true,
       pixKey: true,
       plan: true,
@@ -55,11 +57,17 @@ export async function GET(
           address: professional.address,
           city: professional.city,
           state: professional.state,
+          phone: professional.phone,
+          image: professional.image,
           isDemo: professional.isDemo,
           pixKey: professional.plan === 'PRO' ? (professional.pixKey ?? null) : null,
           plan: professional.plan,
         },
         services: professional.services,
+        availability: professional.availability
+          .filter(a => a.active)
+          .map(({ dayOfWeek, startTime, endTime }) => ({ dayOfWeek, startTime, endTime }))
+          .sort((a, b) => a.dayOfWeek - b.dayOfWeek),
       },
       { headers: { 'Cache-Control': 'no-store, must-revalidate' } },
     )
