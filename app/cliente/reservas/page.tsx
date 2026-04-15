@@ -131,8 +131,20 @@ export default function ClienteReservasPage() {
   const sorted = useMemo(() => {
     let list = [...appointments]
     if (statusFilter !== 'ALL') list = list.filter(a => a.status === statusFilter)
-    if (sort === 'date-desc') list.sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())
-    if (sort === 'date-asc')  list.sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+    if (sort === 'date-desc') {
+      // Upcoming appointments first (soonest next), then past most-recent-first
+      const now = Date.now()
+      list.sort((a, b) => {
+        const aTime = new Date(a.scheduledAt).getTime()
+        const bTime = new Date(b.scheduledAt).getTime()
+        const aFuture = aTime >= now
+        const bFuture = bTime >= now
+        if (aFuture && bFuture) return aTime - bTime   // both future: soonest first
+        if (!aFuture && !bFuture) return bTime - aTime  // both past: most recent first
+        return aFuture ? -1 : 1                         // future before past
+      })
+    }
+    if (sort === 'date-asc') list.sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
     return list
   }, [appointments, sort, statusFilter])
 
@@ -227,8 +239,8 @@ export default function ClienteReservasPage() {
               <ArrowUpDown className="h-4 w-4 text-gray-400 shrink-0" />
               <span className="text-xs text-gray-500 font-medium">Ordenar:</span>
               {([
-                { key: 'date-desc' as SortKey, label: 'Mais recentes' },
-                { key: 'date-asc'  as SortKey, label: 'Mais antigos' },
+                { key: 'date-desc' as SortKey, label: 'Próximos primeiro' },
+                { key: 'date-asc'  as SortKey, label: 'Mais antigos primeiro' },
               ]).map(({ key, label }) => (
                 <button
                   key={key}
