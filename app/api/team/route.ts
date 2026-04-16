@@ -7,7 +7,7 @@ import { z } from 'zod'
 const schema = z.object({
   name:  z.string().min(1, 'Nome é obrigatório'),
   role:  z.string().min(1, 'Função é obrigatória'),
-  image: z.string().url().optional().or(z.literal('')),
+  image: z.string().optional(),
 })
 
 export async function GET() {

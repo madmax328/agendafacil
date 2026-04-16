@@ -15,6 +15,7 @@ const updateProfileSchema = z.object({
   state: z.string().optional(),
   pixKey: z.string().optional(),
   bio: z.string().optional(),
+  image: z.string().optional(),
 })
 
 export async function GET() {
@@ -38,6 +39,7 @@ export async function GET() {
       state: true,
       pixKey: true,
       bio: true,
+      image: true,
       slug: true,
       plan: true,
     },

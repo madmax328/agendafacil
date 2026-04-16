@@ -7,7 +7,7 @@ import { z } from 'zod'
 const schema = z.object({
   name:  z.string().min(1).optional(),
   role:  z.string().min(1).optional(),
-  image: z.string().url().optional().or(z.literal('')),
+  image: z.string().optional(),
 })
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {

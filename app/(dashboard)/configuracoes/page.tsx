@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, useState, useEffect, useTransition } from 'react'
+import { type ReactNode, useState, useEffect, useTransition, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,7 +8,7 @@ import { z } from 'zod'
 import {
   Building2, Clock, Save, Loader2, CheckCircle2, XCircle,
   AlertCircle, RefreshCw, Crown, Zap, Sparkles, Users, Star,
-  Plus, Trash2, Pencil, X,
+  Plus, Trash2, Pencil, X, ImageIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -91,10 +91,65 @@ interface Review {
   createdAt: string
 }
 
+// ── ImageUpload component ──────────────────────────────────────────────────────
+
+function ImageUpload({
+  value,
+  onChange,
+  shape = 'square',
+}: {
+  value: string | null
+  onChange: (val: string | null) => void
+  shape?: 'square' | 'circle'
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const { toast } = useToast()
+  const rounded = shape === 'circle' ? 'rounded-full' : 'rounded-2xl'
+
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: 'Imagem muito grande. Máximo 2MB.', variant: 'destructive' })
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => onChange(reader.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  return (
+    <div className="flex items-center gap-5">
+      <div className={`w-20 h-20 ${rounded} bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden shrink-0`}>
+        {value
+          ? <img src={value} alt="" className="w-full h-full object-cover" />
+          : <ImageIcon className="h-8 w-8 text-gray-300" />}
+      </div>
+      <div className="flex flex-col gap-2">
+        <button type="button" onClick={() => inputRef.current?.click()}
+          className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          {value ? 'Trocar foto' : 'Escolher foto'}
+        </button>
+        {value && (
+          <button type="button" onClick={() => onChange(null)}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 transition-colors text-left">
+            Remover
+          </button>
+        )}
+        <p className="text-xs text-gray-400">JPG, PNG ou WebP · máx. 2MB</p>
+      </div>
+      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp"
+        className="hidden" onChange={handleFile} />
+    </div>
+  )
+}
+
 // ── Perfil Tab ─────────────────────────────────────────────────────────────────
 
 function PerfilTab() {
   const [isPending, startTransition] = useTransition()
+  const [profileImage, setProfileImage] = useState<string | null>(null)
   const { toast } = useToast()
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ProfileFormData>({
@@ -102,7 +157,11 @@ function PerfilTab() {
   })
 
   useEffect(() => {
-    fetch('/api/profile').then(r => r.ok ? r.json() : null).then(d => d && reset(d))
+    fetch('/api/profile').then(r => r.ok ? r.json() : null).then(d => {
+      if (!d) return
+      reset(d)
+      setProfileImage(d.image ?? null)
+    })
   }, [reset])
 
   function onSubmit(data: ProfileFormData) {
@@ -111,7 +170,7 @@ function PerfilTab() {
         const res = await fetch('/api/profile', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify({ ...data, image: profileImage }),
         })
         if (!res.ok) throw new Error()
         toast({ title: 'Perfil salvo com sucesso!' })
@@ -123,6 +182,15 @@ function PerfilTab() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Logo */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <div>
+          <h3 className="text-base font-semibold text-gray-900">Logo do negócio</h3>
+          <p className="text-sm text-gray-500 mt-1">Aparece na sua página pública de agendamentos.</p>
+        </div>
+        <ImageUpload value={profileImage} onChange={setProfileImage} shape="square" />
+      </div>
+
       {/* Informações do Negócio */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
         <h3 className="text-base font-semibold text-gray-900">Informações do Negócio</h3>
@@ -412,9 +480,12 @@ function EquipeTab() {
                   onChange={e => setForm(p => ({ ...p, role: e.target.value }))} />
               </div>
               <div className="sm:col-span-2 space-y-1">
-                <Label className="text-xs font-semibold text-gray-700">URL da foto (opcional)</Label>
-                <Input placeholder="https://..." value={form.image}
-                  onChange={e => setForm(p => ({ ...p, image: e.target.value }))} />
+                <Label className="text-xs font-semibold text-gray-700">Foto (opcional)</Label>
+                <ImageUpload
+                  value={form.image || null}
+                  onChange={val => setForm(p => ({ ...p, image: val ?? '' }))}
+                  shape="circle"
+                />
               </div>
             </div>
             <div className="flex gap-2 pt-1">
