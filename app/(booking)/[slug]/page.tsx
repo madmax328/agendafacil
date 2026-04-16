@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   CheckCircle2, MapPin, Phone, Clock, ChevronLeft, ChevronRight,
-  X, User, Mail, Loader2, Check, Copy, QrCode, Scissors, ArrowRight,
+  X, User, Mail, Loader2, Check, Copy, QrCode, Scissors, ArrowRight, Star,
 } from 'lucide-react'
 import {
   format, addMonths, subMonths, startOfMonth, endOfMonth,
@@ -37,13 +37,31 @@ interface Professional {
   businessName: string
   businessType: string
   address: string | null
+  addressNumber: string | null
+  zipCode: string | null
   city: string | null
   state: string | null
   phone: string | null
   image: string | null
+  bio: string | null
   isDemo: boolean
   pixKey: string | null
   plan: string
+}
+
+interface TeamMember {
+  id: string
+  name: string
+  role: string
+  image: string | null
+}
+
+interface Review {
+  id: string
+  rating: number
+  comment: string | null
+  clientName: string
+  createdAt: string
 }
 
 interface TimeSlot {
@@ -121,6 +139,8 @@ export default function ProfissionalPage() {
   const [professional, setProfessional] = useState<Professional | null>(null)
   const [services, setServices] = useState<Service[]>([])
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([])
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+  const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
 
   // ── Auth ──
@@ -163,6 +183,8 @@ export default function ProfissionalPage() {
         setProfessional(data.professional)
         setServices(data.services ?? [])
         setAvailability(data.availability ?? [])
+        setTeamMembers(data.teamMembers ?? [])
+        setReviews(data.reviews ?? [])
         if (meRes.ok) {
           const me = await meRes.json()
           setLoggedInClient(me)
@@ -282,7 +304,8 @@ export default function ProfissionalPage() {
   )
 
   const typeLabel  = BUSINESS_TYPES[professional.businessType] ?? 'Profissional'
-  const fullAddr   = [professional.address, professional.city, professional.state].filter(Boolean).join(', ')
+  const addrLine   = [professional.address, professional.addressNumber].filter(Boolean).join(', ')
+  const fullAddr   = [addrLine || null, professional.zipCode, professional.city, professional.state].filter(Boolean).join(', ')
   const mapsUrl    = fullAddr ? `https://maps.google.com/?q=${encodeURIComponent(fullAddr)}` : null
 
   return (
@@ -316,42 +339,18 @@ export default function ProfissionalPage() {
         </div>
       </header>
 
-      {/* ── Hero banner ── */}
-      <div className="w-full h-52 sm:h-72 relative overflow-hidden">
-        {professional.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={professional.image} alt={professional.businessName}
-            className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 flex items-end p-6 sm:p-10">
-            <div>
-              <span className="text-blue-200 text-xs font-semibold uppercase tracking-widest">{typeLabel}</span>
-              <h2 className="text-white text-3xl sm:text-4xl font-extrabold mt-1 drop-shadow">
-                {professional.businessName}
-              </h2>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── Profile row ── */}
+      {/* ── Identity section ── */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
-          {/* Avatar */}
-          <div className="w-16 h-16 rounded-2xl border-2 border-white shadow-lg bg-blue-100 flex items-center justify-center shrink-0 overflow-hidden -mt-8">
-            {professional.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={professional.image} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-2xl font-extrabold text-blue-600">
-                {professional.businessName.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-          <div>
-            <h1 className="text-xl font-extrabold text-gray-900 leading-tight">{professional.businessName}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{typeLabel}</p>
-          </div>
+        <div className="max-w-5xl mx-auto px-4 py-10 flex flex-col items-center text-center gap-3">
+          {professional.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={professional.image} alt={professional.businessName}
+              className="w-24 h-24 rounded-2xl object-cover shadow-md" />
+          ) : null}
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
+            {professional.businessName}
+          </h1>
+          <p className="text-sm text-gray-500">{typeLabel}</p>
         </div>
 
         {/* Demo warning */}
@@ -485,6 +484,66 @@ export default function ProfissionalPage() {
           </aside>
         </div>
       </div>
+
+      {/* ── Nossa equipe ── */}
+      {teamMembers.length > 0 && (
+        <div className="max-w-5xl mx-auto w-full px-4 pb-8">
+          <h2 className="text-lg font-extrabold text-gray-900 mb-4">Nossa equipe</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {teamMembers.map(member => (
+              <div key={member.id} className="flex flex-col items-center text-center gap-2 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+                {member.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={member.image} alt={member.name}
+                    className="w-16 h-16 rounded-full object-cover" />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span className="text-xl font-extrabold text-blue-600">
+                      {member.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <p className="font-bold text-gray-900 text-sm">{member.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{member.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Avaliações dos clientes ── */}
+      {reviews.length > 0 && (
+        <div className="max-w-5xl mx-auto w-full px-4 pb-8">
+          <h2 className="text-lg font-extrabold text-gray-900 mb-4">Avaliações dos clientes</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {reviews.map(review => (
+              <div key={review.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+                <div className="flex items-center gap-1 mb-2">
+                  {[1,2,3,4,5].map(n => (
+                    <Star key={n} className={`h-4 w-4 ${n <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`} />
+                  ))}
+                </div>
+                {review.comment && (
+                  <p className="text-sm text-gray-700 mb-2 leading-relaxed">{review.comment}</p>
+                )}
+                <p className="text-xs font-semibold text-gray-500">{review.clientName}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Sobre o negócio ── */}
+      {professional.bio && (
+        <div className="max-w-5xl mx-auto w-full px-4 pb-8">
+          <h2 className="text-lg font-extrabold text-gray-900 mb-3">Sobre</h2>
+          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{professional.bio}</p>
+          </div>
+        </div>
+      )}
 
       {/* ── Footer ── */}
       <footer className="bg-gray-950 text-gray-500 py-8 mt-8">

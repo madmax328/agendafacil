@@ -24,8 +24,11 @@ model Professional {
   stripeCustomerId     String?
   stripeSubscriptionId String?
   address       String?
+  addressNumber String?
+  zipCode       String?
   city          String?
   state         String?
+  bio           String?
   isFeatured    Boolean   @default(false)
   isDemo        Boolean   @default(false)
   createdAt     DateTime  @default(now())
@@ -35,6 +38,8 @@ model Professional {
   appointments  Appointment[]
   customers     Customer[]
   availability  Availability[]
+  teamMembers   TeamMember[]
+  reviews       Review[]
   accounts      Account[]
   sessions      Session[]
 }
@@ -142,6 +147,26 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model TeamMember {
+  id             String       @id @default(cuid()) @map("_id")
+  name           String
+  role           String
+  image          String?
+  professionalId String
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+}
+
+model Review {
+  id             String       @id @default(cuid()) @map("_id")
+  rating         Int
+  comment        String?
+  clientName     String
+  professionalId String
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
 }
 
 model ClientAccount {

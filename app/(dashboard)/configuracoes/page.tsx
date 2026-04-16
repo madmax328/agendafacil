@@ -6,45 +6,34 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
-  Building2,
-  MessageCircle,
-  Clock,
-  Save,
-  Loader2,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  RefreshCw,
-  Crown,
-  Zap,
-  Sparkles,
+  Building2, Clock, Save, Loader2, CheckCircle2, XCircle,
+  AlertCircle, RefreshCw, Crown, Zap, Sparkles, Users, Star,
+  Plus, Trash2, Pencil, X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type TabId = 'perfil' | 'disponibilidade'
+type TabId = 'perfil' | 'disponibilidade' | 'equipe' | 'avaliacoes'
 
-interface Tab {
-  id: TabId
-  label: string
-  icon: ReactNode
-}
+interface Tab { id: TabId; label: string; icon: ReactNode }
 
 const BUSINESS_TYPES = [
-  { value: 'salao', label: 'Salão de Beleza' },
-  { value: 'barbearia', label: 'Barbearia' },
-  { value: 'clinica', label: 'Clínica Estética' },
-  { value: 'dentista', label: 'Dentista' },
-  { value: 'psicologo', label: 'Psicólogo(a)' },
+  { value: 'salao',          label: 'Salão de Beleza' },
+  { value: 'barbearia',      label: 'Barbearia' },
+  { value: 'clinica',        label: 'Clínica Estética' },
+  { value: 'dentista',       label: 'Dentista' },
+  { value: 'psicologo',      label: 'Psicólogo(a)' },
   { value: 'fisioterapeuta', label: 'Fisioterapeuta' },
-  { value: 'nutricionista', label: 'Nutricionista' },
-  { value: 'personal', label: 'Personal Trainer' },
-  { value: 'manicure', label: 'Manicure/Pedicure' },
-  { value: 'outros', label: 'Outros' },
+  { value: 'nutricionista',  label: 'Nutricionista' },
+  { value: 'personal',       label: 'Personal Trainer' },
+  { value: 'manicure',       label: 'Manicure/Pedicure' },
+  { value: 'outros',         label: 'Outros' },
 ]
 
 const DAYS_OF_WEEK = [
@@ -66,13 +55,16 @@ const STATES_BR = [
 // ── Zod schemas ────────────────────────────────────────────────────────────────
 
 const profileSchema = z.object({
-  businessName: z.string().min(1, 'Nome do negócio é obrigatório'),
-  businessType: z.string().min(1, 'Selecione o tipo'),
-  phone: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  pixKey: z.string().optional(),
+  businessName:  z.string().min(1, 'Nome do negócio é obrigatório'),
+  businessType:  z.string().min(1, 'Selecione o tipo'),
+  phone:         z.string().optional(),
+  address:       z.string().optional(),
+  addressNumber: z.string().optional(),
+  zipCode:       z.string().optional(),
+  city:          z.string().optional(),
+  state:         z.string().optional(),
+  pixKey:        z.string().optional(),
+  bio:           z.string().optional(),
 })
 
 type ProfileFormData = z.infer<typeof profileSchema>
@@ -84,30 +76,33 @@ interface AvailabilityRow {
   endTime: string
 }
 
+interface TeamMember {
+  id: string
+  name: string
+  role: string
+  image: string | null
+}
+
+interface Review {
+  id: string
+  rating: number
+  comment: string | null
+  clientName: string
+  createdAt: string
+}
+
 // ── Perfil Tab ─────────────────────────────────────────────────────────────────
 
 function PerfilTab() {
   const [isPending, startTransition] = useTransition()
   const { toast } = useToast()
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ProfileFormData>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
   })
 
   useEffect(() => {
-    async function load() {
-      const res = await fetch('/api/profile')
-      if (res.ok) {
-        const data = await res.json()
-        reset(data)
-      }
-    }
-    load()
+    fetch('/api/profile').then(r => r.ok ? r.json() : null).then(d => d && reset(d))
   }, [reset])
 
   function onSubmit(data: ProfileFormData) {
@@ -128,6 +123,7 @@ function PerfilTab() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Informações do Negócio */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
         <h3 className="text-base font-semibold text-gray-900">Informações do Negócio</h3>
 
@@ -136,12 +132,9 @@ function PerfilTab() {
             <Label htmlFor="businessName" className="text-gray-700 font-medium">
               Nome do negócio <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="businessName"
-              placeholder="Ex: Studio Beleza Silva"
+            <Input id="businessName" placeholder="Ex: Studio Beleza Silva"
               {...register('businessName')}
-              className={errors.businessName ? 'border-red-400' : ''}
-            />
+              className={errors.businessName ? 'border-red-400' : ''} />
             {errors.businessName && (
               <p className="text-xs text-red-600 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" /> {errors.businessName.message}
@@ -153,92 +146,82 @@ function PerfilTab() {
             <Label htmlFor="businessType" className="text-gray-700 font-medium">
               Tipo de negócio <span className="text-red-500">*</span>
             </Label>
-            <select
-              id="businessType"
-              {...register('businessType')}
-              className="w-full h-10 rounded-md border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-            >
+            <select id="businessType" {...register('businessType')}
+              className="w-full h-10 rounded-md border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
               <option value="">Selecione...</option>
-              {BUSINESS_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
+              {BUSINESS_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
             </select>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="phone" className="text-gray-700 font-medium">
-              Telefone
-            </Label>
-            <Input
-              id="phone"
-              placeholder="(11) 99999-9999"
-              {...register('phone')}
-            />
+            <Label htmlFor="phone" className="text-gray-700 font-medium">Telefone</Label>
+            <Input id="phone" placeholder="(11) 99999-9999" {...register('phone')} />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="pixKey" className="text-gray-700 font-medium">
-              Chave Pix
-            </Label>
-            <Input
-              id="pixKey"
-              placeholder="CPF, CNPJ, e-mail ou telefone"
-              {...register('pixKey')}
-            />
+            <Label htmlFor="pixKey" className="text-gray-700 font-medium">Chave Pix</Label>
+            <Input id="pixKey" placeholder="CPF, CNPJ, e-mail ou telefone" {...register('pixKey')} />
+          </div>
+        </div>
+      </div>
+
+      {/* Endereço */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h3 className="text-base font-semibold text-gray-900">Endereço</h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="sm:col-span-2 space-y-1.5">
+            <Label htmlFor="address" className="text-gray-700 font-medium">Rua / Logradouro</Label>
+            <Input id="address" placeholder="Ex: Av. Paulista" {...register('address')} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="addressNumber" className="text-gray-700 font-medium">Número</Label>
+            <Input id="addressNumber" placeholder="Ex: 1000" {...register('addressNumber')} />
           </div>
         </div>
 
-        <h3 className="text-base font-semibold text-gray-900 pt-2">Endereço</h3>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="address" className="text-gray-700 font-medium">
-            Endereço completo
-          </Label>
-          <Input
-            id="address"
-            placeholder="Rua, número, complemento, bairro"
-            {...register('address')}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="city" className="text-gray-700 font-medium">
-              Cidade
-            </Label>
-            <Input
-              id="city"
-              placeholder="São Paulo"
-              {...register('city')}
-            />
+            <Label htmlFor="zipCode" className="text-gray-700 font-medium">CEP</Label>
+            <Input id="zipCode" placeholder="00000-000" {...register('zipCode')} />
           </div>
-
           <div className="space-y-1.5">
-            <Label htmlFor="state" className="text-gray-700 font-medium">
-              Estado
-            </Label>
-            <select
-              id="state"
-              {...register('state')}
-              className="w-full h-10 rounded-md border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-            >
+            <Label htmlFor="city" className="text-gray-700 font-medium">Cidade</Label>
+            <Input id="city" placeholder="São Paulo" {...register('city')} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="state" className="text-gray-700 font-medium">Estado</Label>
+            <select id="state" {...register('state')}
+              className="w-full h-10 rounded-md border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
               <option value="">UF</option>
-              {STATES_BR.map((uf) => (
-                <option key={uf} value={uf}>{uf}</option>
-              ))}
+              {STATES_BR.map(uf => <option key={uf} value={uf}>{uf}</option>)}
             </select>
           </div>
         </div>
       </div>
 
+      {/* Sobre o negócio */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <div>
+          <h3 className="text-base font-semibold text-gray-900">Sobre o negócio</h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Apresente sua empresa aos clientes — aparece na sua página pública.
+          </p>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="bio" className="text-gray-700 font-medium">Descrição</Label>
+          <textarea
+            id="bio"
+            {...register('bio')}
+            rows={5}
+            placeholder="Conte um pouco sobre seu negócio, seus diferenciais, formas de pagamento..."
+            className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+          />
+        </div>
+      </div>
+
       <div className="flex justify-end">
-        <Button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
-          disabled={isPending}
-        >
+        <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white gap-2" disabled={isPending}>
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Salvar perfil
         </Button>
@@ -247,181 +230,28 @@ function PerfilTab() {
   )
 }
 
-// ── WhatsApp Tab ───────────────────────────────────────────────────────────────
-
-const PLAN_WHATSAPP_FEATURES: Record<string, { label: string; available: boolean }[]> = {
-  FREE: [
-    { label: 'Confirmação via WhatsApp', available: false },
-    { label: 'Lembrete J-1 (dia anterior)', available: false },
-    { label: 'Lembrete H-2 (2 horas antes)', available: false },
-  ],
-  STARTER: [
-    { label: 'Confirmação via WhatsApp', available: true },
-    { label: 'Lembrete J-1 (dia anterior)', available: false },
-    { label: 'Lembrete H-2 (2 horas antes)', available: false },
-  ],
-  PRO: [
-    { label: 'Confirmação via WhatsApp', available: true },
-    { label: 'Lembrete J-1 (dia anterior)', available: true },
-    { label: 'Lembrete H-2 (2 horas antes)', available: true },
-  ],
-}
-
-const PLAN_ICON: Record<string, ReactNode> = {
-  FREE: <Sparkles className="h-5 w-5 text-gray-500" />,
-  STARTER: <Zap className="h-5 w-5 text-blue-500" />,
-  PRO: <Crown className="h-5 w-5 text-purple-500" />,
-}
-
-function WhatsAppTab() {
-  const { data: session } = useSession()
-  const [connectionStatus, setConnectionStatus] = useState<'unknown' | 'connected' | 'disconnected'>('unknown')
-  const [connectionDetail, setConnectionDetail] = useState<string>('')
-  const [checkingStatus, setCheckingStatus] = useState(false)
-
-  const plan: string = (session?.user as { plan?: string })?.plan ?? 'FREE'
-  const features = PLAN_WHATSAPP_FEATURES[plan] ?? PLAN_WHATSAPP_FEATURES.FREE
-
-  async function checkConnection() {
-    setCheckingStatus(true)
-    try {
-      const res = await fetch('/api/whatsapp/status')
-      const data = await res.json()
-      if (data.connected) {
-        setConnectionStatus('connected')
-        setConnectionDetail(data.accountName ? `Conta: ${data.accountName}` : 'Twilio conectado e funcionando')
-      } else {
-        setConnectionStatus('disconnected')
-        setConnectionDetail(data.reason ?? 'Não foi possível conectar')
-      }
-    } catch {
-      setConnectionStatus('disconnected')
-      setConnectionDetail('Erro de rede ao verificar status')
-    } finally {
-      setCheckingStatus(false)
-    }
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-        <div>
-          <h3 className="text-base font-semibold text-gray-900">WhatsApp — Twilio Business API</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            O envio de mensagens é gerenciado pela plataforma. Não é necessário nenhuma configuração adicional da sua parte.
-          </p>
-        </div>
-
-        {/* Connection status */}
-        <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50">
-          <div className="flex items-center gap-3">
-            {connectionStatus === 'connected' ? (
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
-            ) : connectionStatus === 'disconnected' ? (
-              <XCircle className="h-5 w-5 text-red-500" />
-            ) : (
-              <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-            )}
-            <div>
-              <p className="text-sm font-medium text-gray-900">Status do serviço</p>
-              <p className="text-xs text-gray-500">
-                {connectionStatus === 'connected'
-                  ? connectionDetail
-                  : connectionStatus === 'disconnected'
-                  ? connectionDetail
-                  : 'Clique em "Verificar" para testar'}
-              </p>
-            </div>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={checkConnection}
-            disabled={checkingStatus}
-            className="gap-1.5"
-          >
-            {checkingStatus ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-            Verificar
-          </Button>
-        </div>
-
-        {/* Plan features */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50 space-y-3">
-          <div className="flex items-center gap-2">
-            {PLAN_ICON[plan]}
-            <p className="text-sm font-semibold text-gray-900">
-              Recursos do plano {plan === 'FREE' ? 'Grátis' : plan.charAt(0) + plan.slice(1).toLowerCase()}
-            </p>
-          </div>
-          <ul className="space-y-2">
-            {features.map((f) => (
-              <li key={f.label} className="flex items-center gap-2.5">
-                <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${f.available ? 'bg-green-100' : 'bg-gray-100'}`}>
-                  <CheckCircle2 className={`h-3 w-3 ${f.available ? 'text-green-600' : 'text-gray-300'}`} />
-                </div>
-                <span className={`text-sm ${f.available ? 'text-gray-700' : 'text-gray-400 line-through'}`}>
-                  {f.label}
-                </span>
-              </li>
-            ))}
-          </ul>
-          {plan === 'FREE' && (
-            <p className="text-xs text-blue-600 font-medium pt-1">
-              Faça upgrade para o plano Starter ou Pro para ativar o envio automático de mensagens.
-            </p>
-          )}
-          {plan === 'STARTER' && (
-            <p className="text-xs text-purple-600 font-medium pt-1">
-              Faça upgrade para o plano Pro para ativar os lembretes automáticos (J-1 e H-2).
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ── Disponibilidade Tab ────────────────────────────────────────────────────────
 
 function DisponibilidadeTab() {
   const [isPending, startTransition] = useTransition()
   const [rows, setRows] = useState<AvailabilityRow[]>(
-    DAYS_OF_WEEK.map(({ day }) => ({
-      dayOfWeek: day,
-      active: day >= 1 && day <= 5, // Mon–Fri default
-      startTime: '08:00',
-      endTime: '18:00',
-    })),
+    DAYS_OF_WEEK.map(({ day }) => ({ dayOfWeek: day, active: day >= 1 && day <= 5, startTime: '08:00', endTime: '18:00' })),
   )
   const { toast } = useToast()
 
   useEffect(() => {
-    async function load() {
-      const res = await fetch('/api/availability')
-      if (res.ok) {
-        const data: AvailabilityRow[] = await res.json()
-        if (data.length > 0) {
-          setRows(
-            DAYS_OF_WEEK.map(({ day }) => {
-              const found = data.find((r) => r.dayOfWeek === day)
-              return found ?? { dayOfWeek: day, active: false, startTime: '08:00', endTime: '18:00' }
-            }),
-          )
-        }
+    fetch('/api/availability').then(r => r.ok ? r.json() : []).then((data: AvailabilityRow[]) => {
+      if (data.length > 0) {
+        setRows(DAYS_OF_WEEK.map(({ day }) => {
+          const found = data.find(r => r.dayOfWeek === day)
+          return found ?? { dayOfWeek: day, active: false, startTime: '08:00', endTime: '18:00' }
+        }))
       }
-    }
-    load()
+    })
   }, [])
 
   function updateRow(dayOfWeek: number, patch: Partial<AvailabilityRow>) {
-    setRows((prev) =>
-      prev.map((r) => (r.dayOfWeek === dayOfWeek ? { ...r, ...patch } : r)),
-    )
+    setRows(prev => prev.map(r => r.dayOfWeek === dayOfWeek ? { ...r, ...patch } : r))
   }
 
   function handleSave() {
@@ -445,64 +275,34 @@ function DisponibilidadeTab() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
         <div>
           <h3 className="text-base font-semibold text-gray-900">Horário de atendimento</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            Configure os dias e horários em que você aceita agendamentos.
-          </p>
+          <p className="text-sm text-gray-500 mt-1">Configure os dias e horários em que você aceita agendamentos.</p>
         </div>
-
         <div className="space-y-3">
           {DAYS_OF_WEEK.map(({ day, label }) => {
-            const row = rows.find((r) => r.dayOfWeek === day)!
+            const row = rows.find(r => r.dayOfWeek === day)!
             return (
-              <div
-                key={day}
-                className={`flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border transition-colors ${
-                  row.active ? 'border-blue-200 bg-blue-50/30' : 'border-gray-100 bg-gray-50/50'
-                }`}
-              >
-                {/* Toggle + Label */}
+              <div key={day} className={`flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border transition-colors ${
+                row.active ? 'border-blue-200 bg-blue-50/30' : 'border-gray-100 bg-gray-50/50'
+              }`}>
                 <div className="flex items-center gap-3 sm:w-44">
-                  <button
-                    type="button"
-                    aria-label={`${row.active ? 'Desativar' : 'Ativar'} ${label}`}
+                  <button type="button" aria-label={`${row.active ? 'Desativar' : 'Ativar'} ${label}`}
                     onClick={() => updateRow(day, { active: !row.active })}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 ${
-                      row.active ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
-                        row.active ? 'translate-x-4' : 'translate-x-0.5'
-                      }`}
-                    />
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 ${row.active ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                    <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${row.active ? 'translate-x-4' : 'translate-x-0.5'}`} />
                   </button>
-                  <span
-                    className={`text-sm font-medium ${row.active ? 'text-gray-900' : 'text-gray-400'}`}
-                  >
-                    {label}
-                  </span>
+                  <span className={`text-sm font-medium ${row.active ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
                 </div>
-
-                {/* Time inputs */}
                 {row.active ? (
                   <div className="flex items-center gap-3 ml-0 sm:ml-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-500">De</span>
-                      <input
-                        type="time"
-                        value={row.startTime}
-                        onChange={(e) => updateRow(day, { startTime: e.target.value })}
-                        className="h-9 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      />
+                      <input type="time" value={row.startTime} onChange={e => updateRow(day, { startTime: e.target.value })}
+                        className="h-9 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-500">até</span>
-                      <input
-                        type="time"
-                        value={row.endTime}
-                        onChange={(e) => updateRow(day, { endTime: e.target.value })}
-                        className="h-9 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      />
+                      <input type="time" value={row.endTime} onChange={e => updateRow(day, { endTime: e.target.value })}
+                        className="h-9 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                   </div>
                 ) : (
@@ -513,13 +313,8 @@ function DisponibilidadeTab() {
           })}
         </div>
       </div>
-
       <div className="flex justify-end">
-        <Button
-          onClick={handleSave}
-          className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
-          disabled={isPending}
-        >
+        <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white gap-2" disabled={isPending}>
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Salvar disponibilidade
         </Button>
@@ -528,11 +323,342 @@ function DisponibilidadeTab() {
   )
 }
 
+// ── Equipe Tab ─────────────────────────────────────────────────────────────────
+
+function EquipeTab() {
+  const [members, setMembers] = useState<TeamMember[]>([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ name: '', role: '', image: '' })
+  const { toast } = useToast()
+
+  useEffect(() => {
+    fetch('/api/team').then(r => r.ok ? r.json() : [])
+      .then(setMembers).finally(() => setLoading(false))
+  }, [])
+
+  function openAdd() { setForm({ name: '', role: '', image: '' }); setEditingId(null); setShowForm(true) }
+  function openEdit(m: TeamMember) { setForm({ name: m.name, role: m.role, image: m.image ?? '' }); setEditingId(m.id); setShowForm(true) }
+  function closeForm() { setShowForm(false); setEditingId(null) }
+
+  async function handleSave() {
+    if (!form.name.trim() || !form.role.trim()) {
+      toast({ title: 'Nome e função são obrigatórios', variant: 'destructive' }); return
+    }
+    setSaving(true)
+    try {
+      if (editingId) {
+        await fetch(`/api/team/${editingId}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form),
+        })
+        setMembers(prev => prev.map(m => m.id === editingId ? { ...m, ...form, image: form.image || null } : m))
+        toast({ title: 'Membro atualizado!' })
+      } else {
+        const res = await fetch('/api/team', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form),
+        })
+        const created = await res.json()
+        setMembers(prev => [...prev, created])
+        toast({ title: 'Membro adicionado!' })
+      }
+      closeForm()
+    } catch {
+      toast({ title: 'Erro ao salvar', variant: 'destructive' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Remover este membro da equipe?')) return
+    await fetch(`/api/team/${id}`, { method: 'DELETE' })
+    setMembers(prev => prev.filter(m => m.id !== id))
+    toast({ title: 'Membro removido' })
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">Nossa equipe</h3>
+            <p className="text-sm text-gray-500 mt-1">Apresente os profissionais da sua equipe na página pública.</p>
+          </div>
+          <Button type="button" onClick={openAdd} className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5" size="sm">
+            <Plus className="h-4 w-4" /> Adicionar
+          </Button>
+        </div>
+
+        {/* Inline form */}
+        {showForm && (
+          <div className="border border-blue-200 bg-blue-50/40 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-sm font-semibold text-gray-900">{editingId ? 'Editar membro' : 'Novo membro'}</p>
+              <button type="button" onClick={closeForm} className="p-1 rounded-lg hover:bg-gray-200 text-gray-500">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">Nome *</Label>
+                <Input placeholder="Ex: Ana Silva" value={form.name}
+                  onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">Função *</Label>
+                <Input placeholder="Ex: Manicure, Cabeleireira" value={form.role}
+                  onChange={e => setForm(p => ({ ...p, role: e.target.value }))} />
+              </div>
+              <div className="sm:col-span-2 space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">URL da foto (opcional)</Label>
+                <Input placeholder="https://..." value={form.image}
+                  onChange={e => setForm(p => ({ ...p, image: e.target.value }))} />
+              </div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button type="button" onClick={handleSave} disabled={saving}
+                className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5" size="sm">
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                Salvar
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={closeForm}>Cancelar</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Members list */}
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-blue-600" /></div>
+        ) : members.length === 0 ? (
+          <div className="text-center py-10 bg-gray-50 rounded-2xl">
+            <Users className="h-10 w-10 mx-auto mb-2 text-gray-300" />
+            <p className="text-sm text-gray-500">Nenhum membro adicionado ainda</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {members.map(m => (
+              <div key={m.id} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 overflow-hidden">
+                  {m.image
+                    ? <img src={m.image} alt={m.name} className="w-full h-full object-cover" />
+                    : <span className="text-sm font-bold text-blue-600">{m.name.charAt(0).toUpperCase()}</span>
+                  }
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-gray-900">{m.name}</p>
+                  <p className="text-xs text-gray-500">{m.role}</p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button type="button" onClick={() => openEdit(m)}
+                    className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  <button type="button" onClick={() => handleDelete(m.id)}
+                    className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Avaliações Tab ─────────────────────────────────────────────────────────────
+
+function StarRating({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
+  return (
+    <div className="flex gap-0.5">
+      {[1,2,3,4,5].map(n => (
+        <button key={n} type="button" onClick={() => onChange?.(n)}
+          className={onChange ? 'cursor-pointer' : 'cursor-default'}>
+          <Star className={`h-5 w-5 ${n <= value ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function AvaliacoesTab() {
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ clientName: '', rating: 5, comment: '' })
+  const { toast } = useToast()
+
+  useEffect(() => {
+    fetch('/api/reviews').then(r => r.ok ? r.json() : [])
+      .then(setReviews).finally(() => setLoading(false))
+  }, [])
+
+  function openAdd() { setForm({ clientName: '', rating: 5, comment: '' }); setShowForm(true) }
+  function closeForm() { setShowForm(false) }
+
+  async function handleSave() {
+    if (!form.clientName.trim()) {
+      toast({ title: 'Nome do cliente é obrigatório', variant: 'destructive' }); return
+    }
+    setSaving(true)
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientName: form.clientName, rating: form.rating, comment: form.comment }),
+      })
+      const created = await res.json()
+      setReviews(prev => [created, ...prev])
+      toast({ title: 'Avaliação adicionada!' })
+      closeForm()
+    } catch {
+      toast({ title: 'Erro ao salvar', variant: 'destructive' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Remover esta avaliação?')) return
+    await fetch(`/api/reviews/${id}`, { method: 'DELETE' })
+    setReviews(prev => prev.filter(r => r.id !== id))
+    toast({ title: 'Avaliação removida' })
+  }
+
+  const avg = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">Avaliações dos clientes</h3>
+            <p className="text-sm text-gray-500 mt-1">Adicione avaliações recebidas pelos seus clientes.</p>
+          </div>
+          <Button type="button" onClick={openAdd} className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5" size="sm">
+            <Plus className="h-4 w-4" /> Adicionar
+          </Button>
+        </div>
+
+        {/* Summary */}
+        {reviews.length > 0 && (
+          <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-100 rounded-xl px-4 py-3">
+            <span className="text-2xl font-extrabold text-gray-900">{avg.toFixed(1)}</span>
+            <StarRating value={Math.round(avg)} />
+            <span className="text-sm text-gray-500">{reviews.length} avaliação{reviews.length !== 1 ? 'ões' : ''}</span>
+          </div>
+        )}
+
+        {/* Inline form */}
+        {showForm && (
+          <div className="border border-blue-200 bg-blue-50/40 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-sm font-semibold text-gray-900">Nova avaliação</p>
+              <button type="button" onClick={closeForm} className="p-1 rounded-lg hover:bg-gray-200 text-gray-500">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">Nome do cliente *</Label>
+                <Input placeholder="Ex: Maria Silva" value={form.clientName}
+                  onChange={e => setForm(p => ({ ...p, clientName: e.target.value }))} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">Nota</Label>
+                <StarRating value={form.rating} onChange={v => setForm(p => ({ ...p, rating: v }))} />
+              </div>
+              <div className="sm:col-span-2 space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">Comentário (opcional)</Label>
+                <textarea value={form.comment} onChange={e => setForm(p => ({ ...p, comment: e.target.value }))}
+                  rows={3} placeholder="O que o cliente disse..."
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none" />
+              </div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button type="button" onClick={handleSave} disabled={saving}
+                className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5" size="sm">
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                Salvar
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={closeForm}>Cancelar</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Reviews list */}
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-blue-600" /></div>
+        ) : reviews.length === 0 ? (
+          <div className="text-center py-10 bg-gray-50 rounded-2xl">
+            <Star className="h-10 w-10 mx-auto mb-2 text-gray-300" />
+            <p className="text-sm text-gray-500">Nenhuma avaliação adicionada ainda</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {reviews.map(r => (
+              <div key={r.id} className="p-4 rounded-xl border border-gray-100 space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <StarRating value={r.rating} />
+                    <span className="text-sm font-semibold text-gray-900">{r.clientName}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-400">
+                      {format(new Date(r.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                    </span>
+                    <button type="button" onClick={() => handleDelete(r.id)}
+                      className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors ml-1">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+                {r.comment && <p className="text-sm text-gray-600">{r.comment}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── WhatsApp Tab ───────────────────────────────────────────────────────────────
+
+const PLAN_WHATSAPP_FEATURES: Record<string, { label: string; available: boolean }[]> = {
+  FREE:    [
+    { label: 'Confirmação via WhatsApp', available: false },
+    { label: 'Lembrete J-1 (dia anterior)', available: false },
+    { label: 'Lembrete H-2 (2 horas antes)', available: false },
+  ],
+  STARTER: [
+    { label: 'Confirmação via WhatsApp', available: true },
+    { label: 'Lembrete J-1 (dia anterior)', available: false },
+    { label: 'Lembrete H-2 (2 horas antes)', available: false },
+  ],
+  PRO: [
+    { label: 'Confirmação via WhatsApp', available: true },
+    { label: 'Lembrete J-1 (dia anterior)', available: true },
+    { label: 'Lembrete H-2 (2 horas antes)', available: true },
+  ],
+}
+
+const PLAN_ICON: Record<string, ReactNode> = {
+  FREE:    <Sparkles className="h-5 w-5 text-gray-500" />,
+  STARTER: <Zap className="h-5 w-5 text-blue-500" />,
+  PRO:     <Crown className="h-5 w-5 text-purple-500" />,
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────────
 
 const TABS: Tab[] = [
-  { id: 'perfil', label: 'Perfil', icon: <Building2 className="h-4 w-4" /> },
-  { id: 'disponibilidade', label: 'Disponibilidade', icon: <Clock className="h-4 w-4" /> },
+  { id: 'perfil',         label: 'Perfil',         icon: <Building2 className="h-4 w-4" /> },
+  { id: 'disponibilidade',label: 'Disponibilidade', icon: <Clock className="h-4 w-4" /> },
+  { id: 'equipe',         label: 'Equipe',          icon: <Users className="h-4 w-4" /> },
+  { id: 'avaliacoes',     label: 'Avaliações',      icon: <Star className="h-4 w-4" /> },
 ]
 
 export default function ConfiguracoesPage() {
@@ -542,33 +668,26 @@ export default function ConfiguracoesPage() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Gerencie as configurações do seu negócio
-        </p>
+        <p className="text-sm text-gray-500 mt-1">Gerencie as configurações do seu negócio</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-8">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
-              activeTab === tab.id
-                ? 'bg-white shadow text-gray-900'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-8 overflow-x-auto">
+        {TABS.map(tab => (
+          <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-all whitespace-nowrap min-w-fit ${
+              activeTab === tab.id ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'
+            }`}>
             {tab.icon}
             <span className="hidden sm:inline">{tab.label}</span>
           </button>
         ))}
       </div>
 
-      {/* Tab content */}
-      {activeTab === 'perfil' && <PerfilTab />}
+      {activeTab === 'perfil'          && <PerfilTab />}
       {activeTab === 'disponibilidade' && <DisponibilidadeTab />}
+      {activeTab === 'equipe'          && <EquipeTab />}
+      {activeTab === 'avaliacoes'      && <AvaliacoesTab />}
     </div>
   )
 }

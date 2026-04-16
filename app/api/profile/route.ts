@@ -9,9 +9,12 @@ const updateProfileSchema = z.object({
   businessType: z.string().optional(),
   phone: z.string().optional(),
   address: z.string().optional(),
+  addressNumber: z.string().optional(),
+  zipCode: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   pixKey: z.string().optional(),
+  bio: z.string().optional(),
 })
 
 export async function GET() {
@@ -29,9 +32,12 @@ export async function GET() {
       businessType: true,
       phone: true,
       address: true,
+      addressNumber: true,
+      zipCode: true,
       city: true,
       state: true,
       pixKey: true,
+      bio: true,
       slug: true,
       plan: true,
     },
@@ -75,9 +81,12 @@ export async function PUT(req: NextRequest) {
       businessType: true,
       phone: true,
       address: true,
+      addressNumber: true,
+      zipCode: true,
       city: true,
       state: true,
       pixKey: true,
+      bio: true,
     },
   })
 

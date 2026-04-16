@@ -21,10 +21,13 @@ export async function GET(
       businessName: true,
       businessType: true,
       address: true,
+      addressNumber: true,
+      zipCode: true,
       city: true,
       state: true,
       phone: true,
       image: true,
+      bio: true,
       isDemo: true,
       pixKey: true,
       plan: true,
@@ -34,6 +37,8 @@ export async function GET(
         orderBy: { name: 'asc' },
       },
       availability: true,
+      teamMembers: { orderBy: { createdAt: 'asc' } },
+      reviews: { orderBy: { createdAt: 'desc' } },
     },
   })
 
@@ -55,10 +60,13 @@ export async function GET(
           businessName: professional.businessName,
           businessType: professional.businessType,
           address: professional.address,
+          addressNumber: professional.addressNumber,
+          zipCode: professional.zipCode,
           city: professional.city,
           state: professional.state,
           phone: professional.phone,
           image: professional.image,
+          bio: professional.bio,
           isDemo: professional.isDemo,
           pixKey: professional.plan === 'PRO' ? (professional.pixKey ?? null) : null,
           plan: professional.plan,
@@ -68,6 +76,10 @@ export async function GET(
           .filter(a => a.active)
           .map(({ dayOfWeek, startTime, endTime }) => ({ dayOfWeek, startTime, endTime }))
           .sort((a, b) => a.dayOfWeek - b.dayOfWeek),
+        teamMembers: professional.teamMembers.map(({ id, name, role, image }) => ({ id, name, role, image })),
+        reviews: professional.reviews.map(({ id, rating, comment, clientName, createdAt }) => ({
+          id, rating, comment, clientName, createdAt,
+        })),
       },
       { headers: { 'Cache-Control': 'no-store, must-revalidate' } },
     )
