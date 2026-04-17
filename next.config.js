@@ -13,6 +13,7 @@ const nextConfig = {
       "res.cloudinary.com",
       "images.unsplash.com",
       "plus.unsplash.com",
+      "api.qrserver.com",
     ],
   },
 };

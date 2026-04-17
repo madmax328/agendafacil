@@ -13,6 +13,7 @@ import {
   Link2,
   ExternalLink,
 } from 'lucide-react'
+import Image from 'next/image'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { formatCurrency, formatTime } from '@/lib/utils'
@@ -23,32 +24,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+
 import { CopyLinkButton } from '@/components/copy-link-button'
+import { InlineStatusBadge } from '@/components/dashboard/inline-status-badge'
 
 export const metadata = {
   title: 'Dashboard',
 }
 
-// Status badge labels in Portuguese
-const statusLabels: Record<string, string> = {
-  PENDING: 'Pendente',
-  CONFIRMED: 'Confirmado',
-  COMPLETED: 'Concluído',
-  CANCELLED: 'Cancelado',
-}
-
-const statusVariants: Record<
-  string,
-  'default' | 'secondary' | 'success' | 'destructive' | 'outline' | 'warning' | 'info'
-> = {
-  PENDING: 'info',
-  CONFIRMED: 'success',
-  COMPLETED: 'secondary',
-  CANCELLED: 'destructive',
-}
 
 function getInitials(name?: string | null): string {
   if (!name) return '?'
@@ -189,7 +174,7 @@ export default async function DashboardPage() {
       take: 5,
       include: {
         customer: { select: { name: true, phone: true } },
-        service: { select: { name: true } },
+        service: { select: { name: true, duration: true } },
       },
     }),
   ])
@@ -246,23 +231,55 @@ export default async function DashboardPage() {
 
       {/* Public booking link banner */}
       {bookingUrl ? (
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-5 py-4">
-          <div className="flex items-center gap-2 text-blue-700 shrink-0">
-            <Link2 className="h-5 w-5" />
-            <span className="text-sm font-semibold">Seu link de agendamento:</span>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-2 text-blue-700 shrink-0">
+              <Link2 className="h-5 w-5" />
+              <span className="text-sm font-semibold">Seu link de agendamento:</span>
+            </div>
+            <div className="flex flex-1 items-center gap-2 min-w-0">
+              <code className="flex-1 truncate text-sm bg-white border border-blue-200 rounded-lg px-3 py-1.5 text-blue-800 font-mono select-all">
+                {bookingUrl}
+              </code>
+              <CopyLinkButton url={bookingUrl} />
+              <Button asChild size="sm" variant="outline" className="shrink-0 border-blue-200 text-blue-700 hover:bg-blue-100 gap-1">
+                <a href={bookingUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Abrir</span>
+                </a>
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-1 items-center gap-2 min-w-0">
-            <code className="flex-1 truncate text-sm bg-white border border-blue-200 rounded-lg px-3 py-1.5 text-blue-800 font-mono select-all">
-              {bookingUrl}
-            </code>
-            <CopyLinkButton url={bookingUrl} />
-            <Button asChild size="sm" variant="outline" className="shrink-0 border-blue-200 text-blue-700 hover:bg-blue-100 gap-1">
-              <a href={bookingUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Abrir</span>
-              </a>
-            </Button>
-          </div>
+          {/* QR Code for printing / display */}
+          <details className="group">
+            <summary className="cursor-pointer text-xs font-semibold text-blue-600 hover:text-blue-800 select-none list-none flex items-center gap-1">
+              <span className="group-open:hidden">▶ Mostrar QR Code</span>
+              <span className="hidden group-open:inline">▼ Ocultar QR Code</span>
+            </summary>
+            <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="bg-white border border-blue-200 rounded-xl p-3 inline-block">
+                <Image
+                  src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(bookingUrl)}&size=160x160&margin=4`}
+                  alt="QR Code para agendamento"
+                  width={160}
+                  height={160}
+                  unoptimized
+                />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs text-blue-700 font-medium">Imprima e cole no seu espaço para facilitar o agendamento.</p>
+                <a
+                  href={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(bookingUrl)}&size=400x400&margin=10`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 underline"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  Baixar QR Code em alta resolução
+                </a>
+              </div>
+            </div>
+          </details>
         </div>
       ) : (
         <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-5 py-4">
@@ -313,7 +330,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Today's schedule — visual timeline strip */}
+      {/* Today's schedule — rectangular timeline rows */}
       {upcomingAppointments.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
@@ -327,39 +344,39 @@ export default async function DashboardPage() {
               <Link href="/agenda">Ver agenda <ChevronRight className="h-4 w-4" /></Link>
             </Button>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="space-y-2">
             {upcomingAppointments.map((appt, i) => {
-              const colors = [
-                { bar: 'bg-blue-500', bg: 'bg-blue-50', text: 'text-blue-700', initials: 'bg-blue-100 text-blue-700' },
-                { bar: 'bg-purple-500', bg: 'bg-purple-50', text: 'text-purple-700', initials: 'bg-purple-100 text-purple-700' },
-                { bar: 'bg-pink-500', bg: 'bg-pink-50', text: 'text-pink-700', initials: 'bg-pink-100 text-pink-700' },
-                { bar: 'bg-orange-500', bg: 'bg-orange-50', text: 'text-orange-700', initials: 'bg-orange-100 text-orange-700' },
-                { bar: 'bg-teal-500', bg: 'bg-teal-50', text: 'text-teal-700', initials: 'bg-teal-100 text-teal-700' },
-              ]
-              const c = colors[i % colors.length]
+              const bars = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500', 'bg-teal-500']
+              const bar = bars[i % bars.length]
               const initials = appt.customer.name.split(' ').slice(0,2).map((n: string) => n[0]).join('').toUpperCase()
               return (
                 <Link
                   key={appt.id}
                   href={`/agenda/${appt.id}`}
-                  className={`shrink-0 w-44 ${c.bg} rounded-xl p-4 border border-transparent hover:shadow-md transition-shadow`}
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm bg-gray-50 hover:bg-white transition-all group"
                 >
-                  <div className={`w-1.5 h-6 rounded-full ${c.bar} mb-3`} />
-                  <p className={`text-xs font-bold ${c.text}`}>{formatTime(appt.scheduledAt)}</p>
-                  <div className={`w-9 h-9 rounded-full ${c.initials} flex items-center justify-center font-bold text-sm mt-2 mb-1`}>
+                  <div className={`w-1 self-stretch rounded-full ${bar} shrink-0`} />
+                  <div className="w-12 shrink-0 text-center">
+                    <p className="text-sm font-bold text-gray-800 tabular-nums">{formatTime(appt.scheduledAt)}</p>
+                    <p className="text-[10px] text-gray-400">{appt.service.duration} min</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs text-gray-600 shrink-0">
                     {initials}
                   </div>
-                  <p className="text-sm font-semibold text-gray-900 truncate">{appt.customer.name}</p>
-                  <p className="text-xs text-gray-500 truncate mt-0.5">{appt.service.name}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{appt.customer.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{appt.service.name}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-gray-400 shrink-0" />
                 </Link>
               )
             })}
             <Link
               href="/agenda/novo"
-              className="shrink-0 w-44 bg-gray-50 rounded-xl p-4 border-2 border-dashed border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-colors flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-blue-500"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 border-dashed border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-colors text-gray-400 hover:text-blue-500"
             >
-              <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-xl font-bold">+</div>
-              <p className="text-xs font-medium text-center">Novo agendamento</p>
+              <Plus className="h-4 w-4" />
+              <p className="text-xs font-medium">Novo agendamento</p>
             </Link>
           </div>
         </div>
@@ -415,46 +432,37 @@ export default async function DashboardPage() {
           ) : (
             <ul className="divide-y divide-gray-100">
               {upcomingAppointments.map((appointment) => (
-                <li key={appointment.id}>
-                  <Link
-                    href={`/agenda/${appointment.id}`}
-                    className="flex items-center gap-4 py-3 px-1 rounded-lg hover:bg-gray-50 transition-colors group"
-                  >
-                    {/* Customer avatar with initials */}
-                    <Avatar className="h-10 w-10 shrink-0">
-                      <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold text-sm">
-                        {getInitials(appointment.customer.name)}
-                      </AvatarFallback>
-                    </Avatar>
+                <li key={appointment.id} className="flex items-center gap-4 py-3 px-1">
+                  {/* Customer avatar with initials */}
+                  <Avatar className="h-10 w-10 shrink-0">
+                    <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold text-sm">
+                      {getInitials(appointment.customer.name)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                    {/* Customer + service info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">
-                        {appointment.customer.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">
-                        {appointment.service.name}
-                      </p>
-                    </div>
-
-                    {/* Time + status */}
-                    <div className="shrink-0 text-right">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground justify-end">
-                        <Clock className="h-3 w-3" />
-                        <span>{formatTime(appointment.scheduledAt)}</span>
-                      </div>
-                      <Badge
-                        variant={
-                          statusVariants[appointment.status] ?? 'secondary'
-                        }
-                        className="mt-1 text-[10px] px-1.5"
-                      >
-                        {statusLabels[appointment.status] ?? appointment.status}
-                      </Badge>
-                    </div>
-
-                    <ChevronRight className="h-4 w-4 text-gray-300 shrink-0 group-hover:text-gray-500 transition-colors" />
+                  {/* Customer + service info — links to detail */}
+                  <Link href={`/agenda/${appointment.id}`} className="flex-1 min-w-0 hover:opacity-75 transition-opacity">
+                    <p className="text-sm font-semibold text-gray-900 truncate">
+                      {appointment.customer.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">
+                      {appointment.service.name}
+                    </p>
                   </Link>
+
+                  {/* Time + inline status badge */}
+                  <div className="shrink-0 text-right space-y-1">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground justify-end">
+                      <Clock className="h-3 w-3" />
+                      <span>{formatTime(appointment.scheduledAt)}</span>
+                    </div>
+                    <div className="flex justify-end">
+                      <InlineStatusBadge
+                        appointmentId={appointment.id}
+                        currentStatus={appointment.status}
+                      />
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>

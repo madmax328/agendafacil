@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Loader2, Calendar, LogOut, Clock, MapPin, AlertCircle,
-  ChevronRight, ArrowUpDown, CheckCircle2, Copy, Check, QrCode,
+  ChevronRight, ArrowUpDown, CheckCircle2, Copy, Check, QrCode, Star,
 } from 'lucide-react'
 import { format, isPast } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -28,6 +28,96 @@ interface Appointment {
     plan: string
     pixKey: string | null
   }
+}
+
+function RatingBlock({ appointmentId }: { appointmentId: string }) {
+  const [hover, setHover] = useState(0)
+  const [selected, setSelected] = useState(0)
+  const [comment, setComment] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
+
+  async function handleSubmit() {
+    if (!selected) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/cliente/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ appointmentId, rating: selected, comment }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast({ title: data.error || 'Erro ao enviar avaliação', variant: 'destructive' })
+        return
+      }
+      setSubmitted(true)
+      toast({ title: 'Avaliação enviada! Obrigado.' })
+    } catch {
+      toast({ title: 'Erro inesperado', variant: 'destructive' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-3 py-2 flex items-center gap-2 text-sm text-yellow-800">
+        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+        Avaliação enviada! Obrigado pelo feedback.
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 space-y-2">
+      <p className="text-xs font-semibold text-yellow-800 flex items-center gap-1">
+        <Star className="h-3.5 w-3.5" />
+        Como foi o atendimento?
+      </p>
+      <div className="flex gap-1">
+        {[1,2,3,4,5].map(star => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => setSelected(star)}
+            onMouseEnter={() => setHover(star)}
+            onMouseLeave={() => setHover(0)}
+            className="p-0.5 transition-transform hover:scale-110"
+          >
+            <Star
+              className={`h-6 w-6 transition-colors ${
+                star <= (hover || selected)
+                  ? 'fill-yellow-400 text-yellow-400'
+                  : 'text-gray-300'
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+      {selected > 0 && (
+        <>
+          <textarea
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            placeholder="Comentário opcional..."
+            rows={2}
+            className="w-full text-xs rounded-lg border border-yellow-200 bg-white px-2.5 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-yellow-400"
+          />
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full py-2 rounded-lg bg-yellow-400 text-yellow-900 text-xs font-bold hover:bg-yellow-500 disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Enviar avaliação
+          </button>
+        </>
+      )}
+    </div>
+  )
 }
 
 interface Customer {
@@ -382,6 +472,11 @@ export default function ClienteReservasPage() {
                 {/* Pix block — PRO professionals with pixKey */}
                 {appt.professional.plan === 'PRO' && appt.professional.pixKey && (
                   <PixBlock pixKey={appt.professional.pixKey} />
+                )}
+
+                {/* Rating block — only for completed appointments */}
+                {appt.status === 'COMPLETED' && (
+                  <RatingBlock appointmentId={appt.id} />
                 )}
 
                 {/* Action buttons */}

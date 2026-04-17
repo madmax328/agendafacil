@@ -251,16 +251,15 @@ export default function ProfissionalPage() {
     if (!selectedDate || !selectedTime || !selectedService) return
     setBookingLoading(true)
     try {
-      const [h, m] = selectedTime.split(':').map(Number)
-      const scheduledAt = new Date(selectedDate)
-      scheduledAt.setHours(h, m, 0, 0)
+      const dateStr = format(selectedDate, 'yyyy-MM-dd')
+      const scheduledAtStr = `${dateStr}T${selectedTime}:00.000Z`
       const customer = loggedInClient
         ? { name: loggedInClient.name, phone: loggedInClient.phone, email: loggedInClient.email }
         : { name: clientInfo.name.trim(), phone: clientInfo.phone.replace(/\D/g, ''), email: clientInfo.email.trim() }
       const res = await fetch(`/api/booking/${slug}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ serviceId: selectedService.id, scheduledAt: scheduledAt.toISOString(), customer }),
+        body: JSON.stringify({ serviceId: selectedService.id, scheduledAt: scheduledAtStr, customer }),
       })
       const data = await res.json()
       if (!res.ok) { toast({ title: data.error || 'Erro ao agendar', variant: 'destructive' }); return }
