@@ -743,10 +743,10 @@ export default function ProfissionalPage() {
                             className={[
                               'aspect-square w-full rounded-xl text-xs font-semibold transition-all',
                               !inMonth ? 'invisible' : '',
-                              selected ? 'bg-blue-600 text-white shadow-md' : '',
-                              !selected && available && !isPast ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' : '',
-                              !selected && (!available || isPast) && inMonth ? 'text-gray-300 cursor-not-allowed' : '',
-                              isToday(day) && !selected ? 'ring-2 ring-blue-600 ring-offset-1' : '',
+                              selected ? '!bg-blue-600 !text-white shadow-md' : '',
+                              !selected && available && !isPast ? '!bg-blue-50 !text-blue-700 hover:!bg-blue-100' : '',
+                              !selected && (!available || isPast) && inMonth ? '!text-gray-300 !bg-transparent cursor-not-allowed' : '',
+                              isToday(day) && !selected ? 'ring-2 !ring-blue-600 ring-offset-1' : '',
                             ].join(' ')}
                           >
                             {format(day, 'd')}
@@ -783,9 +783,9 @@ export default function ProfissionalPage() {
                                 onClick={() => setSelectedTime(slot.time)}
                                 className={[
                                   'py-2.5 rounded-xl text-sm font-semibold transition-all',
-                                  !slot.available ? 'bg-gray-100 text-gray-300 line-through cursor-not-allowed text-xs' :
-                                  selectedTime === slot.time ? 'bg-blue-600 text-white shadow-md' :
-                                  'bg-blue-50 text-blue-700 hover:bg-blue-100',
+                                  !slot.available ? '!bg-gray-100 !text-gray-300 line-through cursor-not-allowed text-xs' :
+                                  selectedTime === slot.time ? '!bg-blue-600 !text-white shadow-md' :
+                                  '!bg-blue-50 !text-blue-700 hover:!bg-blue-100',
                                 ].join(' ')}
                               >
                                 {slot.time}
@@ -804,9 +804,9 @@ export default function ProfissionalPage() {
                                 onClick={() => setSelectedTime(slot.time)}
                                 className={[
                                   'py-2.5 rounded-xl text-sm font-semibold transition-all',
-                                  !slot.available ? 'bg-gray-100 text-gray-300 line-through cursor-not-allowed text-xs' :
-                                  selectedTime === slot.time ? 'bg-blue-600 text-white shadow-md' :
-                                  'bg-blue-50 text-blue-700 hover:bg-blue-100',
+                                  !slot.available ? '!bg-gray-100 !text-gray-300 line-through cursor-not-allowed text-xs' :
+                                  selectedTime === slot.time ? '!bg-blue-600 !text-white shadow-md' :
+                                  '!bg-blue-50 !text-blue-700 hover:!bg-blue-100',
                                 ].join(' ')}
                               >
                                 {slot.time}

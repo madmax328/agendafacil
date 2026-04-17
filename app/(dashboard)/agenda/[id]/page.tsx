@@ -17,8 +17,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
-import { formatCurrency } from '@/lib/utils'
-import { format, parseISO } from 'date-fns'
+import { formatCurrency, toNaiveLocal } from '@/lib/utils'
+import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 type Status = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
@@ -141,8 +141,8 @@ export default function AppointmentDetailPage() {
     )
   }
 
-  const start = parseISO(appointment.scheduledAt)
-  const end = parseISO(appointment.endsAt)
+  const start = toNaiveLocal(appointment.scheduledAt)
+  const end = toNaiveLocal(appointment.endsAt)
   const dateFormatted = format(start, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })
   const timeFormatted = `${format(start, 'HH:mm')} – ${format(end, 'HH:mm')}`
 

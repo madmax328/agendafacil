@@ -85,7 +85,7 @@ export default function NovoAgendamentoPage() {
     e.preventDefault()
     if (!validate()) return
 
-    const scheduledAt = new Date(`${date}T${time}:00`)
+    const scheduledAtStr = `${date}T${time}:00.000Z`
 
     startTransition(async () => {
       try {
@@ -95,7 +95,7 @@ export default function NovoAgendamentoPage() {
           body: JSON.stringify({
             customerId,
             serviceId,
-            scheduledAt: scheduledAt.toISOString(),
+            scheduledAt: scheduledAtStr,
             notes: notes || undefined,
           }),
         })

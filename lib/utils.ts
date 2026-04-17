@@ -15,14 +15,25 @@ export function formatCurrency(value: number): string {
   }).format(value)
 }
 
-// Format date in pt-BR
-export function formatDate(date: Date | string, pattern = "dd 'de' MMMM 'de' yyyy"): string {
-  return format(new Date(date), pattern, { locale: ptBR })
+// Convert a stored UTC timestamp to a naive-local Date so that
+// "2024-04-17T17:00:00.000Z" always displays as "17:00" regardless
+// of the environment timezone (server UTC or client UTC+N).
+export function toNaiveLocal(date: Date | string): Date {
+  const d = new Date(date)
+  return new Date(
+    d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(),
+    d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(),
+  )
 }
 
-// Format time
+// Format date in pt-BR
+export function formatDate(date: Date | string, pattern = "dd 'de' MMMM 'de' yyyy"): string {
+  return format(toNaiveLocal(date), pattern, { locale: ptBR })
+}
+
+// Format time — always reads the UTC clock (timezone-naive)
 export function formatTime(date: Date | string): string {
-  return format(new Date(date), 'HH:mm', { locale: ptBR })
+  return format(toNaiveLocal(date), 'HH:mm', { locale: ptBR })
 }
 
 // Generate slug from name

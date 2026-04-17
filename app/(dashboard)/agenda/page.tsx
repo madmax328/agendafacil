@@ -14,7 +14,7 @@ import {
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, toNaiveLocal } from '@/lib/utils'
 import {
   addDays,
   addWeeks,
@@ -85,8 +85,8 @@ interface AppointmentCardProps {
 }
 
 function AppointmentCard({ appointment, dayStart, onClick }: AppointmentCardProps) {
-  const start = parseISO(appointment.scheduledAt)
-  const end = parseISO(appointment.endsAt)
+  const start = toNaiveLocal(appointment.scheduledAt)
+  const end = toNaiveLocal(appointment.endsAt)
 
   // Position relative to 07:00 of that day
   const dayBase = setMinutes(setHours(dayStart, 7), 0)
@@ -129,8 +129,8 @@ interface DetailModalProps {
 
 function DetailModal({ appointment, onClose, onStatusChange }: DetailModalProps) {
   if (!appointment) return null
-  const start = parseISO(appointment.scheduledAt)
-  const end = parseISO(appointment.endsAt)
+  const start = toNaiveLocal(appointment.scheduledAt)
+  const end = toNaiveLocal(appointment.endsAt)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -232,8 +232,8 @@ function DayView({ appointments, selectedDay, onAppointmentClick }: DayViewProps
   return (
     <div className="divide-y divide-gray-100">
       {dayAppts.map((appt) => {
-        const start = parseISO(appt.scheduledAt)
-        const end = parseISO(appt.endsAt)
+        const start = toNaiveLocal(appt.scheduledAt)
+        const end = toNaiveLocal(appt.endsAt)
         return (
           <button
             key={appt.id}
