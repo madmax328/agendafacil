@@ -106,9 +106,9 @@ function Sidebar({ onClose }: SidebarProps) {
   }
 
   return (
-    <aside className="flex flex-col h-full bg-[#2563EB] text-white w-64">
+    <aside className="flex flex-col h-full bg-[#2563EB] dark:bg-[#161b22] text-white w-64 dark:border-r dark:border-[#30363d]">
       {/* Logo */}
-      <div className="flex items-center justify-between px-5 py-5 border-b border-blue-500/40">
+      <div className="flex items-center justify-between px-5 py-5 border-b border-blue-500/40 dark:border-[#30363d]">
         <Link
           href="/dashboard"
           className="flex items-center gap-2.5 group"
@@ -183,7 +183,7 @@ function Sidebar({ onClose }: SidebarProps) {
       </div>
 
       {/* User info at bottom */}
-      <div className="px-3 py-4 border-t border-blue-500/40">
+      <div className="px-3 py-4 border-t border-blue-500/40 dark:border-[#30363d]">
         <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/10 transition-colors group">
           <Avatar className="h-9 w-9 shrink-0 ring-2 ring-white/30">
             <AvatarImage
@@ -255,7 +255,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main content area */}
       <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         {/* Mobile top bar */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#2563EB] text-white shadow-md">
+        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#2563EB] dark:bg-[#161b22] text-white shadow-md dark:border-b dark:border-[#30363d]">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-1.5 rounded-md hover:bg-white/20 transition-colors"

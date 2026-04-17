@@ -348,29 +348,73 @@ export default function ProfissionalPage() {
         </div>
       </header>
 
-      {/* ── Identity section ── */}
+      {/* ── Hero banner ── */}
+      <div className="w-full overflow-hidden border-b border-gray-200" style={{ height: '300px' }}>
+        <div className="max-w-5xl mx-auto h-full flex">
+          {/* Left: large photo */}
+          <div className="flex-1 overflow-hidden bg-gray-900">
+            {professional.image
+              ? /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={professional.image} alt={professional.businessName} className="w-full h-full object-cover" />
+              : <div className="w-full h-full flex items-center justify-center">
+                  <Scissors className="h-24 w-24 text-gray-700" />
+                </div>
+            }
+          </div>
+          {/* Right: name card */}
+          <div className="w-64 sm:w-80 shrink-0 flex items-center justify-center bg-white border-l border-gray-200 px-6 py-8">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 uppercase leading-tight tracking-tight text-center">
+              {professional.businessName}
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Profile row ── */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 py-10 flex flex-col items-center text-center gap-3">
-          {professional.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={professional.image} alt={professional.businessName}
-              className="w-24 h-24 rounded-2xl object-cover shadow-md border-2 border-gray-200" />
-          ) : null}
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
-            {professional.businessName}
-          </h1>
-          <p className="text-sm text-gray-500">{typeLabel}</p>
-          {reviews.length > 0 && (
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-gray-900">{avgRating.toFixed(1)}</span>
-              <div className="flex gap-0.5">
-                {[1,2,3,4,5].map(n => (
-                  <Star key={n} className={`h-4 w-4 ${n <= Math.round(avgRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`} />
-                ))}
+        <div className="max-w-5xl mx-auto px-4 py-4">
+          <div className="flex items-start gap-4">
+            {/* Logo box + info */}
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div className="w-20 h-20 shrink-0 border-2 border-gray-400 flex items-center justify-center overflow-hidden bg-white">
+                {professional.image
+                  ? /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={professional.image} alt="" className="w-full h-full object-cover" />
+                  : <span className="text-[10px] font-black text-gray-900 text-center px-1 uppercase leading-tight">
+                      {professional.businessName}
+                    </span>
+                }
               </div>
-              <span className="text-sm text-gray-500">({reviews.length} avaliações)</span>
+              <div className="min-w-0">
+                <p className="text-lg font-extrabold text-gray-900 uppercase leading-tight truncate">{professional.businessName}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{typeLabel}</p>
+                {reviews.length > 0 && (
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <span className="text-sm font-bold text-gray-900">{avgRating.toFixed(1)}</span>
+                    <div className="flex gap-0.5">
+                      {[1,2,3,4,5].map(n => (
+                        <Star key={n} className={`h-3.5 w-3.5 ${n <= Math.round(avgRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`} />
+                      ))}
+                    </div>
+                    <span className="text-xs text-gray-500">({reviews.length} avaliações)</span>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+            {/* Map embed */}
+            {fullAddr && (
+              <div className="hidden sm:block w-64 shrink-0 h-28 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                <iframe
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(fullAddr)}&output=embed&z=15`}
+                  width="100%" height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Localização"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Demo warning */}
@@ -457,14 +501,14 @@ export default function ProfissionalPage() {
           <aside className="space-y-4 lg:mt-0">
 
             {fullAddr && (
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 space-y-2">
+              <div className="sm:hidden bg-white border border-gray-200 rounded-2xl p-4">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-sm text-gray-700 leading-snug">{fullAddr}</p>
                     {mapsUrl && (
                       <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
-                        className="text-xs font-semibold text-blue-600 hover:underline mt-1 inline-block">
+                        className="text-xs font-semibold text-gray-500 hover:underline mt-1 inline-block">
                         Ver no mapa
                       </a>
                     )}
