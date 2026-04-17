@@ -196,6 +196,11 @@ export default async function DashboardPage() {
 
   const firstName = session.user.name?.split(' ')[0] ?? 'Profissional'
 
+  // Filter to today only for "Agenda de hoje"
+  const todayAppointments = upcomingAppointments.filter(
+    appt => new Date(appt.scheduledAt) <= endOfToday
+  )
+
   return (
     <div className="p-6 space-y-8 max-w-7xl mx-auto">
       {/* Welcome heading + quick actions */}
@@ -331,21 +336,26 @@ export default async function DashboardPage() {
       </div>
 
       {/* Today's schedule — rectangular timeline rows */}
-      {upcomingAppointments.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-base font-bold text-gray-900">Agenda de hoje</p>
-              <p className="text-xs text-muted-foreground">
-                {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
-              </p>
-            </div>
-            <Button asChild variant="ghost" size="sm" className="gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-              <Link href="/agenda">Ver agenda <ChevronRight className="h-4 w-4" /></Link>
-            </Button>
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-base font-bold text-gray-900">Agenda de hoje</p>
+            <p className="text-xs text-muted-foreground">
+              {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </p>
           </div>
+          <Button asChild variant="ghost" size="sm" className="gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+            <Link href="/agenda">Ver agenda <ChevronRight className="h-4 w-4" /></Link>
+          </Button>
+        </div>
+        {todayAppointments.length === 0 ? (
+          <div className="text-center py-6 text-gray-400">
+            <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-200" />
+            <p className="text-sm">Nenhum agendamento para hoje.</p>
+          </div>
+        ) : (
           <div className="space-y-2">
-            {upcomingAppointments.map((appt, i) => {
+            {todayAppointments.map((appt, i) => {
               const bars = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500', 'bg-teal-500']
               const bar = bars[i % bars.length]
               const initials = appt.customer.name.split(' ').slice(0,2).map((n: string) => n[0]).join('').toUpperCase()
@@ -379,8 +389,8 @@ export default async function DashboardPage() {
               <p className="text-xs font-medium">Novo agendamento</p>
             </Link>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Upcoming appointments list */}
       <Card>

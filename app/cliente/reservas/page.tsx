@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { format, isPast } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, toNaiveLocal } from '@/lib/utils'
 import { useToast } from '@/components/ui/use-toast'
 
 interface Appointment {
@@ -414,8 +414,8 @@ export default function ClienteReservasPage() {
         {/* Appointment cards */}
         {sorted.map((appt) => {
           const statusInfo = STATUS_LABELS[appt.status] ?? STATUS_LABELS.PENDING
-          const scheduledDate = new Date(appt.scheduledAt)
-          const past = isPast(scheduledDate)
+          const scheduledDate = toNaiveLocal(appt.scheduledAt)
+          const past = isPast(new Date(appt.scheduledAt))
           const showCancel = appt.status !== 'CANCELLED' && appt.status !== 'COMPLETED' && canCancel(appt.scheduledAt)
 
           return (
