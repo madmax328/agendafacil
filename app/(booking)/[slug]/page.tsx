@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -282,6 +282,15 @@ export default function ProfissionalPage() {
   const amSlots = slots.filter(s => parseInt(s.time.split(':')[0]) < 12)
   const pmSlots = slots.filter(s => parseInt(s.time.split(':')[0]) >= 12)
 
+  // ── Team scroll ──
+  const teamScrollRef = useRef<HTMLDivElement>(null)
+  function scrollTeam(dir: 'left' | 'right') {
+    teamScrollRef.current?.scrollBy({ left: dir === 'right' ? 220 : -220, behavior: 'smooth' })
+  }
+
+  // ── Rating average ──
+  const avgRating = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0
+
   // ── Progress bar labels ──
   const stepLabels = loggedInClient
     ? ['Data', 'Horário', 'Confirmar']
@@ -345,12 +354,23 @@ export default function ProfissionalPage() {
           {professional.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={professional.image} alt={professional.businessName}
-              className="w-24 h-24 rounded-2xl object-cover shadow-md" />
+              className="w-24 h-24 rounded-2xl object-cover shadow-md border-2 border-gray-200" />
           ) : null}
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
             {professional.businessName}
           </h1>
           <p className="text-sm text-gray-500">{typeLabel}</p>
+          {reviews.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-gray-900">{avgRating.toFixed(1)}</span>
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map(n => (
+                  <Star key={n} className={`h-4 w-4 ${n <= Math.round(avgRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`} />
+                ))}
+              </div>
+              <span className="text-sm text-gray-500">({reviews.length} avaliações)</span>
+            </div>
+          )}
         </div>
 
         {/* Demo warning */}
@@ -488,23 +508,35 @@ export default function ProfissionalPage() {
       {/* ── Nossa equipe ── */}
       {teamMembers.length > 0 && (
         <div className="max-w-5xl mx-auto w-full px-4 pb-8">
-          <h2 className="text-lg font-extrabold text-gray-900 mb-4">Nossa equipe</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-extrabold text-gray-900">Nossa equipe</h2>
+            <div className="flex gap-1">
+              <button type="button" onClick={() => scrollTeam('left')}
+                className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 text-gray-600 transition-colors">
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button type="button" onClick={() => scrollTeam('right')}
+                className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 text-gray-600 transition-colors">
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+          <div ref={teamScrollRef} className="flex gap-4 overflow-x-auto pb-2 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x">
             {teamMembers.map(member => (
-              <div key={member.id} className="flex flex-col items-center text-center gap-2 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+              <div key={member.id}
+                className="snap-start shrink-0 w-44 bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm text-center">
                 {member.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={member.image} alt={member.name}
-                    className="w-16 h-16 rounded-full object-cover" />
+                  <img src={member.image} alt={member.name} className="w-full h-44 object-cover" />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-xl font-extrabold text-blue-600">
+                  <div className="w-full h-44 bg-blue-50 flex items-center justify-center">
+                    <span className="text-4xl font-extrabold text-blue-600">
                       {member.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
                 )}
-                <div>
-                  <p className="font-bold text-gray-900 text-sm">{member.name}</p>
+                <div className="p-3">
+                  <p className="font-bold text-gray-900 text-sm leading-snug">{member.name}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{member.role}</p>
                 </div>
               </div>
@@ -516,19 +548,39 @@ export default function ProfissionalPage() {
       {/* ── Avaliações dos clientes ── */}
       {reviews.length > 0 && (
         <div className="max-w-5xl mx-auto w-full px-4 pb-8">
-          <h2 className="text-lg font-extrabold text-gray-900 mb-4">Avaliações dos clientes</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <h2 className="text-lg font-extrabold text-gray-900 mb-5">Avaliações dos nossos clientes</h2>
+
+          {/* Aggregate */}
+          <div className="flex items-end gap-4 mb-6">
+            <span className="text-5xl font-extrabold text-gray-900 leading-none">{avgRating.toFixed(1)}</span>
+            <div>
+              <div className="flex gap-0.5 mb-1">
+                {[1,2,3,4,5].map(n => (
+                  <Star key={n} className={`h-5 w-5 ${n <= Math.round(avgRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`} />
+                ))}
+              </div>
+              <p className="text-sm text-gray-500">{reviews.length} avaliação{reviews.length !== 1 ? 'ões' : ''}</p>
+            </div>
+          </div>
+
+          {/* List */}
+          <div className="divide-y divide-gray-100">
             {reviews.map(review => (
-              <div key={review.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-                <div className="flex items-center gap-1 mb-2">
-                  {[1,2,3,4,5].map(n => (
-                    <Star key={n} className={`h-4 w-4 ${n <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`} />
-                  ))}
+              <div key={review.id} className="py-4 first:pt-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-bold text-gray-800">{review.rating.toFixed(1)}</span>
+                  <div className="flex gap-0.5">
+                    {[1,2,3,4,5].map(n => (
+                      <Star key={n} className={`h-3.5 w-3.5 ${n <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`} />
+                    ))}
+                  </div>
                 </div>
                 {review.comment && (
-                  <p className="text-sm text-gray-700 mb-2 leading-relaxed">{review.comment}</p>
+                  <p className="text-sm text-gray-700 mb-1.5 leading-relaxed">{review.comment}</p>
                 )}
-                <p className="text-xs font-semibold text-gray-500">{review.clientName}</p>
+                <p className="text-xs text-gray-400">
+                  {review.clientName}, em {format(new Date(review.createdAt), 'dd/MM/yyyy', { locale: ptBR })}
+                </p>
               </div>
             ))}
           </div>

@@ -68,7 +68,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
+    <html lang="pt-BR" className={`${inter.variable} dark`} suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
           {children}
