@@ -207,30 +207,30 @@ function PhoneMockup() {
 
 export default function ParaProfissionaisPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#0d1117]">
 
       {/* ── NAVBAR ── */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
+      <header className="sticky top-0 z-50 bg-[#0d1117]/95 backdrop-blur border-b border-[#21262d]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <div className="bg-blue-600 rounded-lg p-1.5">
+            <div className="bg-gray-700 rounded-lg p-1.5">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">Markou</span>
+            <span className="text-xl font-bold text-white">Markou</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <a href="#negocios" className="hover:text-blue-600 transition-colors">Negócios</a>
-            <a href="#funcionalidades" className="hover:text-blue-600 transition-colors">Funcionalidades</a>
-            <a href="#planos" className="hover:text-blue-600 transition-colors">Planos</a>
-            <a href="#depoimentos" className="hover:text-blue-600 transition-colors">Depoimentos</a>
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
+            <a href="#negocios" className="hover:text-white transition-colors">Negócios</a>
+            <a href="#funcionalidades" className="hover:text-white transition-colors">Funcionalidades</a>
+            <a href="#planos" className="hover:text-white transition-colors">Planos</a>
+            <a href="#depoimentos" className="hover:text-white transition-colors">Depoimentos</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors hidden sm:block">
+            <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors hidden sm:block">
               Já sou cliente
             </Link>
             <Link
               href="/cadastro"
-              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-md shadow-blue-600/25"
+              className="bg-gray-700 hover:bg-gray-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors"
             >
               TESTE GRÁTIS
             </Link>
@@ -239,48 +239,46 @@ export default function ParaProfissionaisPage() {
       </header>
 
       {/* ── HERO ── */}
-      <section className="bg-white overflow-hidden relative">
-        {/* Decorative background shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-blue-50 opacity-60" />
-          <div className="absolute top-1/2 -left-24 w-72 h-72 rounded-full bg-blue-50 opacity-40" />
-        </div>
+      <section className="bg-[#0d1117] overflow-hidden relative">
+        {/* Decorative dot pattern */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.04]"
+          style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 relative">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
             {/* Left col */}
             <div className="flex-1 text-center lg:text-left">
-              <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-6">
+              <p className="text-gray-400 font-bold text-sm uppercase tracking-widest mb-6">
                 Para salões, barbearias, clínicas e muito mais
               </p>
 
               <h1 className="font-black leading-[1.05] tracking-tight mb-6">
-                <span className="text-blue-600 text-5xl md:text-6xl lg:text-7xl block">Da correria do dia</span>
-                <span className="text-blue-600 text-5xl md:text-6xl lg:text-7xl block">ao controle total</span>
-                <span className="text-slate-900 text-4xl md:text-5xl lg:text-6xl block mt-1">o Markou simplifica.</span>
+                <span className="text-white text-5xl md:text-6xl lg:text-7xl block">Da correria do dia</span>
+                <span className="text-white text-5xl md:text-6xl lg:text-7xl block">ao controle total</span>
+                <span className="text-gray-400 text-4xl md:text-5xl lg:text-6xl block mt-1">o Markou simplifica.</span>
               </h1>
 
-              <p className="text-lg md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 mb-10 leading-relaxed">
+              <p className="text-lg md:text-xl text-gray-500 max-w-lg mx-auto lg:mx-0 mb-10 leading-relaxed">
                 Dê adeus às mensagens para marcar horário, clientes que não aparecem e agenda no papel. Aqui a sua gestão acontece num piscar de olhos.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-6">
                 <Link
                   href="/cadastro"
-                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30"
+                  className="w-full sm:w-auto bg-white hover:bg-gray-100 text-gray-900 font-bold px-10 py-4 rounded-2xl text-lg transition-all flex items-center justify-center gap-2 shadow-xl"
                 >
                   TESTE GRÁTIS
                   <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
                   href="#planos"
-                  className="w-full sm:w-auto border-2 border-slate-200 bg-white hover:border-blue-300 text-slate-700 font-semibold px-8 py-4 rounded-2xl text-base transition-colors flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto border-2 border-[#30363d] bg-transparent hover:border-[#444c56] text-gray-300 font-semibold px-8 py-4 rounded-2xl text-base transition-colors flex items-center justify-center gap-2"
                 >
                   Ver planos
                 </Link>
               </div>
 
-              <p className="text-slate-400 text-sm">
+              <p className="text-gray-500 text-sm">
                 ✓ Grátis para começar &nbsp;·&nbsp; ✓ Ativo em 10 minutos &nbsp;·&nbsp; ✓ Sem cartão de crédito
               </p>
             </div>
@@ -319,22 +317,22 @@ export default function ParaProfissionaisPage() {
       </section>
 
       {/* ── STATS ── */}
-      <section className="bg-white py-16 border-t border-slate-100">
+      <section className="bg-[#161b22] py-16 border-t border-[#21262d]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-slate-400 text-sm font-semibold uppercase tracking-widest mb-10">
+          <p className="text-center text-gray-500 text-sm font-semibold uppercase tracking-widest mb-10">
             Feito para quem entende o mercado de beleza e saúde
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { num: '+500', label: 'profissionais ativos', color: 'bg-blue-100' },
-              { num: '70%', label: 'redução em no-shows', color: 'bg-green-100' },
-              { num: '10min', label: 'para ativar a agenda', color: 'bg-purple-100' },
-              { num: '24h', label: 'disponível para clientes', color: 'bg-orange-100' },
+              { num: '+500', label: 'profissionais ativos', color: 'bg-gray-700' },
+              { num: '70%', label: 'redução em no-shows', color: 'bg-gray-700' },
+              { num: '10min', label: 'para ativar a agenda', color: 'bg-gray-700' },
+              { num: '24h', label: 'disponível para clientes', color: 'bg-gray-700' },
             ].map(({ num, label, color }) => (
               <div key={label} className="relative flex flex-col items-center">
-                <div className={`absolute -top-2 -left-2 w-14 h-14 ${color} rounded-full opacity-60`} />
-                <p className="relative text-4xl md:text-5xl font-black text-slate-900">{num}</p>
-                <p className="relative text-sm text-slate-500 mt-2 max-w-[110px]">{label}</p>
+                <div className={`absolute -top-2 -left-2 w-14 h-14 ${color} rounded-full opacity-30`} />
+                <p className="relative text-4xl md:text-5xl font-black text-white">{num}</p>
+                <p className="relative text-sm text-gray-500 mt-2 max-w-[110px]">{label}</p>
               </div>
             ))}
           </div>
@@ -342,15 +340,15 @@ export default function ParaProfissionaisPage() {
       </section>
 
       {/* ── NEGÓCIOS / BUSINESS TYPES ── */}
-      <section id="negocios" className="bg-slate-50 py-20">
+      <section id="negocios" className="bg-[#0d1117] py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-4">
-            <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-3">Para todos os tipos de negócio</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">
+            <p className="text-gray-400 font-bold text-sm uppercase tracking-widest mb-3">Para todos os tipos de negócio</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white">
               O Markou é para o seu negócio
             </h2>
           </div>
-          <p className="text-center text-slate-500 text-lg mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
             Sistema completo para salões de beleza, barbearias, clínicas de estética, studios e muito mais.
           </p>
           {/*
@@ -392,23 +390,23 @@ export default function ParaProfissionaisPage() {
                 desc: 'Gerencie consultas, atraia mais pacientes e organize sua clínica com ferramentas profissionais.',
               },
             ].map(({ photoUrl, photoAlt, title, border, tag, features, desc }) => (
-              <div key={title} className={`bg-white border ${border} rounded-3xl overflow-hidden flex flex-col shadow-sm hover:shadow-lg transition-shadow`}>
+              <div key={title} className="bg-[#161b22] border border-[#30363d] rounded-3xl overflow-hidden flex flex-col shadow-sm hover:shadow-lg hover:border-[#444c56] transition-all">
                 <div className="h-56 overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={photoUrl} alt={photoAlt} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-8 flex flex-col flex-1">
-                  <h3 className="text-xl font-extrabold text-slate-900 mb-3">{title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6">{desc}</p>
+                  <h3 className="text-xl font-extrabold text-white mb-3">{title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6">{desc}</p>
                   <ul className="space-y-2 mb-8 flex-1">
                     {features.map(f => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
-                        <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${tag}`}>✓</span>
+                      <li key={f} className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-gray-700 text-gray-300">✓</span>
                         {f}
                       </li>
                     ))}
                   </ul>
-                  <Link href="/cadastro" className="text-blue-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+                  <Link href="/cadastro" className="text-gray-300 font-bold text-sm flex items-center gap-1 hover:gap-2 hover:text-white transition-all">
                     Criar minha agenda grátis <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -520,13 +518,13 @@ export default function ParaProfissionaisPage() {
       </section>
 
       {/* ── PROBLEMA → SOLUÇÃO ── */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-[#161b22]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
               Chega de perder dinheiro assim
             </h2>
-            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+            <p className="text-gray-500 text-lg max-w-xl mx-auto">
               Quem ainda gerencia a agenda pelo WhatsApp enfrenta isso todo dia
             </p>
           </div>
@@ -536,10 +534,10 @@ export default function ParaProfissionaisPage() {
               { emoji: '💸', title: 'Cliente que não aparece', desc: 'Você bloqueou o horário, preparou tudo — e o cliente simplesmente não foi. Dinheiro e tempo no lixo.' },
               { emoji: '😵', title: 'Erro de agenda', desc: 'Caderno, WhatsApp e memória ao mesmo tempo. Uma distração e você marca dois clientes no mesmo horário.' },
             ].map(({ emoji, title, desc }) => (
-              <div key={title} className="bg-slate-50 border border-slate-100 rounded-2xl p-7 text-left relative overflow-hidden">
+              <div key={title} className="bg-[#21262d] border border-[#30363d] rounded-2xl p-7 text-left relative overflow-hidden">
                 <div className="text-4xl mb-4">{emoji}</div>
-                <h3 className="font-bold text-slate-900 mb-2 text-base">{title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                <h3 className="font-bold text-white mb-2 text-base">{title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -547,31 +545,31 @@ export default function ParaProfissionaisPage() {
           {/* arrow */}
           <div className="text-center mb-12">
             <div className="inline-flex flex-col items-center gap-2">
-              <div className="w-px h-8 bg-gradient-to-b from-slate-200 to-blue-600" />
-              <div className="bg-blue-600 text-white text-sm font-bold px-6 py-2.5 rounded-full">
+              <div className="w-px h-8 bg-gradient-to-b from-[#30363d] to-gray-400" />
+              <div className="bg-gray-700 text-white text-sm font-bold px-6 py-2.5 rounded-full">
                 Com o Markou, isso acaba
               </div>
-              <div className="w-px h-8 bg-gradient-to-b from-blue-600 to-slate-200" />
+              <div className="w-px h-8 bg-gradient-to-b from-gray-400 to-[#30363d]" />
             </div>
           </div>
         </div>
       </section>
 
       {/* ── FUNCIONALIDADES — alternating ── */}
-      <section id="funcionalidades" className="bg-white pb-6">
+      <section id="funcionalidades" className="bg-[#0d1117] pb-6">
 
         {/* Feature 1 — Agendamento online */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-[#21262d]">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
+              <div className="inline-flex items-center gap-2 bg-[#21262d] text-gray-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
                 <Smartphone className="h-3.5 w-3.5" />
                 Para o seu cliente
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-5">
                 Seu cliente marca<br />sozinho, no celular
               </h2>
-              <p className="text-slate-500 text-lg leading-relaxed mb-8">
+              <p className="text-gray-400 text-lg leading-relaxed mb-8">
                 Você tem uma página de agendamento profissional com o seu nome. O cliente acessa, escolhe o serviço, o horário e confirma — sem precisar falar com você.
               </p>
               <ul className="space-y-3">
@@ -581,7 +579,7 @@ export default function ParaProfissionaisPage() {
                   'Seu link personalizado: markou.com/seu-nome',
                   'Coloque no Instagram, WhatsApp ou cartão de visita',
                 ].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-slate-600">
+                  <li key={item} className="flex items-start gap-3 text-sm text-gray-400">
                     <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                     {item}
                   </li>
@@ -595,17 +593,17 @@ export default function ParaProfissionaisPage() {
         </div>
 
         {/* Feature 2 — Dashboard */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-[#21262d]">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 flex justify-center">
-              <div className="w-full max-w-md bg-slate-50 rounded-2xl border border-slate-100 p-6">
+              <div className="w-full max-w-md bg-[#161b22] rounded-2xl border border-[#30363d] p-6">
                 {/* mini dashboard view */}
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p className="text-xs font-bold text-slate-900">Sua agenda hoje</p>
-                    <p className="text-xs text-slate-400">Quinta, 3 de Abril</p>
+                    <p className="text-xs font-bold text-white">Sua agenda hoje</p>
+                    <p className="text-xs text-gray-500">Quinta, 3 de Abril</p>
                   </div>
-                  <div className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">4 clientes</div>
+                  <div className="bg-[#21262d] text-green-400 text-xs font-bold px-3 py-1 rounded-full">4 clientes</div>
                 </div>
                 <div className="space-y-2">
                   {[
@@ -614,40 +612,40 @@ export default function ParaProfissionaisPage() {
                     { t: '14:00', n: 'Carla Matos', s: 'Manicure', v: 'R$45', c: 'bg-green-500' },
                     { t: '16:00', n: 'Pedro Alves', s: 'Corte masculino', v: 'R$60', c: 'bg-orange-500' },
                   ].map(({ t, n, s, v, c }) => (
-                    <div key={t} className="bg-white rounded-xl px-4 py-3 border border-slate-100 flex items-center gap-3">
+                    <div key={t} className="bg-[#21262d] rounded-xl px-4 py-3 border border-[#30363d] flex items-center gap-3">
                       <div className={`w-1.5 h-10 rounded-full ${c} shrink-0`} />
                       <div className="flex-1">
-                        <p className="text-xs font-semibold text-slate-900">{n}</p>
-                        <p className="text-xs text-slate-400">{s}</p>
+                        <p className="text-xs font-semibold text-white">{n}</p>
+                        <p className="text-xs text-gray-500">{s}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs font-bold text-slate-900">{v}</p>
-                        <p className="text-xs text-slate-400">{t}</p>
+                        <p className="text-xs font-bold text-white">{v}</p>
+                        <p className="text-xs text-gray-500">{t}</p>
                       </div>
                     </div>
                   ))}
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3">
-                  <div className="bg-white rounded-xl p-3 border border-slate-100 text-center">
-                    <p className="text-xs text-slate-400">Receita hoje</p>
-                    <p className="text-lg font-extrabold text-slate-900">R$235</p>
+                  <div className="bg-[#21262d] rounded-xl p-3 border border-[#30363d] text-center">
+                    <p className="text-xs text-gray-500">Receita hoje</p>
+                    <p className="text-lg font-extrabold text-white">R$235</p>
                   </div>
-                  <div className="bg-white rounded-xl p-3 border border-slate-100 text-center">
-                    <p className="text-xs text-slate-400">No-shows</p>
-                    <p className="text-lg font-extrabold text-green-600">0</p>
+                  <div className="bg-[#21262d] rounded-xl p-3 border border-[#30363d] text-center">
+                    <p className="text-xs text-gray-500">No-shows</p>
+                    <p className="text-lg font-extrabold text-green-400">0</p>
                   </div>
                 </div>
               </div>
             </div>
             <div className="flex-1">
-              <div className="inline-flex items-center gap-2 bg-purple-50 text-purple-700 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
+              <div className="inline-flex items-center gap-2 bg-[#21262d] text-gray-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
                 <BarChart3 className="h-3.5 w-3.5" />
                 Para você
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-5">
                 Tudo na mesma tela,<br />sem confusão
               </h2>
-              <p className="text-slate-500 text-lg leading-relaxed mb-8">
+              <p className="text-gray-400 text-lg leading-relaxed mb-8">
                 Veja todos os agendamentos do dia, a receita acumulada e o histórico de cada cliente — numa interface simples, que funciona no celular e no computador.
               </p>
               <ul className="space-y-3">
@@ -657,7 +655,7 @@ export default function ParaProfissionaisPage() {
                   'Receita por período em tempo real',
                   'Funciona no celular, tablet e computador',
                 ].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-slate-600">
+                  <li key={item} className="flex items-start gap-3 text-sm text-gray-400">
                     <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                     {item}
                   </li>
@@ -668,17 +666,17 @@ export default function ParaProfissionaisPage() {
         </div>
 
         {/* Feature 3 — Email automático */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-[#21262d]">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
+              <div className="inline-flex items-center gap-2 bg-[#21262d] text-gray-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5">
                 <Bell className="h-3.5 w-3.5" />
                 Automático
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-5">
                 Confirmações e lembretes<br />sem você mover um dedo
               </h2>
-              <p className="text-slate-500 text-lg leading-relaxed mb-8">
+              <p className="text-gray-400 text-lg leading-relaxed mb-8">
                 Assim que o cliente marca, ele já recebe a confirmação por e-mail. Com o plano Pro, ele ainda recebe um lembrete no dia anterior e outro 2 horas antes — eliminando os no-shows.
               </p>
               <ul className="space-y-3">
@@ -688,7 +686,7 @@ export default function ParaProfissionaisPage() {
                   'Lembrete 2h antes do horário (plano Pro)',
                   'Zero configuração — funciona sozinho',
                 ].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-slate-600">
+                  <li key={item} className="flex items-start gap-3 text-sm text-gray-400">
                     <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                     {item}
                   </li>
@@ -697,22 +695,22 @@ export default function ParaProfissionaisPage() {
             </div>
             <div className="flex-1 order-1 lg:order-2 flex justify-center">
               {/* email mockup */}
-              <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-                <div className="bg-slate-100 px-4 py-2.5 flex items-center gap-2 text-xs text-slate-500">
+              <div className="w-full max-w-sm bg-[#161b22] rounded-2xl shadow-xl border border-[#30363d] overflow-hidden">
+                <div className="bg-[#21262d] px-4 py-2.5 flex items-center gap-2 text-xs text-gray-400">
                   <Mail className="h-3.5 w-3.5" />
                   <span className="font-medium">Caixa de entrada</span>
                 </div>
                 <div className="p-5">
                   <div className="flex items-start gap-3 mb-5">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center shrink-0">
                       <Calendar className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">Markou</p>
-                      <p className="text-xs text-slate-400">noreply@markou.app</p>
+                      <p className="text-xs font-bold text-white">Markou</p>
+                      <p className="text-xs text-gray-500">noreply@markou.app</p>
                     </div>
                   </div>
-                  <div className="bg-blue-600 rounded-xl p-4 text-white mb-4">
+                  <div className="bg-gray-700 rounded-xl p-4 text-white mb-4">
                     <p className="text-xs font-bold mb-1">Agendamento confirmado! ✓</p>
                     <div className="text-xs opacity-90 space-y-1">
                       <p><strong>Serviço:</strong> Corte + Escova</p>
@@ -721,8 +719,8 @@ export default function ParaProfissionaisPage() {
                       <p><strong>Local:</strong> Salão da Ana Paula</p>
                     </div>
                   </div>
-                  <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-800">
-                    <strong>Lembrete:</strong> Seu horário é amanhã às 14h. Até já!
+                  <div className="bg-[#21262d] border border-[#30363d] rounded-xl p-3 text-xs text-gray-400">
+                    <strong className="text-gray-300">Lembrete:</strong> Seu horário é amanhã às 14h. Até já!
                   </div>
                 </div>
               </div>
@@ -763,22 +761,22 @@ export default function ParaProfissionaisPage() {
       </section>
 
       {/* ── PLANOS ── */}
-      <section id="planos" className="bg-slate-50 py-20">
+      <section id="planos" className="bg-[#161b22] py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-4">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">Preço justo, sem surpresas</h2>
-            <p className="text-slate-500 text-lg">Comece grátis. Upgrade só quando precisar.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Preço justo, sem surpresas</h2>
+            <p className="text-gray-500 text-lg">Comece grátis. Upgrade só quando precisar.</p>
           </div>
 
           {/* Trust line */}
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-500 mb-12">
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500 mb-12">
             {[
               { icon: ShieldCheck, text: 'Sem taxa de adesão' },
               { icon: Clock, text: 'Cancele quando quiser' },
               { icon: BarChart3, text: 'Sem fidelidade' },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-1.5">
-                <Icon className="h-4 w-4 text-blue-500" />
+                <Icon className="h-4 w-4 text-gray-500" />
                 <span>{text}</span>
               </div>
             ))}
@@ -786,13 +784,13 @@ export default function ParaProfissionaisPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* FREE */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col">
+            <div className="bg-[#21262d] rounded-2xl border border-[#30363d] p-8 flex flex-col">
               <div>
-                <h3 className="text-lg font-extrabold text-slate-900 mb-1">Grátis</h3>
-                <p className="text-slate-400 text-sm mb-6">Para testar sem compromisso</p>
+                <h3 className="text-lg font-extrabold text-white mb-1">Grátis</h3>
+                <p className="text-gray-500 text-sm mb-6">Para testar sem compromisso</p>
                 <div className="mb-6">
-                  <span className="text-4xl font-extrabold text-slate-900">R$0</span>
-                  <span className="text-slate-400 text-sm">/mês</span>
+                  <span className="text-4xl font-extrabold text-white">R$0</span>
+                  <span className="text-gray-500 text-sm">/mês</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {[
@@ -804,16 +802,16 @@ export default function ParaProfissionaisPage() {
                     { label: 'Agendamentos ilimitados', ok: false },
                   ].map((f) => (
                     <li key={f.label} className="flex items-start gap-2 text-sm">
-                      <span className={`mt-0.5 shrink-0 font-bold text-base leading-none ${f.ok ? 'text-green-500' : 'text-slate-200'}`}>{f.ok ? '✓' : '×'}</span>
-                      <span className={f.ok ? 'text-slate-700' : 'text-slate-300'}>{f.label}</span>
+                      <span className={`mt-0.5 shrink-0 font-bold text-base leading-none ${f.ok ? 'text-green-400' : 'text-gray-600'}`}>{f.ok ? '✓' : '×'}</span>
+                      <span className={f.ok ? 'text-gray-300' : 'text-gray-600'}>{f.label}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <Link href="/cadastro" className="block text-center border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-semibold py-3 rounded-xl transition-colors mt-auto">
+              <Link href="/cadastro" className="block text-center border-2 border-[#444c56] hover:border-[#6e7681] text-gray-300 font-semibold py-3 rounded-xl transition-colors mt-auto">
                 Começar grátis
               </Link>
-              <p className="text-center text-xs text-slate-400 mt-2">Sem cartão de crédito</p>
+              <p className="text-center text-xs text-gray-500 mt-2">Sem cartão de crédito</p>
             </div>
 
             {/* STARTER */}
@@ -851,13 +849,13 @@ export default function ParaProfissionaisPage() {
             </div>
 
             {/* PRO */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col">
+            <div className="bg-[#21262d] rounded-2xl border border-[#30363d] p-8 flex flex-col">
               <div>
-                <h3 className="text-lg font-extrabold text-slate-900 mb-1">Pro</h3>
-                <p className="text-slate-400 text-sm mb-6">Para clínicas e salões que não param</p>
+                <h3 className="text-lg font-extrabold text-white mb-1">Pro</h3>
+                <p className="text-gray-500 text-sm mb-6">Para clínicas e salões que não param</p>
                 <div className="mb-6">
-                  <span className="text-4xl font-extrabold text-slate-900">R$69</span>
-                  <span className="text-slate-400 text-sm">/mês</span>
+                  <span className="text-4xl font-extrabold text-white">R$69</span>
+                  <span className="text-gray-500 text-sm">/mês</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {[
@@ -870,29 +868,29 @@ export default function ParaProfissionaisPage() {
                     'Suporte prioritário',
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
-                      <span className="text-green-500 font-bold mt-0.5 shrink-0">✓</span>
-                      <span className="text-slate-700">{f}</span>
+                      <span className="text-green-400 font-bold mt-0.5 shrink-0">✓</span>
+                      <span className="text-gray-300">{f}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <Link href="/cadastro" className="block text-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-colors mt-auto">
+              <Link href="/cadastro" className="block text-center bg-white hover:bg-gray-100 text-gray-900 font-bold py-3 rounded-xl transition-colors mt-auto">
                 Assinar Pro
               </Link>
-              <p className="text-center text-xs text-slate-400 mt-2">Sem cartão de crédito · Cancele quando quiser</p>
+              <p className="text-center text-xs text-gray-500 mt-2">Sem cartão de crédito · Cancele quando quiser</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── DEPOIMENTOS ── */}
-      <section id="depoimentos" className="py-20 bg-[#FDF6F0]">
+      <section id="depoimentos" className="py-20 bg-[#0d1117]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row gap-16 items-start">
             {/* left: big heading */}
             <div className="lg:w-72 shrink-0">
-              <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-4">Depoimentos</p>
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+              <p className="text-gray-400 font-bold text-sm uppercase tracking-widest mb-4">Depoimentos</p>
+              <h2 className="text-3xl md:text-4xl font-black text-white leading-tight">
                 Quem usa o Markou conta com ele.
               </h2>
               <div className="mt-8 space-y-4">
@@ -902,8 +900,8 @@ export default function ParaProfissionaisPage() {
                   { num: '98%', label: 'recomendam' },
                 ].map(({ num, label }) => (
                   <div key={label} className="flex items-center gap-3">
-                    <span className="text-2xl font-black text-slate-900">{num}</span>
-                    <span className="text-sm text-slate-500">{label}</span>
+                    <span className="text-2xl font-black text-white">{num}</span>
+                    <span className="text-sm text-gray-500">{label}</span>
                   </div>
                 ))}
               </div>
@@ -942,20 +940,20 @@ export default function ParaProfissionaisPage() {
                   result: '2h/dia economizadas',
                 },
               ].map(({ text, name, biz, role, city, logo, logoColor, result }) => (
-                <div key={name} className="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
-                  <div className="text-5xl text-blue-200 font-black leading-none mb-3">&ldquo;</div>
-                  <p className="text-slate-700 leading-relaxed mb-5">{text}</p>
+                <div key={name} className="bg-[#161b22] rounded-2xl p-7 border border-[#30363d]">
+                  <div className="text-5xl text-gray-600 font-black leading-none mb-3">&ldquo;</div>
+                  <p className="text-gray-300 leading-relaxed mb-5">{text}</p>
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-xl ${logoColor} flex items-center justify-center text-white font-extrabold text-sm shrink-0`}>
                         {logo}
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900 text-sm">{name}</p>
-                        <p className="text-slate-400 text-xs">{biz} · {role} · {city}</p>
+                        <p className="font-bold text-white text-sm">{name}</p>
+                        <p className="text-gray-500 text-xs">{biz} · {role} · {city}</p>
                       </div>
                     </div>
-                    <div className="bg-green-50 border border-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <div className="bg-[#21262d] border border-[#30363d] text-green-400 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
                       <TrendingUp className="h-3 w-3" />
                       {result}
                     </div>
@@ -968,29 +966,29 @@ export default function ParaProfissionaisPage() {
       </section>
 
       {/* ── CTA FINAL ── */}
-      <section className="bg-blue-600 py-20">
+      <section className="bg-[#161b22] py-20 border-t border-[#21262d]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
             <div className="text-center lg:text-left">
               <h2 className="text-3xl md:text-4xl font-black text-white leading-tight mb-4">
                 A sua parceira dos<br />negócios de beleza e saúde.
               </h2>
-              <p className="text-blue-100 text-lg max-w-lg">
+              <p className="text-gray-400 text-lg max-w-lg">
                 Crie sua conta em 2 minutos e tenha sua página de agendamento funcionando ainda hoje — de graça.
               </p>
             </div>
             <div className="flex flex-col items-center gap-4 shrink-0">
               <Link
                 href="/cadastro"
-                className="bg-white hover:bg-blue-50 text-blue-600 font-black px-12 py-5 rounded-2xl text-xl transition-colors shadow-2xl shadow-blue-900/30 flex items-center gap-3"
+                className="bg-white hover:bg-gray-100 text-gray-900 font-black px-12 py-5 rounded-2xl text-xl transition-colors shadow-2xl flex items-center gap-3"
               >
                 TESTE GRÁTIS
                 <ArrowRight className="h-6 w-6" />
               </Link>
-              <div className="flex flex-wrap items-center justify-center gap-5 text-blue-100 text-sm">
-                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-white" /> Sem cartão</span>
-                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-white" /> 10 minutos</span>
-                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-white" /> Cancele quando quiser</span>
+              <div className="flex flex-wrap items-center justify-center gap-5 text-gray-500 text-sm">
+                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-gray-400" /> Sem cartão</span>
+                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-gray-400" /> 10 minutos</span>
+                <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-gray-400" /> Cancele quando quiser</span>
               </div>
             </div>
           </div>
@@ -998,10 +996,10 @@ export default function ParaProfissionaisPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-gray-900 text-gray-400 py-10">
+      <footer className="bg-[#010409] text-gray-500 py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <Link href="/" className="flex items-center gap-2">
-            <div className="bg-blue-600 rounded-lg p-1">
+            <div className="bg-gray-700 rounded-lg p-1">
               <Calendar className="h-4 w-4 text-white" />
             </div>
             <span className="font-semibold text-white">Markou</span>
