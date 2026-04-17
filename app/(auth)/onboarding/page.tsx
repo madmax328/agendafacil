@@ -541,18 +541,18 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-600">Markou</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Markou</h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             Vamos configurar sua conta em poucos passos
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-white dark:bg-[#161b22] rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-[#30363d]">
           <ProgressIndicator currentStep={step} />
 
           <h2 className="text-xl font-semibold text-gray-800 mb-6">

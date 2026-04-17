@@ -37,12 +37,12 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null
         const professional = await prisma.professional.findUnique({
           where: { email: credentials.email.toLowerCase() },
-          select: { id: true, email: true, name: true, image: true, password: true },
+          select: { id: true, email: true, name: true, password: true },
         })
         if (!professional?.password) return null
         const valid = await bcrypt.compare(credentials.password, professional.password)
         if (!valid) return null
-        return { id: professional.id, email: professional.email, name: professional.name, image: professional.image }
+        return { id: professional.id, email: professional.email, name: professional.name }
       },
     }),
   ],
@@ -74,6 +74,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user?.id) token.id = user.id
+      delete token.picture  // never store image in JWT — base64 overflows the 4KB cookie limit
       return token
     },
 

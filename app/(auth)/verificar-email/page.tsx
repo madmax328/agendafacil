@@ -8,12 +8,12 @@ export const metadata = {
 
 export default function VerificarEmailPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
+        <div className="bg-white dark:bg-[#161b22] rounded-2xl shadow-xl border border-gray-200 dark:border-[#30363d] overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-8 text-center">
+          <div className="bg-gray-900 dark:bg-[#21262d] px-8 py-8 text-center">
             <div className="flex items-center justify-center gap-2">
               <div className="bg-white/20 rounded-xl p-2">
                 <Calendar className="h-6 w-6 text-white" />

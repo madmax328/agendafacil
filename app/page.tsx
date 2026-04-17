@@ -110,8 +110,11 @@ export default async function HomePage() {
       </header>
 
       {/* ── HERO ── */}
-      <section className="bg-white pt-16 pb-8">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      <section className="bg-white pt-16 pb-8 relative overflow-hidden">
+        {/* Dot pattern */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
             Encontre e{' '}
             <strong className="font-extrabold">agende</strong>{' '}

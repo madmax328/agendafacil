@@ -60,17 +60,17 @@ export default function ClienteCadastroPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-10 text-center">
+        <div className="bg-white dark:bg-[#161b22] rounded-2xl shadow-xl border border-gray-200 dark:border-[#30363d] overflow-hidden">
+          <div className="bg-gray-900 dark:bg-[#21262d] px-8 py-10 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               <div className="bg-white/20 rounded-xl p-2">
                 <Calendar className="h-7 w-7 text-white" />
               </div>
               <h1 className="text-3xl font-bold text-white tracking-tight">Markou</h1>
             </div>
-            <p className="text-blue-100 text-sm mt-1">Crie sua conta de cliente</p>
+            <p className="text-gray-400 text-sm mt-1">Crie sua conta de cliente</p>
           </div>
           <div className="px-8 py-8 space-y-5">
             <div className="text-center">
