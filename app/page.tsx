@@ -88,43 +88,33 @@ export default async function HomePage() {
       {/* ── NAVBAR ── */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
-          <div className="flex items-center gap-2.5">
-            <div className="bg-blue-600 rounded-xl p-1.5 shadow-sm shadow-blue-200">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="bg-gray-900 rounded-xl p-1.5">
               <Calendar className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900 tracking-tight">Markou</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
-            <Link href="/profissionais" className="hover:text-gray-900 transition-colors">Explorar</Link>
-            <Link href="/para-profissionais" className="hover:text-gray-900 transition-colors">Para profissionais</Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/cliente/login" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors hidden sm:block">
-              Minhas reservas
+          </Link>
+          {/* Right buttons */}
+          <div className="flex items-center gap-2">
+            <Link href="/cliente/login"
+              className="text-sm font-semibold px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+              Entrar
             </Link>
-            <Link href="/login" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors hidden sm:block">
-              Entrar (pro)
-            </Link>
-            <Link
-              href="/para-profissionais"
-              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm"
-            >
-              Cadastre seu negócio
+            <Link href="/para-profissionais"
+              className="text-sm font-bold px-4 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-gray-700 transition-colors">
+              Para Profissionais
             </Link>
           </div>
         </div>
       </header>
 
-      {/* ── HERO ── white, centered, like Trinks ── */}
-      <section className="bg-white pt-16 pb-8 overflow-hidden relative">
-        {/* Light decorative dots pattern */}
-        <div className="absolute inset-0 pointer-events-none opacity-30"
-          style={{ backgroundImage: 'radial-gradient(circle, #dbeafe 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      {/* ── HERO ── */}
+      <section className="bg-white pt-16 pb-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
             Encontre e{' '}
-            <strong className="font-extrabold text-blue-600">agende</strong>{' '}
+            <strong className="font-extrabold">agende</strong>{' '}
             serviços de{' '}
             <strong className="font-extrabold">beleza e bem-estar.</strong>
             <br className="hidden sm:block" />
@@ -135,9 +125,9 @@ export default async function HomePage() {
 
           {/* Search bar */}
           <form action="/profissionais" method="get"
-            className="flex flex-col sm:flex-row gap-2 bg-white border-2 border-gray-200 rounded-2xl p-2 shadow-xl shadow-gray-100 max-w-2xl mx-auto">
+            className="flex flex-col sm:flex-row gap-2 bg-white border-2 border-gray-200 rounded-2xl p-2 shadow-xl max-w-2xl mx-auto">
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-gray-400 pointer-events-none h-[18px] w-[18px]" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400 pointer-events-none" />
               <input
                 name="q"
                 type="text"
@@ -151,14 +141,14 @@ export default async function HomePage() {
               <input
                 name="cidade"
                 type="text"
-                placeholder="Onde gostaria de agendar?"
+                placeholder="Cidade"
                 defaultValue={visitorCity ?? ''}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-white text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none"
               />
             </div>
             <button
               type="submit"
-              className="bg-gray-900 hover:bg-gray-800 text-white font-bold px-8 py-3 rounded-xl transition-colors shrink-0 text-sm tracking-wide"
+              className="bg-gray-900 hover:bg-gray-700 text-white font-bold px-8 py-3 rounded-xl transition-colors shrink-0 text-sm tracking-wide"
             >
               BUSCAR
             </button>
@@ -172,7 +162,7 @@ export default async function HomePage() {
               { icon: Shield, text: 'Confirmação por e-mail' },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-1.5">
-                <Icon className="h-4 w-4 text-blue-500" />
+                <Icon className="h-4 w-4 text-gray-400" />
                 {text}
               </div>
             ))}
@@ -180,7 +170,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CATEGORIAS — horizontal text links like Trinks ── */}
+      {/* ── CATEGORIAS ── */}
       <section className="border-y border-gray-100 bg-white py-4">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-center flex-wrap gap-x-8 gap-y-3">
@@ -188,7 +178,7 @@ export default async function HomePage() {
               <Link
                 key={cat.value}
                 href={`/profissionais?tipo=${cat.value}`}
-                className="text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors tracking-wider py-1 border-b-2 border-transparent hover:border-blue-600"
+                className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors tracking-wider py-1 border-b-2 border-transparent hover:border-gray-400"
               >
                 {cat.label}
               </Link>
@@ -220,7 +210,7 @@ export default async function HomePage() {
               </p>
               <Link
                 href="/profissionais"
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-md shadow-blue-200 text-sm"
+                className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors text-sm"
               >
                 Explorar profissionais
                 <ArrowRight className="h-4 w-4" />
@@ -245,14 +235,14 @@ export default async function HomePage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <p className="text-sm font-semibold text-blue-600 mb-1">
+                <p className="text-sm font-semibold text-gray-500 mb-1">
                   {isLocal ? `📍 ${visitorCity}` : 'Em destaque'}
                 </p>
                 <h2 className="text-2xl font-extrabold text-gray-900">
                   {isLocal ? 'Profissionais perto de você' : 'Profissionais em destaque'}
                 </h2>
               </div>
-              <Link href="/profissionais" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5 group">
+              <Link href="/profissionais" className="text-sm font-semibold text-gray-500 hover:text-gray-900 flex items-center gap-1.5 group">
                 Ver todos
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
@@ -267,19 +257,19 @@ export default async function HomePage() {
                   <Link
                     key={pro.id}
                     href={`/${pro.slug}`}
-                    className="group bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-lg hover:border-blue-200 hover:-translate-y-0.5 transition-all"
+                    className="group bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-lg hover:border-gray-400 hover:-translate-y-0.5 transition-all"
                   >
                     <div className="flex items-start gap-3.5">
-                      <div className={`${color} w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0`}>
+                      <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-xl shrink-0">
                         {emoji}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
-                          <p className="font-bold text-gray-900 truncate text-sm group-hover:text-blue-700 transition-colors leading-snug">
+                          <p className="font-bold text-gray-900 truncate text-sm group-hover:text-gray-700 transition-colors leading-snug">
                             {pro.businessName || pro.name || 'Sem nome'}
                           </p>
                           {pro.isFeatured && (
-                            <span className="shrink-0 text-[10px] font-bold bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full">⭐</span>
+                            <span className="shrink-0 text-[10px] font-bold bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">⭐</span>
                           )}
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5">{typeLabel}</p>
@@ -295,7 +285,7 @@ export default async function HomePage() {
                       <span className="text-xs text-gray-500">
                         {pro._count.services} serviço{pro._count.services !== 1 ? 's' : ''}
                       </span>
-                      <span className="text-xs font-semibold text-blue-600 flex items-center gap-1 group-hover:gap-2 transition-all">
+                      <span className="text-xs font-semibold text-gray-500 flex items-center gap-1 group-hover:gap-2 transition-all">
                         Agendar <ArrowRight className="h-3.5 w-3.5" />
                       </span>
                     </div>
@@ -310,7 +300,7 @@ export default async function HomePage() {
       {/* ── COMO FUNCIONA ── */}
       <section className="py-20 bg-gray-50 border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-3">Simples e rápido</p>
+          <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">Simples e rápido</p>
           <h2 className="text-3xl font-extrabold text-gray-900 mb-3">Agende em menos de 1 minuto</h2>
           <p className="text-gray-500 mb-14">Sem criar conta, sem baixar app</p>
           <div className="grid md:grid-cols-3 gap-6">
@@ -329,7 +319,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/profissionais"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-colors mt-12 shadow-lg shadow-blue-200"
+            className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white font-bold px-8 py-4 rounded-xl transition-colors mt-12"
           >
             Encontrar profissional agora
             <ArrowRight className="h-5 w-5" />
@@ -338,27 +328,27 @@ export default async function HomePage() {
       </section>
 
       {/* ── CTA PARA PROFISSIONAIS ── */}
-      <section className="bg-blue-600 py-16">
+      <section className="bg-gray-900 py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-center md:text-left">
-              <p className="text-blue-200 text-sm font-bold uppercase tracking-widest mb-2">Você é profissional?</p>
+              <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-2">Você é profissional?</p>
               <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
                 Tenha sua agenda online em 10 minutos
               </h3>
-              <p className="text-blue-100 text-sm max-w-md">
+              <p className="text-gray-400 text-sm max-w-md">
                 Clientes marcam sozinhos 24h. Confirmação automática por e-mail. Começa grátis, sem cartão.
               </p>
             </div>
             <div className="flex flex-col items-center gap-3 shrink-0">
               <Link
                 href="/para-profissionais"
-                className="bg-white hover:bg-blue-50 text-blue-600 font-extrabold px-8 py-4 rounded-xl transition-colors flex items-center gap-2 shadow-xl text-base whitespace-nowrap"
+                className="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-8 py-4 rounded-xl transition-colors flex items-center gap-2 text-base whitespace-nowrap"
               >
                 Criar minha agenda grátis
                 <ArrowRight className="h-5 w-5" />
               </Link>
-              <p className="text-blue-200 text-xs">Sem cartão de crédito · Ativo em 10 min</p>
+              <p className="text-gray-500 text-xs">Sem cartão de crédito · Ativo em 10 min</p>
             </div>
           </div>
         </div>
