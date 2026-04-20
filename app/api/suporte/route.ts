@@ -26,11 +26,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Profissional não encontrado' }, { status: 404 })
   }
 
+  const trimmedSubject = subject.trim()
+  const trimmedMessage = message.trim()
+  const professionalName = professional.businessName || professional.name || ''
+
+  await (prisma as any).supportMessage.create({
+    data: {
+      professionalId: session.user.id,
+      professionalName,
+      professionalEmail: professional.email,
+      subject: trimmedSubject,
+      message: trimmedMessage,
+    },
+  })
+
   const ok = await sendContactoSuporte({
-    professionalName: professional.businessName ?? professional.name,
+    professionalName,
     professionalEmail: professional.email,
-    subject: subject.trim(),
-    message: message.trim(),
+    subject: trimmedSubject,
+    message: trimmedMessage,
   })
 
   if (!ok) {

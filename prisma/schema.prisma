@@ -170,6 +170,17 @@ model Review {
   createdAt      DateTime     @default(now())
 }
 
+model SupportMessage {
+  id                String   @id @default(cuid()) @map("_id")
+  professionalId    String
+  professionalName  String
+  professionalEmail String
+  subject           String
+  message           String
+  status            String   @default("open")
+  createdAt         DateTime @default(now())
+}
+
 model ClientAccount {
   id        String   @id @default(cuid()) @map("_id")
   name      String
