@@ -6,13 +6,13 @@ import { Search, Loader2, MapPin } from 'lucide-react'
 
 const TIPOS_MOBILE = [
   { value: '', label: 'Todos' },
-  { value: 'salao', label: '💇 Salão' },
-  { value: 'barbearia', label: '✂️ Barbearia' },
-  { value: 'clinica', label: '🏥 Clínica' },
-  { value: 'dentista', label: '🦷 Dentista' },
-  { value: 'estetica', label: '✨ Estética' },
-  { value: 'massagem', label: '💆 Massagem' },
-  { value: 'outros', label: '📋 Outros' },
+  { value: 'salao', label: 'Salão' },
+  { value: 'barbearia', label: 'Barbearia' },
+  { value: 'clinica', label: 'Clínica' },
+  { value: 'dentista', label: 'Dentista' },
+  { value: 'estetica', label: 'Estética' },
+  { value: 'massagem', label: 'Massagem' },
+  { value: 'outros', label: 'Outros' },
 ]
 
 export function ProfissionaisSearch({
