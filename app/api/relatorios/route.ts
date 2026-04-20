@@ -50,7 +50,7 @@ export async function GET() {
       month: label,
       key,
       total: appts.length,
-      revenue: appts.reduce((s, a) => s + a.service.price, 0),
+      revenue: appts.filter(a => a.status === 'COMPLETED').reduce((s, a) => s + a.service.price, 0),
     }
   })
 
@@ -65,7 +65,7 @@ export async function GET() {
     serviceMap.set(a.serviceId, {
       name: prev.name,
       count: prev.count + 1,
-      revenue: prev.revenue + a.service.price,
+      revenue: prev.revenue + (a.status === 'COMPLETED' ? a.service.price : 0),
     })
   })
   const topServices = Array.from(serviceMap.values())
@@ -77,6 +77,7 @@ export async function GET() {
   const thisMonthAppts = appointments.filter(a =>
     new Date(a.scheduledAt) >= currentMonthStart && a.status !== 'CANCELLED'
   )
+  const completedThisMonth = thisMonthAppts.filter(a => a.status === 'COMPLETED')
   const cancelledThisMonth = appointments.filter(a =>
     new Date(a.scheduledAt) >= currentMonthStart && a.status === 'CANCELLED'
   )
@@ -87,7 +88,7 @@ export async function GET() {
     topServices,
     summary: {
       appointmentsThisMonth: thisMonthAppts.length,
-      revenueThisMonth: thisMonthAppts.reduce((s, a) => s + a.service.price, 0),
+      revenueThisMonth: completedThisMonth.reduce((s, a) => s + a.service.price, 0),
       totalCustomers,
       cancellationRate: total > 0 ? Math.round((cancelledThisMonth.length / total) * 100) : 0,
     },

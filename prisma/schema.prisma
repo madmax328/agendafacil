@@ -179,6 +179,7 @@ model SupportMessage {
   message           String
   status            String         @default("open") // open | answered | closed
   readByAdmin       Boolean        @default(false)
+  proHasUnread      Boolean        @default(false)
   createdAt         DateTime       @default(now())
   replies           SupportReply[]
 }

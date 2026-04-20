@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { sendSupportAdminNotif } from '@/lib/email'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
@@ -33,14 +32,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     where: { id: params.id },
     data: { status: 'open', readByAdmin: false },
   })
-
-  // Notify admin
-  sendSupportAdminNotif({
-    professionalName: ticket.professionalName,
-    professionalEmail: ticket.professionalEmail,
-    subject: ticket.subject,
-    replyText: replyText.trim(),
-  }).catch(err => console.error('[Email] sendSupportAdminNotif:', err))
 
   return NextResponse.json({ ok: true, reply })
 }

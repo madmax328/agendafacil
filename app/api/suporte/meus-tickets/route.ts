@@ -17,5 +17,14 @@ export async function GET() {
     },
   })
 
+  // Clear unread flags now that pro is viewing
+  const unreadIds = tickets.filter((t: any) => t.proHasUnread).map((t: any) => t.id)
+  if (unreadIds.length > 0) {
+    await (prisma as any).supportMessage.updateMany({
+      where: { id: { in: unreadIds } },
+      data: { proHasUnread: false },
+    })
+  }
+
   return NextResponse.json(tickets)
 }

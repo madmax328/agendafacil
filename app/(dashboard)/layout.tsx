@@ -102,6 +102,14 @@ interface SidebarProps {
 function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const [supportUnread, setSupportUnread] = React.useState(0)
+
+  React.useEffect(() => {
+    fetch('/api/suporte/unread-count')
+      .then(r => r.json())
+      .then(d => setSupportUnread(d.count ?? 0))
+      .catch(() => {})
+  }, [pathname])
 
   const plan = (session?.user?.plan as string) ?? 'FREE'
   const planLabel = planLabels[plan] ?? 'Gratuito'
@@ -169,7 +177,12 @@ function Sidebar({ onClose }: SidebarProps) {
                 )}
               />
               <span className="flex-1">{label}</span>
-              {isActive && (
+              {href === '/suporte' && supportUnread > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                  {supportUnread}
+                </span>
+              )}
+              {isActive && supportUnread === 0 && (
                 <ChevronRight className="h-3.5 w-3.5 text-white/70" />
               )}
             </Link>

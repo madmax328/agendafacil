@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminSession } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
-import { sendSupportResposta } from '@/lib/email'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const admin = await getAdminSession()
@@ -21,16 +20,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   await (prisma as any).supportMessage.update({
     where: { id: params.id },
-    data: { status: 'answered' },
+    data: { status: 'answered', proHasUnread: true },
   })
-
-  // Send email notification to professional
-  sendSupportResposta({
-    professionalName: ticket.professionalName,
-    professionalEmail: ticket.professionalEmail,
-    subject: ticket.subject,
-    replyText: replyText.trim(),
-  }).catch(err => console.error('[Email] sendSupportResposta:', err))
 
   return NextResponse.json({ ok: true, reply })
 }
