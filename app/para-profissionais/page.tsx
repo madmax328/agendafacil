@@ -15,10 +15,65 @@ import {
   Smartphone,
 } from 'lucide-react'
 
+const BASE = process.env.NEXTAUTH_URL ?? 'https://markou.app'
+
 export const metadata = {
   title: 'Markou para Profissionais – Sua agenda online em minutos',
   description:
     'Adeus no-show. Sua página de agendamento online em 10 minutos. Clientes marcam sozinhos, confirmações automáticas, zero papel.',
+  keywords: [
+    'agenda online profissional', 'sistema de agendamento', 'reduzir no-show',
+    'link de agendamento', 'markou profissional', 'software agenda beleza',
+    'agendamento automático', 'confirmação automática cliente',
+  ],
+  openGraph: {
+    title: 'Markou para Profissionais – Sua agenda online em minutos',
+    description: 'Adeus no-show. Página de agendamento online em 10 minutos. Clientes marcam sozinhos.',
+    url: `${BASE}/para-profissionais`,
+    type: 'website',
+    locale: 'pt_BR',
+    siteName: 'Markou',
+  },
+  alternates: { canonical: `${BASE}/para-profissionais` },
+}
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'O Markou é gratuito para profissionais?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sim! O plano FREE é gratuito para sempre e permite até 30 agendamentos por mês. Planos pagos desbloqueiam mais funcionalidades.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Preciso instalar algum aplicativo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Não. O Markou funciona 100% no navegador, sem instalação. Acesse pelo celular, tablet ou computador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Como meus clientes agendam?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Você recebe um link exclusivo (markou.app/seu-nome) que pode compartilhar no WhatsApp, Instagram ou imprimir como QR Code. O cliente acessa, escolhe o serviço, data e horário e confirma em segundos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'O sistema envia lembretes automáticos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sim. O Markou envia lembretes por e-mail automaticamente 24h e 2h antes do horário agendado, reduzindo faltas.',
+      },
+    },
+  ],
 }
 
 /* ─── tiny helpers ─────────────────────────────────── */
@@ -207,6 +262,8 @@ function PhoneMockup() {
 
 export default function ParaProfissionaisPage() {
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
     <div className="min-h-screen bg-[#0d1117]">
 
       {/* ── NAVBAR ── */}
@@ -1014,5 +1071,6 @@ export default function ParaProfissionaisPage() {
         </div>
       </footer>
     </div>
+    </>
   )
 }

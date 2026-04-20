@@ -18,12 +18,10 @@ export const metadata: Metadata = {
   description:
     'Simplifique sua agenda. Aceite agendamentos online 24h, envie lembretes automáticos e gerencie seus clientes com facilidade.',
   keywords: [
-    'agendamento online',
-    'agenda profissional',
-    'reservas online',
-    'salão de beleza',
-    'clínica',
-    'gestão de clientes',
+    'agendamento online', 'agenda profissional', 'reservas online',
+    'salão de beleza', 'barbearia', 'clínica', 'dentista', 'psicólogo',
+    'gestão de clientes', 'agendar horário', 'Markou', 'booking online Brasil',
+    'sistema de agendamento', 'agenda online grátis',
   ],
   authors: [{ name: 'Markou' }],
   creator: 'Markou',

@@ -12,10 +12,53 @@ import {
   Shield,
 } from 'lucide-react'
 
+const BASE_URL = process.env.NEXTAUTH_URL ?? 'https://markou.app'
+
 export const metadata = {
   title: 'Markou – Agende Online com os Melhores Profissionais',
   description:
     'Encontre salões, clínicas, dentistas, psicólogos e muito mais perto de você. Agende online 24h, sem precisar ligar ou mandar mensagem.',
+  keywords: [
+    'agendamento online', 'agendar horário', 'reserva online',
+    'salão de beleza online', 'barbearia agendamento', 'dentista agendamento',
+    'psicólogo online', 'agenda profissional', 'Markou',
+  ],
+  openGraph: {
+    title: 'Markou – Agende Online com os Melhores Profissionais',
+    description: 'Encontre salões, clínicas, dentistas, psicólogos e muito mais. Agende online 24h.',
+    url: BASE_URL,
+    type: 'website',
+    locale: 'pt_BR',
+    siteName: 'Markou',
+  },
+  alternates: { canonical: BASE_URL },
+}
+
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Markou',
+  url: BASE_URL,
+  description: 'Plataforma de agendamento online para profissionais e clientes no Brasil.',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/profissionais?q={search_term_string}` },
+    'query-input': 'required name=search_term_string',
+  },
+}
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Markou',
+  url: BASE_URL,
+  logo: `${BASE_URL}/icon.svg`,
+  sameAs: [],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer support',
+    availableLanguage: 'Portuguese',
+  },
 }
 
 const CATEGORIES = [
@@ -83,6 +126,9 @@ export default async function HomePage() {
   const { professionals: featured, isLocal } = await getFeaturedProfessionals(visitorCity)
 
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
     <div className="min-h-screen bg-white">
 
       {/* ── NAVBAR ── */}
@@ -376,5 +422,6 @@ export default async function HomePage() {
         </div>
       </footer>
     </div>
+    </>
   )
 }

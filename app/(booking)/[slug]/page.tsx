@@ -378,7 +378,7 @@ export default function ProfissionalPage() {
               <div className="w-20 h-20 shrink-0 border-2 border-gray-400 flex items-center justify-center overflow-hidden bg-white">
                 {professional.image
                   ? /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={professional.image} alt="" className="w-full h-full object-cover" />
+                    <img src={professional.image} alt={professional.businessName ?? 'Foto do profissional'} className="w-full h-full object-cover" />
                   : <span className="text-[10px] font-black text-gray-900 text-center px-1 uppercase leading-tight">
                       {professional.businessName}
                     </span>
