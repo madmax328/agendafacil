@@ -243,3 +243,118 @@ export async function sendContactoSuporte(p: ContactoSuporteParams): Promise<boo
     return false
   }
 }
+
+// ── Confirmação ao profissional: mensagem recebida ─────────────────────────────
+
+interface SupportConfirmacaoParams {
+  professionalName: string
+  professionalEmail: string
+  subject: string
+}
+
+export async function sendSupportConfirmacao(p: SupportConfirmacaoParams): Promise<boolean> {
+  const client = getClient()
+  if (!client) return false
+
+  const html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="padding:40px 16px">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
+        <tr><td style="background:#2563eb;padding:28px 40px;text-align:center">
+          <h1 style="margin:0;color:#fff;font-size:20px;font-weight:700">✅ Mensagem recebida</h1>
+        </td></tr>
+        <tr><td style="padding:32px 40px">
+          <p style="margin:0 0 16px;color:#374151;font-size:15px">Olá, <strong>${p.professionalName}</strong>!</p>
+          <p style="margin:0 0 16px;color:#374151;font-size:15px">
+            A tua mensagem sobre <strong>"${p.subject}"</strong> foi recebida com sucesso pela nossa equipa.
+          </p>
+          <p style="margin:0 0 24px;color:#374151;font-size:15px">
+            Responderemos em breve — podes acompanhar a resposta directamente no teu dashboard em <strong>Suporte</strong>.
+          </p>
+          <p style="margin:0;color:#9ca3af;font-size:13px">Obrigado por entrares em contacto.</p>
+        </td></tr>
+        <tr><td style="background:#f9fafb;padding:16px 40px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0;color:#9ca3af;font-size:12px">Markou — Sistema de Agendamento Online</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  try {
+    await client.emails.send({
+      from: getFrom(),
+      to: p.professionalEmail,
+      subject: `Mensagem recebida: ${p.subject} — Markou`,
+      html,
+    })
+    return true
+  } catch (err) {
+    console.error('[Email] Erro ao enviar confirmação de suporte:', err)
+    return false
+  }
+}
+
+// ── Notificação ao profissional: admin respondeu ───────────────────────────────
+
+interface SupportRespostaParams {
+  professionalName: string
+  professionalEmail: string
+  subject: string
+  replyText: string
+}
+
+export async function sendSupportResposta(p: SupportRespostaParams): Promise<boolean> {
+  const client = getClient()
+  if (!client) return false
+
+  const html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="padding:40px 16px">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
+        <tr><td style="background:#7c3aed;padding:28px 40px;text-align:center">
+          <h1 style="margin:0;color:#fff;font-size:20px;font-weight:700">💬 A equipa Markou respondeu</h1>
+        </td></tr>
+        <tr><td style="padding:32px 40px">
+          <p style="margin:0 0 16px;color:#374151;font-size:15px">Olá, <strong>${p.professionalName}</strong>!</p>
+          <p style="margin:0 0 8px;color:#374151;font-size:15px">
+            Recebeste uma resposta ao teu pedido de suporte: <strong>"${p.subject}"</strong>
+          </p>
+          <div style="background:#f9fafb;border-left:3px solid #7c3aed;padding:16px 20px;border-radius:0 8px 8px 0;margin:20px 0">
+            <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;white-space:pre-wrap">${p.replyText}</p>
+          </div>
+          <p style="margin:0 0 24px;color:#374151;font-size:14px">
+            Podes ver a conversa completa no teu dashboard em <strong>Suporte</strong> e responder se necessário.
+          </p>
+        </td></tr>
+        <tr><td style="background:#f9fafb;padding:16px 40px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0;color:#9ca3af;font-size:12px">Markou — Sistema de Agendamento Online</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  try {
+    await client.emails.send({
+      from: getFrom(),
+      to: p.professionalEmail,
+      subject: `Resposta ao teu pedido: ${p.subject} — Markou`,
+      html,
+    })
+    return true
+  } catch (err) {
+    console.error('[Email] Erro ao enviar resposta de suporte:', err)
+    return false
+  }
+}

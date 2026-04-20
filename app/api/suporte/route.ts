@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { sendContactoSuporte } from '@/lib/email'
+import { sendSupportConfirmacao } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -40,16 +40,12 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  const ok = await sendContactoSuporte({
+  // Fire-and-forget: send confirmation email to the professional
+  sendSupportConfirmacao({
     professionalName,
     professionalEmail: professional.email,
     subject: trimmedSubject,
-    message: trimmedMessage,
-  })
-
-  if (!ok) {
-    return NextResponse.json({ error: 'Erro ao enviar mensagem. Tente novamente.' }, { status: 500 })
-  }
+  }).catch(err => console.error('[Email] sendSupportConfirmacao:', err))
 
   return NextResponse.json({ ok: true })
 }

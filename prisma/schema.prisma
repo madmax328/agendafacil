@@ -171,14 +171,31 @@ model Review {
 }
 
 model SupportMessage {
-  id                String   @id @default(cuid()) @map("_id")
+  id                String         @id @default(cuid()) @map("_id")
   professionalId    String
   professionalName  String
   professionalEmail String
   subject           String
   message           String
-  status            String   @default("open")
-  createdAt         DateTime @default(now())
+  status            String         @default("open") // open | answered | closed
+  readByAdmin       Boolean        @default(false)
+  createdAt         DateTime       @default(now())
+  replies           SupportReply[]
+}
+
+model SupportReply {
+  id        String         @id @default(cuid()) @map("_id")
+  messageId String
+  ticket    SupportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  replyText String
+  createdAt DateTime       @default(now())
+}
+
+model AdminUser {
+  id        String   @id @default(cuid()) @map("_id")
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
 }
 
 model ClientAccount {
