@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { headers } from 'next/headers'
+import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { authOptions } from '@/lib/auth'
 import {
   Calendar,
   Search,
@@ -120,10 +122,14 @@ const TYPE_COLOR: Record<string, string> = {
 }
 
 export default async function HomePage() {
-  const headersList = await headers()
+  const [headersList, session] = await Promise.all([
+    headers(),
+    getServerSession(authOptions),
+  ])
   const rawCity = headersList.get('x-vercel-ip-city') ?? ''
   const visitorCity = rawCity ? decodeURIComponent(rawCity) : undefined
   const { professionals: featured, isLocal } = await getFeaturedProfessionals(visitorCity)
+  const isLoggedInPro = !!session?.user?.id
 
   return (
     <>
@@ -143,14 +149,23 @@ export default async function HomePage() {
           </Link>
           {/* Right buttons */}
           <div className="flex items-center gap-2">
-            <Link href="/cliente/login"
-              className="text-sm font-semibold px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
-              Entrar
-            </Link>
-            <Link href="/para-profissionais"
-              className="text-sm font-bold px-4 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-gray-700 transition-colors">
-              Para Profissionais
-            </Link>
+            {isLoggedInPro ? (
+              <Link href="/dashboard"
+                className="text-sm font-bold px-4 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-gray-700 transition-colors">
+                Meu Dashboard →
+              </Link>
+            ) : (
+              <>
+                <Link href="/cliente/login"
+                  className="text-sm font-semibold px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+                  Entrar
+                </Link>
+                <Link href="/para-profissionais"
+                  className="text-sm font-bold px-4 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-gray-700 transition-colors">
+                  Para Profissionais
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
