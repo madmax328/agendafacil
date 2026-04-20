@@ -35,6 +35,7 @@ const FAQS = [
 interface SupportReply {
   id: string
   replyText: string
+  authorType: string
   createdAt: string
 }
 
@@ -67,6 +68,8 @@ export default function SuportePage() {
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [ticketsLoading, setTicketsLoading] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [replyText, setReplyText] = useState<Record<string, string>>({})
+  const [replying, setReplying] = useState<string | null>(null)
   const { toast } = useToast()
 
   async function loadTickets() {
@@ -103,6 +106,34 @@ export default function SuportePage() {
       toast({ title: 'Erro inesperado. Tente novamente.', variant: 'destructive' })
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleTicketReply(ticketId: string) {
+    const text = replyText[ticketId]?.trim()
+    if (!text) return
+    setReplying(ticketId)
+    try {
+      const res = await fetch(`/api/suporte/${ticketId}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ replyText: text }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast({ title: data.error || 'Erro ao enviar resposta', variant: 'destructive' })
+        return
+      }
+      setReplyText(prev => ({ ...prev, [ticketId]: '' }))
+      setTickets(prev => prev.map(t =>
+        t.id === ticketId
+          ? { ...t, status: 'open', replies: [...t.replies, data.reply] }
+          : t
+      ))
+    } catch {
+      toast({ title: 'Erro inesperado. Tente novamente.', variant: 'destructive' })
+    } finally {
+      setReplying(null)
     }
   }
 
@@ -268,18 +299,58 @@ export default function SuportePage() {
 
                           {ticket.replies.map(reply => (
                             <div key={reply.id}>
-                              <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wide mb-1.5">Resposta da equipa Markou</p>
-                              <div className="bg-emerald-50 rounded-xl p-3 border-l-4 border-emerald-400">
-                                <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{reply.replyText}</p>
-                                <p className="text-[11px] text-gray-400 mt-2">
-                                  {new Date(reply.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-                                </p>
-                              </div>
+                              {reply.authorType === 'PROFESSIONAL' ? (
+                                <>
+                                  <p className="text-[11px] font-semibold text-blue-500 uppercase tracking-wide mb-1.5">A tua resposta</p>
+                                  <div className="bg-blue-50 rounded-xl p-3 border-l-4 border-blue-300">
+                                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{reply.replyText}</p>
+                                    <p className="text-[11px] text-gray-400 mt-2">
+                                      {new Date(reply.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                    </p>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wide mb-1.5">Resposta da equipa Markou</p>
+                                  <div className="bg-emerald-50 rounded-xl p-3 border-l-4 border-emerald-400">
+                                    <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{reply.replyText}</p>
+                                    <p className="text-[11px] text-gray-400 mt-2">
+                                      {new Date(reply.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                    </p>
+                                  </div>
+                                </>
+                              )}
                             </div>
                           ))}
 
                           {ticket.replies.length === 0 && (
                             <p className="text-xs text-gray-400 text-center py-2">A aguardar resposta da nossa equipa...</p>
+                          )}
+
+                          {/* Professional reply form */}
+                          {ticket.status !== 'closed' && (
+                            <div>
+                              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">
+                                {ticket.replies.some(r => r.authorType === 'ADMIN') ? 'Responder' : 'Adicionar informação'}
+                              </p>
+                              <textarea
+                                value={replyText[ticket.id] ?? ''}
+                                onChange={e => setReplyText(prev => ({ ...prev, [ticket.id]: e.target.value }))}
+                                rows={3}
+                                placeholder="Escreve a tua resposta..."
+                                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                              />
+                              <div className="flex justify-end mt-2">
+                                <button
+                                  onClick={() => handleTicketReply(ticket.id)}
+                                  disabled={replying === ticket.id || !replyText[ticket.id]?.trim()}
+                                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                >
+                                  {replying === ticket.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                                  {replying === ticket.id ? 'A enviar...' : 'Enviar'}
+                                </button>
+                              </div>
+                            </div>
                           )}
                         </div>
                       )}

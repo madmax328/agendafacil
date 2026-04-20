@@ -358,3 +358,73 @@ export async function sendSupportResposta(p: SupportRespostaParams): Promise<boo
     return false
   }
 }
+
+// ── Notificação ao admin: profissional respondeu ───────────────────────────────
+
+interface SupportAdminNotifParams {
+  professionalName: string
+  professionalEmail: string
+  subject: string
+  replyText: string
+}
+
+export async function sendSupportAdminNotif(p: SupportAdminNotifParams): Promise<boolean> {
+  const client = getClient()
+  if (!client) return false
+
+  const supportEmail = process.env.SUPPORT_EMAIL ?? 'suporte@markou.app'
+
+  const html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="padding:40px 16px">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
+        <tr><td style="background:#d97706;padding:28px 40px">
+          <h1 style="margin:0;color:#fff;font-size:18px;font-weight:700">💬 Profissional respondeu ao ticket</h1>
+          <p style="margin:4px 0 0;color:#fef3c7;font-size:13px">Requer a tua atenção</p>
+        </td></tr>
+        <tr><td style="padding:32px 40px">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:24px">
+            <tr><td style="padding:4px 0">
+              <span style="color:#6b7280;font-size:12px">DE</span><br>
+              <strong style="color:#111827;font-size:14px">${p.professionalName}</strong>
+              <span style="color:#6b7280;font-size:13px"> &lt;${p.professionalEmail}&gt;</span>
+            </td></tr>
+            <tr><td style="padding:8px 0 4px;border-top:1px solid #e5e7eb">
+              <span style="color:#6b7280;font-size:12px">ASSUNTO</span><br>
+              <strong style="color:#111827;font-size:14px">${p.subject}</strong>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 8px;color:#6b7280;font-size:12px;text-transform:uppercase;font-weight:600">Resposta do profissional</p>
+          <div style="background:#fffbeb;border-left:3px solid #d97706;padding:16px 20px;border-radius:0 8px 8px 0">
+            <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;white-space:pre-wrap">${p.replyText}</p>
+          </div>
+          <p style="margin:24px 0 0;color:#9ca3af;font-size:12px">
+            Responde em <a href="${process.env.NEXTAUTH_URL ?? 'https://markou.app'}/admin/suporte" style="color:#2563eb">admin/suporte</a>.
+          </p>
+        </td></tr>
+        <tr><td style="background:#f9fafb;padding:16px 40px;border-top:1px solid #e5e7eb;text-align:center">
+          <p style="margin:0;color:#9ca3af;font-size:11px">Markou — Dashboard de Profissionais</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  try {
+    await client.emails.send({
+      from: getFrom(),
+      to: supportEmail,
+      subject: `[Suporte] Resposta de ${p.professionalName} — ${p.subject}`,
+      html,
+    })
+    return true
+  } catch (err) {
+    console.error('[Email] Erro ao enviar notif admin suporte:', err)
+    return false
+  }
+}

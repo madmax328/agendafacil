@@ -184,11 +184,12 @@ model SupportMessage {
 }
 
 model SupportReply {
-  id        String         @id @default(cuid()) @map("_id")
-  messageId String
-  ticket    SupportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  replyText String
-  createdAt DateTime       @default(now())
+  id         String         @id @default(cuid()) @map("_id")
+  messageId  String
+  ticket     SupportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  replyText  String
+  authorType String         @default("ADMIN") // ADMIN | PROFESSIONAL
+  createdAt  DateTime       @default(now())
 }
 
 model AdminUser {

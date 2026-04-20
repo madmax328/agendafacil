@@ -6,6 +6,7 @@ import { MessageSquare, CheckCircle, Clock, ChevronDown, ChevronUp, Send, Loader
 interface Reply {
   id: string
   replyText: string
+  authorType: string
   createdAt: string
 }
 
@@ -220,12 +221,25 @@ export default function SupportTickets({ tickets: initial }: { tickets: Ticket[]
 
                   {ticket.replies.map(reply => (
                     <div key={reply.id}>
-                      <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wide mb-1.5">
-                        Resposta enviada · {new Date(reply.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
-                      </p>
-                      <div className="bg-emerald-50 rounded-xl p-4 border-l-4 border-emerald-400">
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{reply.replyText}</p>
-                      </div>
+                      {reply.authorType === 'PROFESSIONAL' ? (
+                        <>
+                          <p className="text-[11px] font-semibold text-amber-600 uppercase tracking-wide mb-1.5">
+                            Resposta do profissional · {new Date(reply.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                          </p>
+                          <div className="bg-amber-50 rounded-xl p-4 border-l-4 border-amber-400">
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{reply.replyText}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wide mb-1.5">
+                            A tua resposta · {new Date(reply.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                          </p>
+                          <div className="bg-emerald-50 rounded-xl p-4 border-l-4 border-emerald-400">
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{reply.replyText}</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
 
