@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Globe,
   BarChart2,
+  HelpCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -64,6 +65,11 @@ const navItems: NavItem[] = [
     href: '/assinatura',
     label: 'Assinatura',
     icon: CreditCard,
+  },
+  {
+    href: '/suporte',
+    label: 'Suporte',
+    icon: HelpCircle,
   },
 ]
 
