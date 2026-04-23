@@ -116,7 +116,8 @@ function Sidebar({ onClose }: SidebarProps) {
   const planVariant = planVariants[plan] ?? 'secondary'
 
   async function handleSignOut() {
-    await signOut({ callbackUrl: '/login' })
+    await signOut({ redirect: false })
+    window.location.assign('/login')
   }
 
   return (
