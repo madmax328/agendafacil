@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import { Calendar } from 'lucide-react'
 
+const BASE_URL = process.env.NEXTAUTH_URL ?? 'https://www.markou.app'
+
 export const metadata = {
   title: 'Termos de Uso | Markou',
   description: 'Termos e condições de uso da plataforma Markou.',
+  alternates: { canonical: `${BASE_URL}/termos` },
 }
 
 export default function TermosPage() {

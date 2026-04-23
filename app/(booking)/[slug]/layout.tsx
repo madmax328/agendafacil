@@ -29,14 +29,18 @@ export async function generateMetadata(
   const desc   = p.bio?.slice(0, 160)
     ?? `Agende com ${p.businessName} online. ${type}${loc ? ` em ${loc}` : ''}. Reserve seu horário pelo Markou, rápido e sem precisar ligar.`
 
+  const base = process.env.NEXTAUTH_URL ?? 'https://www.markou.app'
+
   return {
     title,
     description: desc,
+    alternates: { canonical: `${base}/${params.slug}` },
     openGraph: {
       title,
       description: desc,
       type: 'profile',
       locale: 'pt_BR',
+      url: `${base}/${params.slug}`,
       ...(p.image ? { images: [{ url: p.image, alt: p.businessName ?? 'Foto do profissional' }] } : {}),
     },
     twitter: { card: 'summary_large_image', title, description: desc },

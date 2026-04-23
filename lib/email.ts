@@ -403,7 +403,7 @@ export async function sendSupportAdminNotif(p: SupportAdminNotifParams): Promise
             <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;white-space:pre-wrap">${p.replyText}</p>
           </div>
           <p style="margin:24px 0 0;color:#9ca3af;font-size:12px">
-            Responde em <a href="${process.env.NEXTAUTH_URL ?? 'https://markou.app'}/admin/suporte" style="color:#2563eb">admin/suporte</a>.
+            Responde em <a href="${process.env.NEXTAUTH_URL ?? 'https://www.markou.app'}/admin/suporte" style="color:#2563eb">admin/suporte</a>.
           </p>
         </td></tr>
         <tr><td style="background:#f9fafb;padding:16px 40px;border-top:1px solid #e5e7eb;text-align:center">

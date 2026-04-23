@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXTAUTH_URL ?? 'https://markou.app'
+  const base = process.env.NEXTAUTH_URL ?? 'https://www.markou.app'
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: base,                         lastModified: new Date(), changeFrequency: 'daily',   priority: 1.0 },
@@ -12,8 +12,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/profissionais`,      lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
     { url: `${base}/termos`,             lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
     { url: `${base}/privacidade`,        lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
-    { url: `${base}/cliente/login`,      lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${base}/cliente/cadastro`,   lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
   ]
 
   try {

@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import { Calendar } from 'lucide-react'
 
+const BASE_URL = process.env.NEXTAUTH_URL ?? 'https://www.markou.app'
+
 export const metadata = {
   title: 'Política de Privacidade | Markou',
   description: 'Como o Markou coleta, usa e protege seus dados pessoais.',
+  alternates: { canonical: `${BASE_URL}/privacidade` },
 }
 
 export default function PrivacidadePage() {

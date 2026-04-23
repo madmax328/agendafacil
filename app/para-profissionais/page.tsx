@@ -15,7 +15,7 @@ import {
   Smartphone,
 } from 'lucide-react'
 
-const BASE = process.env.NEXTAUTH_URL ?? 'https://markou.app'
+const BASE = process.env.NEXTAUTH_URL ?? 'https://www.markou.app'
 
 export const metadata = {
   title: 'Markou para Profissionais – Sua agenda online em minutos',

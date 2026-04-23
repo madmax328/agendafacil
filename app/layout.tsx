@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Markou' }],
   creator: 'Markou',
   metadataBase: new URL(
-    process.env.NEXTAUTH_URL ?? 'https://markou.app'
+    process.env.NEXTAUTH_URL ?? 'https://www.markou.app'
   ),
   icons: {
     icon: '/icon.svg',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    url: 'https://markou.app',
+    url: 'https://www.markou.app',
     siteName: 'Markou',
     title: 'Markou – Agendamento Online para Profissionais',
     description:

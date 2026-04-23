@@ -5,9 +5,13 @@ import { Calendar } from 'lucide-react'
 import { ProfissionaisSearch } from './search'
 import { ProfissionaisClient } from './client'
 
+const BASE_URL = process.env.NEXTAUTH_URL ?? 'https://www.markou.app'
+
 export const metadata = {
   title: 'Encontrar Profissionais | Markou',
   description: 'Encontre salões de beleza, clínicas, dentistas e outros profissionais perto de você e agende online.',
+  alternates: { canonical: `${BASE_URL}/profissionais` },
+  robots: { index: true, follow: true },
 }
 
 async function fetchProfessionals(tipo?: string, cidade?: string, q?: string) {
