@@ -19,7 +19,7 @@ function unitColor(unit: string) {
   return PALETTES[idx]
 }
 
-export default function ProductionSidebar({ unit, unitName }: { unit: string; unitName: string }) {
+export default function ProductionSidebar({ unit, unitName, mobileOpen, onClose }: { unit: string; unitName: string; mobileOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname()
   const colors = unitColor(unit)
 
@@ -34,7 +34,7 @@ export default function ProductionSidebar({ unit, unitName }: { unit: string; un
   }
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 flex flex-col z-10 no-print">
+    <aside className={`fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 flex flex-col z-50 no-print transition-transform duration-200 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
       <div className="p-4 border-b border-gray-100">
         <Image src="/logo.png" alt="Artigus" width={100} height={32} className="h-8 w-auto mb-3" />
         <div className="flex items-center gap-2">
@@ -55,6 +55,7 @@ export default function ProductionSidebar({ unit, unitName }: { unit: string; un
             <Link
               key={href}
               href={href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 active ? `${colors.badge} ${colors.text} font-medium` : 'text-gray-600 hover:bg-gray-50'
               }`}

@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
         <p className="text-sm text-gray-500 mt-0.5">{formatDateShort(today)}</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
             <div className={`p-2.5 rounded-lg ${color}`}>

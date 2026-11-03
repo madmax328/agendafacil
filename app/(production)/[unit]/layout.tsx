@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import ProductionSidebar from './sidebar'
+import ProductionShell from './shell'
 
 export default async function ProductionLayout({
   children,
@@ -21,11 +21,8 @@ export default async function ProductionLayout({
   if (!dbUnit) redirect('/login')
 
   return (
-    <div className="flex min-h-screen">
-      <ProductionSidebar unit={unit} unitName={session.name} />
-      <main className="flex-1 ml-56 p-8 min-h-screen bg-gray-50">
-        {children}
-      </main>
-    </div>
+    <ProductionShell unit={unit} unitName={session.name}>
+      {children}
+    </ProductionShell>
   )
 }

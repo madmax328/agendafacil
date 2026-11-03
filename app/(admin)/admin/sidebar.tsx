@@ -13,7 +13,7 @@ const links = [
   { href: '/admin/unites', label: 'Unités de prod.', icon: Settings },
 ]
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ mobileOpen, onClose }: { mobileOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname()
 
   async function logout() {
@@ -22,7 +22,7 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 flex flex-col z-10 no-print">
+    <aside className={`fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 flex flex-col z-50 no-print transition-transform duration-200 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
       <div className="p-4 border-b border-gray-100">
         <Image src="/logo.png" alt="Artigus" width={120} height={36} className="h-9 w-auto mb-3" />
         <p className="text-xs text-gray-500 font-medium">Administrateur</p>
@@ -35,6 +35,7 @@ export default function AdminSidebar() {
             <Link
               key={href}
               href={href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 active
                   ? 'bg-blue-50 text-blue-700 font-medium'

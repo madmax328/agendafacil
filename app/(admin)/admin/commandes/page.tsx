@@ -50,7 +50,7 @@ export default function CommandesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Commandes</h1>
         <input
           type="date"
@@ -89,8 +89,8 @@ export default function CommandesPage() {
             </div>
 
             {expanded === order.id && (
-              <div className="border-t border-gray-100 px-5 py-4">
-                <table className="w-full text-sm">
+              <div className="border-t border-gray-100 px-5 py-4 overflow-x-auto">
+                <table className="w-full text-sm min-w-[400px]">
                   <thead>
                     <tr className="text-xs text-gray-500 uppercase tracking-wide">
                       <th className="text-left py-1">Produit</th>
