@@ -33,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: { unit: string
       cafeteria: { select: { name: true } },
       items: {
         where: { product: { unitType } },
-        include: { product: { select: { name: true, unit: true } } },
+        include: { product: { select: { name: true, unit: true, category: { select: { name: true } } } } },
       },
     },
     orderBy: { cafeteria: { name: 'asc' } },

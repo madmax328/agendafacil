@@ -8,7 +8,6 @@ type Category = { id: string; name: string }
 type Product = { id: string; name: string; unit: string; unitType: string; category: Category | null }
 type ProductsByUnit = { CUISINE: Product[]; BOULANGERIE: Product[]; PIZZERIA: Product[] }
 type QuantityMap = Record<string, number>
-type NotesMap = Record<string, string>
 
 const UNIT_LABELS: Record<string, string> = { CUISINE: 'Cuisine', BOULANGERIE: 'Boulangerie', PIZZERIA: 'Pizzeria' }
 const UNIT_COLORS: Record<string, string> = {
@@ -29,7 +28,6 @@ export default function CafeteriaOrderPage() {
   const [date, setDate] = useState(toDateInputValue(tomorrow))
   const [products, setProducts] = useState<ProductsByUnit>({ CUISINE: [], BOULANGERIE: [], PIZZERIA: [] })
   const [quantities, setQuantities] = useState<QuantityMap>({})
-  const [notes, setNotes] = useState<NotesMap>({})
   const [existingOrderId, setExistingOrderId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
@@ -42,18 +40,15 @@ export default function CafeteriaOrderPage() {
   const loadExistingOrder = useCallback(async () => {
     if (!date) return
     const res = await fetch(`/api/cafeteria/orders?date=${date}`)
-    if (!res.ok) { setExistingOrderId(null); setQuantities({}); setNotes({}); return }
+    if (!res.ok) { setExistingOrderId(null); setQuantities({}); return }
     const order = await res.json()
-    if (!order) { setExistingOrderId(null); setQuantities({}); setNotes({}); return }
+    if (!order) { setExistingOrderId(null); setQuantities({}); return }
     setExistingOrderId(order.id)
     const q: QuantityMap = {}
-    const n: NotesMap = {}
     for (const item of order.items) {
       q[item.productId] = item.quantity
-      if (item.notes) n[item.productId] = item.notes
     }
     setQuantities(q)
-    setNotes(n)
   }, [date])
 
   useEffect(() => { loadExistingOrder() }, [loadExistingOrder])
@@ -66,7 +61,7 @@ export default function CafeteriaOrderPage() {
     try {
       const items = Object.entries(quantities)
         .filter(([, q]) => q > 0)
-        .map(([productId, quantity]) => ({ productId, quantity, notes: notes[productId] || undefined }))
+        .map(([productId, quantity]) => ({ productId, quantity }))
 
       if (items.length === 0) { setError('Ajoutez au moins un produit à la commande'); setLoading(false); return }
 
@@ -144,13 +139,6 @@ export default function CafeteriaOrderPage() {
                           <p className="text-sm font-medium text-gray-900">{p.name}</p>
                           <p className="text-xs text-gray-400">{p.unit}</p>
                         </div>
-                        <input
-                          type="text"
-                          value={notes[p.id] ?? ''}
-                          onChange={e => setNotes(n => ({ ...n, [p.id]: e.target.value }))}
-                          placeholder="Notes..."
-                          className="w-36 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        />
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
