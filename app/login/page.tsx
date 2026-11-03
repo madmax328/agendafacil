@@ -38,7 +38,7 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Identifiants incorrects'); return }
-      router.push(data.redirect)
+      window.location.assign(data.redirect)
     } catch {
       setError('Erreur de connexion, réessayez.')
     } finally {

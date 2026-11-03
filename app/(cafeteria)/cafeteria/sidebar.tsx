@@ -15,7 +15,7 @@ export default function CafeteriaSidebar({ cafeteriaName }: { cafeteriaName: str
 
   async function logout() {
     await fetch('/api/auth/logout', { method: 'POST' })
-    router.push('/login')
+    window.location.assign('/login')
   }
 
   return (
