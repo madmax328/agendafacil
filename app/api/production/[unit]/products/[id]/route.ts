@@ -4,19 +4,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 
-const TYPE_MAP: Record<string, 'CUISINE' | 'BOULANGERIE' | 'PIZZERIA'> = {
-  cuisine: 'CUISINE', boulangerie: 'BOULANGERIE', pizzeria: 'PIZZERIA',
-}
-
 async function requireUnit(unit: string) {
   const session = await getSession()
-  if (!session || session.role !== unit.toLowerCase()) return null
-  return TYPE_MAP[unit.toLowerCase()] ?? null
+  return session?.role === unit.toLowerCase() ? session : null
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { unit: string; id: string } }) {
-  const unitType = await requireUnit(params.unit)
-  if (!unitType) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+  if (!await requireUnit(params.unit)) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   const { name, unit, active, categoryId, newCategory } = await req.json()
   const data: Record<string, unknown> = {}
   if (name !== undefined) data.name = name
@@ -24,8 +18,11 @@ export async function PUT(req: NextRequest, { params }: { params: { unit: string
   if (active !== undefined) data.active = active
 
   if (newCategory) {
-    const cat = await prisma.category.create({ data: { name: newCategory, unitType } })
-    data.categoryId = cat.id
+    const current = await prisma.product.findUnique({ where: { id: params.id } })
+    if (current) {
+      const cat = await prisma.category.create({ data: { name: newCategory, unitType: current.unitType } })
+      data.categoryId = cat.id
+    }
   } else if (categoryId !== undefined) {
     data.categoryId = categoryId || null
   }
@@ -35,8 +32,7 @@ export async function PUT(req: NextRequest, { params }: { params: { unit: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { unit: string; id: string } }) {
-  const unitType = await requireUnit(params.unit)
-  if (!unitType) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+  if (!await requireUnit(params.unit)) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   await prisma.product.delete({ where: { id: params.id } })
   return NextResponse.json({ ok: true })
 }

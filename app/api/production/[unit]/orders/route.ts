@@ -41,7 +41,7 @@ export async function GET(req: NextRequest, { params }: { params: { unit: string
       items: o.items,
       orderId: o.id,
       status: o.status,
-      unitConfirmed: o.confirmedUnits.includes(unitType),
+      unitConfirmed: (o.confirmedUnits ?? []).includes(unitType),
     }))
 
   return NextResponse.json(result)

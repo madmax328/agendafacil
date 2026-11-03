@@ -16,7 +16,7 @@ export async function PUT(req: NextRequest, { params }: { params: { unit: string
 
   const order = await prisma.order.findUnique({ where: { id: params.id } })
   if (!order) return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 })
-  if (order.confirmedUnits.includes(unitType)) return NextResponse.json({ error: 'Déjà confirmé' }, { status: 409 })
+  if ((order.confirmedUnits ?? []).includes(unitType)) return NextResponse.json({ error: 'Déjà confirmé' }, { status: 409 })
 
   const updated = await prisma.order.update({
     where: { id: params.id },
