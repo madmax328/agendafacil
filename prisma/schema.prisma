@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid()) @map("_id")
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model ProductionUnit {
+  id       String             @id @default(cuid()) @map("_id")
+  type     ProductionUnitType @unique
+  name     String
+  password String
+}
+
+model Cafeteria {
+  id        String   @id @default(cuid()) @map("_id")
+  name      String   @unique
+  password  String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Category {
+  id       String             @id @default(cuid()) @map("_id")
+  name     String
+  unitType ProductionUnitType
+  active   Boolean            @default(true)
+  products Product[]
+}
+
+model Product {
+  id         String             @id @default(cuid()) @map("_id")
+  name       String
+  unit       String
+  unitType   ProductionUnitType
+  categoryId String?
+  category   Category?          @relation(fields: [categoryId], references: [id])
+  active     Boolean            @default(true)
+  createdAt  DateTime           @default(now())
+  orderItems OrderItem[]
+}
+
+model Order {
+  id           String      @id @default(cuid()) @map("_id")
+  cafeteriaId  String
+  cafeteria    Cafeteria   @relation(fields: [cafeteriaId], references: [id])
+  deliveryDate DateTime
+  status       OrderStatus @default(PENDING)
+  notes        String?
+  items        OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid()) @map("_id")
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Float
+  notes     String?
+}
+
+enum ProductionUnitType {
+  CUISINE
+  BOULANGERIE
+  PIZZERIA
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  DELIVERED
+}
