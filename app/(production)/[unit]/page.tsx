@@ -14,17 +14,29 @@ function printElement(id: string, title: string) {
   if (!el) return
   const w = window.open('', '_blank', 'width=800,height=600')
   if (!w) return
+  const origin = window.location.origin
   w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
-    body{font-family:system-ui,sans-serif;font-size:13px;color:#111;padding:24px}
-    h1{font-size:18px;margin:0 0 4px}p.sub{color:#666;margin:0 0 20px;font-size:12px}
-    h2{font-size:14px;margin:20px 0 6px;padding:6px 10px;background:#f3f4f6;border-radius:4px}
-    h3{font-size:11px;text-transform:uppercase;color:#6b7280;margin:12px 0 4px;letter-spacing:.05em}
-    table{width:100%;border-collapse:collapse;margin-bottom:8px}
-    th{text-align:left;padding:5px 8px;font-size:11px;text-transform:uppercase;color:#6b7280;border-bottom:2px solid #e5e7eb}
-    td{padding:5px 8px;border-bottom:1px solid #f3f4f6}
-    .bold{font-weight:600}
-  </style></head><body>${el.innerHTML}</body></html>`)
+    *{box-sizing:border-box}
+    body{font-family:system-ui,sans-serif;font-size:13px;color:#111;padding:28px 32px;max-width:780px;margin:0 auto}
+    .logo-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #111}
+    .logo-header img{height:44px}
+    .logo-header-title{font-size:15px;font-weight:700;color:#111}
+    .print-only,.no-print{display:none}
+    h2{font-size:14px;font-weight:700;margin:0 0 16px}
+    .cat-group{margin-bottom:16px}
+    .cat-group:last-child{margin-bottom:0}
+    h3{font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;letter-spacing:.06em;margin:0 0 4px;padding-bottom:4px;border-bottom:1px solid #e5e7eb}
+    table{width:100%;border-collapse:collapse}
+    td{padding:5px 0;border-top:1px solid #f3f4f6;font-size:13px}
+    td:last-child{text-align:right;font-weight:600}
+  </style></head><body>
+  <div class="logo-header">
+    <img src="${origin}/logo.png" alt="Artigus" />
+    <div class="logo-header-title">${title}</div>
+  </div>
+  ${el.innerHTML}
+  </body></html>`)
   w.document.close()
   w.focus()
   setTimeout(() => { w.print(); w.close() }, 250)
@@ -108,7 +120,7 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
             <h1 className="print-only text-xl font-bold mb-1">{unitLabel} — Récapitulatif total</h1>
             <p className="print-only text-gray-500 text-sm mb-4">{formatDate(date)}</p>
             {categoryTotals.map((group, gi) => (
-              <div key={group.name} className={gi < categoryTotals.length - 1 ? 'mb-4' : ''}>
+              <div key={group.name} className={`cat-group${gi < categoryTotals.length - 1 ? ' mb-4' : ''}`}>
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 pb-1 border-b border-gray-100">
                   {group.name}
                 </h3>
@@ -156,7 +168,7 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
               <h2 className="print-only font-bold text-lg mb-1">{caf.cafeteriaName}</h2>
               <p className="print-only text-gray-500 text-sm mb-4">{unitLabel} · {formatDate(date)}</p>
               {cafGroups.map((group, gi) => (
-                <div key={group.name} className={gi < cafGroups.length - 1 ? 'mb-4' : ''}>
+                <div key={group.name} className={`cat-group${gi < cafGroups.length - 1 ? ' mb-4' : ''}`}>
                   <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 pb-1 border-b border-gray-100">
                     {group.name}
                   </h3>
