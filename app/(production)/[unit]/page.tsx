@@ -113,17 +113,11 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
                   {group.name}
                 </h3>
                 <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-xs text-gray-400 uppercase tracking-wide">
-                      <th className="text-left py-1">Produit</th>
-                      <th className="text-left py-1">Total à préparer</th>
-                    </tr>
-                  </thead>
                   <tbody>
                     {group.products.map(p => (
                       <tr key={p.name} className="border-t border-gray-50">
-                        <td className="py-2 font-medium text-gray-900">{p.name}</td>
-                        <td className="py-2 text-gray-700 font-semibold">{p.quantity} {p.unit}</td>
+                        <td className="py-1.5 font-medium text-gray-900">{p.name}</td>
+                        <td className="py-1.5 text-gray-700 font-semibold text-right">{p.quantity} {p.unit}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -167,17 +161,11 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
                     {group.name}
                   </h3>
                   <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-xs text-gray-400 uppercase tracking-wide">
-                        <th className="text-left py-1">Produit</th>
-                        <th className="text-left py-1">Quantité</th>
-                      </tr>
-                    </thead>
                     <tbody>
                       {group.items.map(item => (
                         <tr key={item.id} className="border-t border-gray-50">
-                          <td className="py-2 font-medium text-gray-900">{item.product.name}</td>
-                          <td className="py-2 text-gray-700 font-semibold">{item.quantity} {item.product.unit}</td>
+                          <td className="py-1.5 font-medium text-gray-900">{item.product.name}</td>
+                          <td className="py-1.5 text-gray-700 font-semibold text-right">{item.quantity} {item.product.unit}</td>
                         </tr>
                       ))}
                     </tbody>
