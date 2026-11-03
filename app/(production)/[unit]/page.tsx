@@ -107,8 +107,8 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
           <div id="recap-total" className="px-5 py-4">
             <h1 className="print-only text-xl font-bold mb-1">{unitLabel} — Récapitulatif total</h1>
             <p className="print-only text-gray-500 text-sm mb-4">{formatDate(date)}</p>
-            {categoryTotals.map(group => (
-              <div key={group.name} className="mb-4">
+            {categoryTotals.map((group, gi) => (
+              <div key={group.name} className={gi < categoryTotals.length - 1 ? 'mb-4' : ''}>
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 pb-1 border-b border-gray-100">
                   {group.name}
                 </h3>
@@ -135,41 +135,59 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
       )}
 
       {/* Détail par cafétéria */}
-      {orders.map((caf, i) => (
-        <div key={caf.cafeteriaName} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900">{caf.cafeteriaName}</h2>
-            <button
-              onClick={() => printElement(`caf-order-${i}`, `${unitLabel} — ${caf.cafeteriaName} — ${formatDate(date)}`)}
-              className="no-print flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors bg-white"
-            >
-              <Printer size={14} /> Imprimer
-            </button>
+      {orders.map((caf, i) => {
+        const cafCatMap: Record<string, OrderItem[]> = {}
+        for (const item of caf.items) {
+          const cat = item.product.category?.name ?? 'Sans catégorie'
+          if (!cafCatMap[cat]) cafCatMap[cat] = []
+          cafCatMap[cat].push(item)
+        }
+        const cafGroups = Object.keys(cafCatMap).sort((a, b) => a.localeCompare(b, 'fr')).map(cat => ({
+          name: cat,
+          items: cafCatMap[cat].sort((a, b) => a.product.name.localeCompare(b.product.name, 'fr')),
+        }))
+
+        return (
+          <div key={caf.cafeteriaName} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+              <h2 className="font-semibold text-gray-900">{caf.cafeteriaName}</h2>
+              <button
+                onClick={() => printElement(`caf-order-${i}`, `${unitLabel} — ${caf.cafeteriaName} — ${formatDate(date)}`)}
+                className="no-print flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors bg-white"
+              >
+                <Printer size={14} /> Imprimer
+              </button>
+            </div>
+            <div id={`caf-order-${i}`} className="px-5 py-4">
+              <h2 className="print-only font-bold text-lg mb-1">{caf.cafeteriaName}</h2>
+              <p className="print-only text-gray-500 text-sm mb-4">{unitLabel} · {formatDate(date)}</p>
+              {cafGroups.map((group, gi) => (
+                <div key={group.name} className={gi < cafGroups.length - 1 ? 'mb-4' : ''}>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 pb-1 border-b border-gray-100">
+                    {group.name}
+                  </h3>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-xs text-gray-400 uppercase tracking-wide">
+                        <th className="text-left py-1">Produit</th>
+                        <th className="text-left py-1">Quantité</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {group.items.map(item => (
+                        <tr key={item.id} className="border-t border-gray-50">
+                          <td className="py-2 font-medium text-gray-900">{item.product.name}</td>
+                          <td className="py-2 text-gray-700 font-semibold">{item.quantity} {item.product.unit}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
           </div>
-          <div id={`caf-order-${i}`} className="px-5 py-3">
-            <h2 className="print-only font-bold text-lg mb-1">{caf.cafeteriaName}</h2>
-            <p className="print-only text-gray-500 text-sm mb-3">{unitLabel} · {formatDate(date)}</p>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-gray-500 uppercase tracking-wide">
-                  <th className="text-left py-1.5">Produit</th>
-                  <th className="text-left py-1.5">Catégorie</th>
-                  <th className="text-left py-1.5">Quantité</th>
-                </tr>
-              </thead>
-              <tbody>
-                {caf.items.map(item => (
-                  <tr key={item.id} className="border-t border-gray-50">
-                    <td className="py-2 font-medium">{item.product.name}</td>
-                    <td className="py-2 text-gray-400 text-xs">{item.product.category?.name ?? '—'}</td>
-                    <td className="py-2 text-gray-700">{item.quantity} {item.product.unit}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ))}
+        )
+      })}
 
       {orders.length === 0 && (
         <div className="bg-white rounded-xl border border-gray-200 px-5 py-16 text-center text-gray-400">
