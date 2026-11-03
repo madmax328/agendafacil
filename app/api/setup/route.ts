@@ -7,9 +7,7 @@ import bcrypt from 'bcryptjs'
 export async function POST(req: NextRequest) {
   try {
     const adminCount = await prisma.admin.count()
-    if (adminCount > 0) {
-      return NextResponse.json({ error: 'Un compte admin existe déjà' }, { status: 409 })
-    }
+    if (adminCount > 0) return NextResponse.json({ error: 'Un compte admin existe déjà' }, { status: 409 })
 
     const { email, password } = await req.json()
     if (!email || !password || password.length < 6) {
@@ -20,15 +18,16 @@ export async function POST(req: NextRequest) {
       data: { email: email.toLowerCase(), password: await bcrypt.hash(password, 10) },
     })
 
+    const defaultHash = await bcrypt.hash('1234', 10)
     for (const [type, name] of [
       ['CUISINE', 'Cuisine'],
       ['BOULANGERIE', 'Boulangerie'],
       ['PIZZERIA', 'Pizzeria'],
-    ] as ['CUISINE' | 'BOULANGERIE' | 'PIZZERIA', string][]) {
+    ]) {
       await prisma.productionUnit.upsert({
         where: { type },
         update: {},
-        create: { type, name, password: await bcrypt.hash('1234', 10) },
+        create: { type, name, password: defaultHash },
       })
     }
 

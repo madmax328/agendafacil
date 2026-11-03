@@ -2,9 +2,8 @@ export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 import ProductionSidebar from './sidebar'
-
-const VALID_UNITS = ['cuisine', 'boulangerie', 'pizzeria']
 
 export default async function ProductionLayout({
   children,
@@ -16,8 +15,10 @@ export default async function ProductionLayout({
   const session = await getSession()
   const unit = params.unit.toLowerCase()
 
-  if (!VALID_UNITS.includes(unit)) redirect('/login')
   if (!session || session.role !== unit) redirect('/login')
+
+  const dbUnit = await prisma.productionUnit.findFirst({ where: { type: unit.toUpperCase() } })
+  if (!dbUnit) redirect('/login')
 
   return (
     <div className="flex min-h-screen">

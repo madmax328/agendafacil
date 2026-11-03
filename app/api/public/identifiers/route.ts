@@ -4,14 +4,13 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET() {
-  const cafeterias = await prisma.cafeteria.findMany({
-    where: { active: true },
-    orderBy: { name: 'asc' },
-    select: { name: true },
-  })
+  const [units, cafeterias] = await Promise.all([
+    prisma.productionUnit.findMany({ orderBy: { name: 'asc' }, select: { type: true, name: true } }),
+    prisma.cafeteria.findMany({ where: { active: true }, orderBy: { name: 'asc' }, select: { name: true } }),
+  ])
 
   return NextResponse.json({
-    units: ['Cuisine', 'Boulangerie', 'Pizzeria'],
+    units: units.map(u => ({ value: u.type.toLowerCase(), label: u.name })),
     cafeterias: cafeterias.map(c => c.name),
   })
 }

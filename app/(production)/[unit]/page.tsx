@@ -1,13 +1,19 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Printer, Calendar } from 'lucide-react'
+import { Printer, Calendar, CheckCircle } from 'lucide-react'
 import { formatDate, toDateInputValue } from '@/lib/utils'
 
 type Product = { name: string; unit: string; category: { name: string } | null }
 type OrderItem = { id: string; quantity: number; notes: string | null; product: Product }
-type CafeteriaOrder = { cafeteriaName: string; items: OrderItem[] }
+type CafeteriaOrder = { cafeteriaName: string; items: OrderItem[]; orderId: string; status: string }
 type CategoryGroup = { name: string; products: { name: string; quantity: number; unit: string }[] }
+
+const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+  PENDING:   { label: 'En attente',  color: 'bg-yellow-100 text-yellow-700' },
+  CONFIRMED: { label: 'Confirmée',   color: 'bg-green-100 text-green-700' },
+  DELIVERED: { label: 'Livrée',      color: 'bg-blue-100 text-blue-700' },
+}
 
 function printElement(id: string, title: string) {
   const el = document.getElementById(id)
@@ -46,13 +52,13 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
   const [date, setDate] = useState(toDateInputValue(new Date()))
   const [orders, setOrders] = useState<CafeteriaOrder[]>([])
   const [categoryTotals, setCategoryTotals] = useState<CategoryGroup[]>([])
+  const [confirming, setConfirming] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/production/${params.unit}/orders?date=${date}`)
     const data: CafeteriaOrder[] = await res.json()
     setOrders(data)
 
-    // Aggregate by category, then sort categories and products alphabetically
     const catMap: Record<string, Record<string, { quantity: number; unit: string }>> = {}
     for (const caf of data) {
       for (const item of caf.items) {
@@ -77,6 +83,20 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
   }, [date, params.unit])
 
   useEffect(() => { load() }, [load])
+
+  async function confirmOrder(orderId: string) {
+    setConfirming(orderId)
+    try {
+      const res = await fetch(`/api/production/${params.unit}/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CONFIRMED' }),
+      })
+      if (res.ok) load()
+    } finally {
+      setConfirming(null)
+    }
+  }
 
   const unitLabel = params.unit.charAt(0).toUpperCase() + params.unit.slice(1)
   const totalProducts = categoryTotals.reduce((s, c) => s + c.products.length, 0)
@@ -152,17 +172,33 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
           name: cat,
           items: cafCatMap[cat].sort((a, b) => a.product.name.localeCompare(b.product.name, 'fr')),
         }))
+        const st = STATUS_LABELS[caf.status] ?? STATUS_LABELS.PENDING
 
         return (
           <div key={caf.cafeteriaName} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">{caf.cafeteriaName}</h2>
-              <button
-                onClick={() => printElement(`caf-order-${i}`, `${unitLabel} — ${caf.cafeteriaName} — ${formatDate(date)}`)}
-                className="no-print flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors bg-white"
-              >
-                <Printer size={14} /> Imprimer
-              </button>
+              <div className="flex items-center gap-3">
+                <h2 className="font-semibold text-gray-900">{caf.cafeteriaName}</h2>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span>
+              </div>
+              <div className="flex items-center gap-2 no-print">
+                {caf.status === 'PENDING' && (
+                  <button
+                    onClick={() => confirmOrder(caf.orderId)}
+                    disabled={confirming === caf.orderId}
+                    className="flex items-center gap-1.5 text-xs font-medium text-green-700 hover:text-green-900 border border-green-200 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50"
+                  >
+                    <CheckCircle size={14} />
+                    {confirming === caf.orderId ? '...' : 'Confirmer'}
+                  </button>
+                )}
+                <button
+                  onClick={() => printElement(`caf-order-${i}`, `${unitLabel} — ${caf.cafeteriaName} — ${formatDate(date)}`)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors bg-white"
+                >
+                  <Printer size={14} /> Imprimer
+                </button>
+              </div>
             </div>
             <div id={`caf-order-${i}`} className="px-5 py-4">
               <h2 className="print-only font-bold text-lg mb-1">{caf.cafeteriaName}</h2>

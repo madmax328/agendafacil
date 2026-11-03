@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { ChevronDown } from 'lucide-react'
 
-type Identifiers = { units: string[]; cafeterias: string[] }
+type UnitOption = { value: string; label: string }
+type Identifiers = { units: UnitOption[]; cafeterias: string[] }
 
 export default function LoginPage() {
-  const router = useRouter()
   const [identifiers, setIdentifiers] = useState<Identifiers>({ units: [], cafeterias: [] })
   const [selected, setSelected] = useState('')
   const [password, setPassword] = useState('')
@@ -17,10 +17,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetch('/api/public/identifiers')
-      .then(r => r.json())
-      .then(setIdentifiers)
-      .catch(() => {})
+    fetch('/api/public/identifiers').then(r => r.json()).then(setIdentifiers).catch(() => {})
   }, [])
 
   const identifier = adminMode ? adminEmail : selected
@@ -50,10 +47,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 mb-4">
-            <span className="text-white text-2xl font-bold">A</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">ARTIGUS SA</h1>
+          <Image src="/logo.png" alt="Artigus SA" width={160} height={50} className="h-12 w-auto mx-auto mb-4" />
           <p className="text-gray-500 text-sm mt-1">Gestion des commandes</p>
         </div>
 
@@ -86,7 +80,7 @@ export default function LoginPage() {
                   {identifiers.units.length > 0 && (
                     <optgroup label="Unités de production">
                       {identifiers.units.map(u => (
-                        <option key={u} value={u.toLowerCase()}>{u}</option>
+                        <option key={u.value} value={u.value}>{u.label}</option>
                       ))}
                     </optgroup>
                   )}
@@ -130,7 +124,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="text-center mt-4 space-y-1">
+        <div className="text-center mt-4">
           <button
             onClick={() => { setAdminMode(!adminMode); setError(''); setSelected(''); setAdminEmail('') }}
             className="text-xs text-gray-400 hover:text-gray-600 transition-colors"

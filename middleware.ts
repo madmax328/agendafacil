@@ -1,42 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionFromRequest, UserRole } from '@/lib/auth'
+import { getSessionFromRequest } from '@/lib/auth'
 
-const PROTECTED: Record<string, UserRole> = {
+const FIXED_ROLES: Record<string, string> = {
   '/admin': 'admin',
-  '/cuisine': 'cuisine',
-  '/boulangerie': 'boulangerie',
-  '/pizzeria': 'pizzeria',
   '/cafeteria': 'cafeteria',
+}
+
+function homeFor(role: string) {
+  if (role === 'admin') return '/admin'
+  if (role === 'cafeteria') return '/cafeteria'
+  return `/${role}`
 }
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
+  // Public paths
   if (pathname === '/' || pathname === '/login' || pathname === '/setup') {
     const session = await getSessionFromRequest(req)
-    if (session && (pathname === '/login' || pathname === '/')) {
-      const dest = session.role === 'admin' ? '/admin'
-        : session.role === 'cafeteria' ? '/cafeteria'
-        : `/${session.role}`
-      return NextResponse.redirect(new URL(dest, req.url))
+    if (session && pathname !== '/setup') {
+      return NextResponse.redirect(new URL(homeFor(session.role), req.url))
     }
     return NextResponse.next()
   }
 
-  for (const [prefix, role] of Object.entries(PROTECTED)) {
+  // Skip static assets
+  if (pathname.includes('.')) return NextResponse.next()
+
+  // Fixed role paths (admin, cafeteria)
+  for (const [prefix, role] of Object.entries(FIXED_ROLES)) {
     if (pathname === prefix || pathname.startsWith(prefix + '/')) {
       const session = await getSessionFromRequest(req)
-      if (!session) {
-        return NextResponse.redirect(new URL('/login', req.url))
-      }
-      if (session.role !== role) {
-        const dest = session.role === 'admin' ? '/admin'
-          : session.role === 'cafeteria' ? '/cafeteria'
-          : `/${session.role}`
-        return NextResponse.redirect(new URL(dest, req.url))
-      }
+      if (!session) return NextResponse.redirect(new URL('/login', req.url))
+      if (session.role !== role) return NextResponse.redirect(new URL(homeFor(session.role), req.url))
       return NextResponse.next()
     }
+  }
+
+  // Dynamic production unit paths: /{unitSlug}/...
+  const segment = pathname.split('/')[1]
+  if (segment) {
+    const session = await getSessionFromRequest(req)
+    if (!session) return NextResponse.redirect(new URL('/login', req.url))
+    if (session.role !== segment) return NextResponse.redirect(new URL(homeFor(session.role), req.url))
   }
 
   return NextResponse.next()

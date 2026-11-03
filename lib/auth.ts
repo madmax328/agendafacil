@@ -8,7 +8,7 @@ const SECRET = new TextEncoder().encode(
 export const COOKIE_NAME = 'artigus_token'
 export const COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
 
-export type UserRole = 'admin' | 'cuisine' | 'boulangerie' | 'pizzeria' | 'cafeteria'
+export type UserRole = string
 
 export type SessionPayload = {
   id: string

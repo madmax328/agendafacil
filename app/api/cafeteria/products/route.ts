@@ -8,17 +8,22 @@ export async function GET() {
   const session = await getSession()
   if (!session || session.role !== 'cafeteria') return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
-  const products = await prisma.product.findMany({
-    where: { active: true },
-    orderBy: { name: 'asc' },
-    include: { category: { select: { id: true, name: true } } },
-  })
+  const [units, products] = await Promise.all([
+    prisma.productionUnit.findMany({ orderBy: { name: 'asc' } }),
+    prisma.product.findMany({
+      where: { active: true },
+      orderBy: { name: 'asc' },
+      include: { category: { select: { id: true, name: true } } },
+    }),
+  ])
 
-  const grouped = {
-    CUISINE: products.filter(p => p.unitType === 'CUISINE'),
-    BOULANGERIE: products.filter(p => p.unitType === 'BOULANGERIE'),
-    PIZZERIA: products.filter(p => p.unitType === 'PIZZERIA'),
+  const grouped: Record<string, typeof products> = {}
+  for (const unit of units) {
+    grouped[unit.type] = products.filter(p => p.unitType === unit.type)
   }
 
-  return NextResponse.json(grouped)
+  return NextResponse.json({
+    units: units.map(u => ({ type: u.type, name: u.name, allowOrderModification: u.allowOrderModification })),
+    products: grouped,
+  })
 }

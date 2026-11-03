@@ -5,19 +5,14 @@ import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import { startOfDay, endOfDay } from '@/lib/utils'
 
-const TYPE_MAP: Record<string, 'CUISINE' | 'BOULANGERIE' | 'PIZZERIA'> = {
-  cuisine: 'CUISINE',
-  boulangerie: 'BOULANGERIE',
-  pizzeria: 'PIZZERIA',
-}
-
 export async function GET(req: NextRequest, { params }: { params: { unit: string } }) {
   const session = await getSession()
   const unit = params.unit.toLowerCase()
   if (!session || session.role !== unit) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
-  const unitType = TYPE_MAP[unit]
-  if (!unitType) return NextResponse.json({ error: 'Unité invalide' }, { status: 404 })
+  const unitType = unit.toUpperCase()
+  const dbUnit = await prisma.productionUnit.findFirst({ where: { type: unitType } })
+  if (!dbUnit) return NextResponse.json({ error: 'Unité invalide' }, { status: 404 })
 
   const { searchParams } = new URL(req.url)
   const dateStr = searchParams.get('date')
@@ -41,10 +36,7 @@ export async function GET(req: NextRequest, { params }: { params: { unit: string
 
   const result = orders
     .filter(o => o.items.length > 0)
-    .map(o => ({
-      cafeteriaName: o.cafeteria.name,
-      items: o.items,
-    }))
+    .map(o => ({ cafeteriaName: o.cafeteria.name, items: o.items, orderId: o.id, status: o.status }))
 
   return NextResponse.json(result)
 }

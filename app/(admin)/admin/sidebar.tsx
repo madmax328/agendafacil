@@ -1,7 +1,8 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Store, Package, ClipboardList, Settings, LogOut } from 'lucide-react'
 
 const links = [
@@ -14,7 +15,6 @@ const links = [
 
 export default function AdminSidebar() {
   const pathname = usePathname()
-  const router = useRouter()
 
   async function logout() {
     await fetch('/api/auth/logout', { method: 'POST' })
@@ -24,15 +24,8 @@ export default function AdminSidebar() {
   return (
     <aside className="fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 flex flex-col z-10 no-print">
       <div className="p-4 border-b border-gray-100">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <span className="text-white text-sm font-bold">A</span>
-          </div>
-          <div>
-            <p className="text-sm font-bold text-gray-900">ARTIGUS SA</p>
-            <p className="text-xs text-gray-500">Administrateur</p>
-          </div>
-        </div>
+        <Image src="/logo.png" alt="Artigus" width={120} height={36} className="h-9 w-auto mb-3" />
+        <p className="text-xs text-gray-500 font-medium">Administrateur</p>
       </div>
 
       <nav className="flex-1 p-3 space-y-1">
