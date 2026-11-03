@@ -1,13 +1,16 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Printer, Calendar, CheckCircle } from 'lucide-react'
+import { Printer, Calendar, CheckCircle, Bell, PlusCircle, XCircle } from 'lucide-react'
 import { formatDate, toDateInputValue } from '@/lib/utils'
 
 type Product = { name: string; unit: string; category: { name: string } | null }
 type OrderItem = { id: string; quantity: number; notes: string | null; product: Product }
 type CafeteriaOrder = { cafeteriaName: string; items: OrderItem[]; orderId: string; status: string }
 type CategoryGroup = { name: string; products: { name: string; quantity: number; unit: string }[] }
+type AmendProduct = { name: string; unit: string }
+type AmendItem = { id: string; quantity: number; product: AmendProduct }
+type Amendment = { id: string; type: string; status: string; cafeteria: { name: string }; items: AmendItem[]; createdAt: string }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   PENDING:   { label: 'En attente',  color: 'bg-yellow-100 text-yellow-700' },
@@ -53,11 +56,18 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
   const [orders, setOrders] = useState<CafeteriaOrder[]>([])
   const [categoryTotals, setCategoryTotals] = useState<CategoryGroup[]>([])
   const [confirming, setConfirming] = useState<string | null>(null)
+  const [amendments, setAmendments] = useState<Amendment[]>([])
+  const [treating, setTreating] = useState<string | null>(null)
 
   const load = useCallback(async () => {
-    const res = await fetch(`/api/production/${params.unit}/orders?date=${date}`)
-    const data: CafeteriaOrder[] = await res.json()
+    const [ordersRes, amendRes] = await Promise.all([
+      fetch(`/api/production/${params.unit}/orders?date=${date}`),
+      fetch(`/api/production/${params.unit}/amendments?date=${date}`),
+    ])
+    const data: CafeteriaOrder[] = await ordersRes.json()
+    const amendData: Amendment[] = amendRes.ok ? await amendRes.json() : []
     setOrders(data)
+    setAmendments(amendData)
 
     const catMap: Record<string, Record<string, { quantity: number; unit: string }>> = {}
     for (const caf of data) {
@@ -83,6 +93,16 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
   }, [date, params.unit])
 
   useEffect(() => { load() }, [load])
+
+  async function markAmendmentDone(amendmentId: string) {
+    setTreating(amendmentId)
+    try {
+      const res = await fetch(`/api/production/${params.unit}/amendments/${amendmentId}`, { method: 'PUT' })
+      if (res.ok) load()
+    } finally {
+      setTreating(null)
+    }
+  }
 
   async function confirmOrder(orderId: string) {
     setConfirming(orderId)
@@ -119,6 +139,45 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
           />
         </div>
       </div>
+
+      {/* Amendment alerts */}
+      {amendments.filter(a => a.status === 'PENDING').length > 0 && (
+        <div className="space-y-2">
+          {amendments.filter(a => a.status === 'PENDING').map(a => (
+            <div key={a.id} className={`rounded-xl border p-4 flex items-start gap-3 ${a.type === 'ADD' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <div className={`mt-0.5 ${a.type === 'ADD' ? 'text-green-600' : 'text-red-600'}`}>
+                {a.type === 'ADD' ? <PlusCircle size={18} /> : <XCircle size={18} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Bell size={13} className={a.type === 'ADD' ? 'text-green-600' : 'text-red-600'} />
+                  <span className={`text-sm font-semibold ${a.type === 'ADD' ? 'text-green-800' : 'text-red-800'}`}>
+                    Demande d&apos;{a.type === 'ADD' ? 'ajout' : 'annulation'} — {a.cafeteria.name}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {a.items.map(item => (
+                    <span key={item.id} className={`text-xs px-2 py-0.5 rounded-full font-medium ${a.type === 'ADD' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {item.product.name} — {item.quantity} {item.product.unit}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={() => markAmendmentDone(a.id)}
+                disabled={treating === a.id}
+                className={`shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-50 ${
+                  a.type === 'ADD'
+                    ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                    : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+                }`}
+              >
+                {treating === a.id ? '...' : 'Marquer traité'}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Récapitulatif total */}
       {categoryTotals.length > 0 && (

@@ -3,14 +3,18 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingCart, ClipboardList, LogOut } from 'lucide-react'
+import { ShoppingCart, ClipboardList, LogOut, PlusCircle, XCircle } from 'lucide-react'
 
-export default function CafeteriaSidebar({ cafeteriaName }: { cafeteriaName: string }) {
+export default function CafeteriaSidebar({ cafeteriaName, hasLockedUnits }: { cafeteriaName: string; hasLockedUnits: boolean }) {
   const pathname = usePathname()
 
   const links = [
     { href: '/cafeteria', label: 'Passer commande', icon: ShoppingCart, exact: true },
     { href: '/cafeteria/commandes', label: 'Mes commandes', icon: ClipboardList },
+    ...(hasLockedUnits ? [
+      { href: '/cafeteria/ajout', label: 'Demande d\'ajout', icon: PlusCircle },
+      { href: '/cafeteria/annulation', label: 'Demande d\'annulation', icon: XCircle },
+    ] : []),
   ]
 
   async function logout() {

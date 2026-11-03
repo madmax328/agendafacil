@@ -24,12 +24,13 @@ model ProductionUnit {
 }
 
 model Cafeteria {
-  id        String   @id @default(cuid()) @map("_id")
-  name      String   @unique
-  password  String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  orders    Order[]
+  id         String           @id @default(cuid()) @map("_id")
+  name       String           @unique
+  password   String
+  active     Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  orders     Order[]
+  amendments OrderAmendment[]
 }
 
 model Category {
@@ -47,9 +48,10 @@ model Product {
   unitType   String
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id])
-  active     Boolean   @default(true)
-  createdAt  DateTime  @default(now())
-  orderItems OrderItem[]
+  active         Boolean              @default(true)
+  createdAt      DateTime             @default(now())
+  orderItems     OrderItem[]
+  amendmentItems OrderAmendmentItem[]
 }
 
 model Order {
@@ -72,6 +74,26 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
   quantity  Float
   notes     String?
+}
+
+model OrderAmendment {
+  id           String               @id @default(cuid()) @map("_id")
+  type         String
+  cafeteriaId  String
+  cafeteria    Cafeteria            @relation(fields: [cafeteriaId], references: [id])
+  deliveryDate DateTime
+  status       String               @default("PENDING")
+  items        OrderAmendmentItem[]
+  createdAt    DateTime             @default(now())
+}
+
+model OrderAmendmentItem {
+  id          String         @id @default(cuid()) @map("_id")
+  amendmentId String
+  amendment   OrderAmendment @relation(fields: [amendmentId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product        @relation(fields: [productId], references: [id])
+  quantity    Float
 }
 
 enum OrderStatus {
