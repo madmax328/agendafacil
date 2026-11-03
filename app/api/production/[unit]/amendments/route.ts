@@ -11,30 +11,31 @@ export async function GET(req: NextRequest, { params }: { params: { unit: string
   const { searchParams } = new URL(req.url)
   const date = searchParams.get('date')
 
-  const where: Record<string, unknown> = {}
+  const unitType = params.unit.toUpperCase()
 
+  const unitProducts = await prisma.product.findMany({
+    where: { unitType },
+    select: { id: true },
+  })
+  const productIds = unitProducts.map(p => p.id)
+
+  const dateFilter: Record<string, unknown> = {}
   if (date) {
     const d = new Date(date)
     const next = new Date(d)
     next.setDate(next.getDate() + 1)
-    where.deliveryDate = { gte: d, lt: next }
+    dateFilter.deliveryDate = { gte: d, lt: next }
   }
-
-  const unitType = params.unit.toUpperCase()
 
   const amendments = await prisma.orderAmendment.findMany({
     where: {
-      ...where,
-      items: {
-        some: {
-          product: { unitType },
-        },
-      },
+      ...dateFilter,
+      items: { some: { productId: { in: productIds } } },
     },
     include: {
       cafeteria: true,
       items: {
-        where: { product: { unitType } },
+        where: { productId: { in: productIds } },
         include: { product: true },
       },
     },

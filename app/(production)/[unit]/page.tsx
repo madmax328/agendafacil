@@ -118,6 +118,37 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
     }
   }
 
+  function printAmendment(a: Amendment, unitLabel: string) {
+    const typeLabel = a.type === 'ADD' ? 'Ajout' : 'Annulation'
+    const title = `${typeLabel} — ${a.cafeteria.name} — ${formatDate(date)}`
+    const w = window.open('', '_blank', 'width=800,height=600')
+    if (!w) return
+    const origin = window.location.origin
+    const rows = a.items.map(item =>
+      `<tr><td style="padding:5px 0;border-top:1px solid #f3f4f6">${item.product.name}</td><td style="padding:5px 0;text-align:right;font-weight:600;border-top:1px solid #f3f4f6">${item.quantity} ${item.product.unit}</td></tr>`
+    ).join('')
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
+    <style>
+      *{box-sizing:border-box}
+      body{font-family:system-ui,sans-serif;font-size:13px;color:#111;padding:28px 32px;max-width:780px;margin:0 auto}
+      .logo-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #111}
+      .logo-header img{height:44px}
+      .logo-header-title{font-size:15px;font-weight:700;color:#111}
+      .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:16px;${a.type === 'ADD' ? 'background:#dcfce7;color:#166534' : 'background:#fee2e2;color:#991b1b'}}
+      table{width:100%;border-collapse:collapse}
+    </style></head><body>
+    <div class="logo-header">
+      <img src="${origin}/logo.png" alt="Artigus" />
+      <div class="logo-header-title">${title}</div>
+    </div>
+    <div class="badge">Demande d'${a.type === 'ADD' ? 'ajout' : 'annulation'} — ${unitLabel}</div>
+    <table><tbody>${rows}</tbody></table>
+    </body></html>`)
+    w.document.close()
+    w.focus()
+    setTimeout(() => { w.print(); w.close() }, 250)
+  }
+
   const unitLabel = params.unit.charAt(0).toUpperCase() + params.unit.slice(1)
   const totalProducts = categoryTotals.reduce((s, c) => s + c.products.length, 0)
 
@@ -163,17 +194,25 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
                   ))}
                 </div>
               </div>
-              <button
-                onClick={() => markAmendmentDone(a.id)}
-                disabled={treating === a.id}
-                className={`shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-50 ${
-                  a.type === 'ADD'
-                    ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
-                    : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
-                }`}
-              >
-                {treating === a.id ? '...' : 'Marquer traité'}
-              </button>
+              <div className="flex flex-col gap-1 shrink-0">
+                <button
+                  onClick={() => printAmendment(a, unitLabel)}
+                  className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 bg-white px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Printer size={12} /> Imprimer
+                </button>
+                <button
+                  onClick={() => markAmendmentDone(a.id)}
+                  disabled={treating === a.id}
+                  className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-50 ${
+                    a.type === 'ADD'
+                      ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                      : 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  {treating === a.id ? '...' : 'Marquer traité'}
+                </button>
+              </div>
             </div>
           ))}
         </div>

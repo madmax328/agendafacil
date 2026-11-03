@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Calendar, X, Lock, ShoppingCart } from 'lucide-react'
+import { Calendar, Lock, ShoppingCart } from 'lucide-react'
 import { toDateInputValue } from '@/lib/utils'
 
 type Category = { id: string; name: string }
@@ -11,12 +11,12 @@ type ProductsData = { units: UnitInfo[]; products: Record<string, Product[]> }
 type QuantityMap = Record<string, number>
 
 const PALETTES = [
-  { border: 'border-orange-200 bg-orange-50', dot: 'bg-orange-500', text: 'text-orange-700' },
-  { border: 'border-amber-200 bg-amber-50', dot: 'bg-amber-500', text: 'text-amber-700' },
-  { border: 'border-red-200 bg-red-50', dot: 'bg-red-500', text: 'text-red-700' },
-  { border: 'border-emerald-200 bg-emerald-50', dot: 'bg-emerald-500', text: 'text-emerald-700' },
-  { border: 'border-blue-200 bg-blue-50', dot: 'bg-blue-500', text: 'text-blue-700' },
-  { border: 'border-purple-200 bg-purple-50', dot: 'bg-purple-500', text: 'text-purple-700' },
+  { border: 'border-orange-200 bg-orange-50', dot: 'bg-orange-500', tab: 'bg-orange-50 text-orange-700 border-orange-200' },
+  { border: 'border-amber-200 bg-amber-50', dot: 'bg-amber-500', tab: 'bg-amber-50 text-amber-700 border-amber-200' },
+  { border: 'border-red-200 bg-red-50', dot: 'bg-red-500', tab: 'bg-red-50 text-red-700 border-red-200' },
+  { border: 'border-emerald-200 bg-emerald-50', dot: 'bg-emerald-500', tab: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  { border: 'border-blue-200 bg-blue-50', dot: 'bg-blue-500', tab: 'bg-blue-50 text-blue-700 border-blue-200' },
+  { border: 'border-purple-200 bg-purple-50', dot: 'bg-purple-500', tab: 'bg-purple-50 text-purple-700 border-purple-200' },
 ]
 
 export default function CafeteriaOrderPage() {
@@ -25,6 +25,7 @@ export default function CafeteriaOrderPage() {
 
   const [date, setDate] = useState(toDateInputValue(tomorrow))
   const [data, setData] = useState<ProductsData>({ units: [], products: {} })
+  const [selectedUnit, setSelectedUnit] = useState('')
   const [quantities, setQuantities] = useState<QuantityMap>({})
   const [originalQuantities, setOriginalQuantities] = useState<QuantityMap>({})
   const [existingOrderId, setExistingOrderId] = useState<string | null>(null)
@@ -33,7 +34,10 @@ export default function CafeteriaOrderPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch('/api/cafeteria/products').then(r => r.json()).then(setData)
+    fetch('/api/cafeteria/products').then(r => r.json()).then((d: ProductsData) => {
+      setData(d)
+      if (d.units.length) setSelectedUnit(u => u || d.units[0].type)
+    })
   }, [])
 
   const loadExistingOrder = useCallback(async () => {
@@ -53,7 +57,6 @@ export default function CafeteriaOrderPage() {
 
   useEffect(() => { loadExistingOrder() }, [loadExistingOrder])
 
-  // Products locked from modification: in existing order with qty > 0, unit has locked modification
   const lockedProductIds = new Set<string>()
   if (existingOrderId) {
     const lockedUnitTypes = new Set(data.units.filter(u => !u.allowOrderModification).map(u => u.type))
@@ -64,6 +67,10 @@ export default function CafeteriaOrderPage() {
       }
     }
   }
+
+  const currentUnit = data.units.find(u => u.type === selectedUnit)
+  const currentProducts = data.products[selectedUnit] ?? []
+  const isCurrentLocked = !!(existingOrderId && currentUnit && !currentUnit.allowOrderModification)
 
   const totalItems = Object.values(quantities).filter(q => q > 0).length
 
@@ -108,6 +115,9 @@ export default function CafeteriaOrderPage() {
     return map
   }
 
+  const unitIdx = data.units.findIndex(u => u.type === selectedUnit)
+  const palette = PALETTES[unitIdx % PALETTES.length] ?? PALETTES[0]
+  const grouped = groupByCategory(currentProducts)
   const minDate = toDateInputValue(new Date())
 
   return (
@@ -127,74 +137,97 @@ export default function CafeteriaOrderPage() {
         </div>
       </div>
 
+      {/* Unit tabs */}
+      <div className="flex gap-2 flex-wrap">
+        {data.units.map((u, idx) => {
+          const p = PALETTES[idx % PALETTES.length]
+          const active = u.type === selectedUnit
+          return (
+            <button
+              key={u.type}
+              onClick={() => setSelectedUnit(u.type)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                active ? p.tab : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${p.dot}`} />
+              {u.name}
+              {existingOrderId && !u.allowOrderModification && (
+                <Lock size={11} className="ml-0.5 opacity-60" />
+              )}
+            </button>
+          )
+        })}
+      </div>
+
       {success && <p className="text-green-700 bg-green-50 border border-green-200 px-4 py-3 rounded-xl text-sm font-medium">{success}</p>}
       {error && <p className="text-red-700 bg-red-50 border border-red-200 px-4 py-3 rounded-xl text-sm">{error}</p>}
 
       <form onSubmit={handleSubmit}>
         <div className="flex gap-6 items-start">
-          {/* Left: product list */}
-          <div className="flex-1 space-y-4">
-            {data.units.map((unitInfo, unitIdx) => {
-              const prods = data.products[unitInfo.type] ?? []
-              if (prods.length === 0) return null
-              const palette = PALETTES[unitIdx % PALETTES.length]
-              const grouped = groupByCategory(prods)
-              const isLocked = existingOrderId && !unitInfo.allowOrderModification
-
-              return (
-                <div key={unitInfo.type} className={`rounded-xl border ${palette.border} overflow-hidden`}>
-                  <div className="flex items-center gap-3 px-5 py-3 border-b border-inherit">
-                    <div className={`w-3 h-3 rounded-full ${palette.dot}`} />
-                    <h2 className="font-semibold text-gray-900">{unitInfo.name}</h2>
-                    {isLocked && (
-                      <span className="flex items-center gap-1 text-xs text-orange-600 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-full ml-auto">
-                        <Lock size={10} /> Modification verrouillée
-                      </span>
-                    )}
-                  </div>
-                  <div className="bg-white">
-                    {Object.entries(grouped).map(([catName, catProds]) => (
-                      <div key={catName}>
-                        <div className="px-5 py-2 bg-gray-50 border-b border-gray-100">
-                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{catName}</p>
-                        </div>
-                        {catProds.map(p => {
-                          const locked = lockedProductIds.has(p.id)
-                          return (
-                            <div key={p.id} className={`flex items-center gap-4 px-5 py-3 border-b border-gray-50 last:border-0 ${locked ? 'bg-orange-50/30' : 'hover:bg-gray-50'}`}>
-                              <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-900">{p.name}</p>
-                                <p className="text-xs text-gray-400">{p.unit}</p>
-                              </div>
-                              {locked ? (
-                                <div className="flex items-center gap-2 text-orange-600">
-                                  <Lock size={12} />
-                                  <span className="text-sm font-semibold">{quantities[p.id] ?? 0} {p.unit}</span>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                                  <button type="button" onClick={() => setQuantities(q => ({ ...q, [p.id]: Math.max(0, (q[p.id] ?? 0) - 1) }))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-sm font-bold">−</button>
-                                  <input
-                                    type="number" min="0" step="0.5"
-                                    value={quantities[p.id] ?? 0}
-                                    onChange={e => setQuantities(q => ({ ...q, [p.id]: parseFloat(e.target.value) || 0 }))}
-                                    className="w-16 text-center border border-gray-300 rounded-lg py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  />
-                                  <button type="button" onClick={() => setQuantities(q => ({ ...q, [p.id]: (q[p.id] ?? 0) + 1 }))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-sm font-bold">+</button>
-                                </div>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    ))}
-                  </div>
+          {/* Left: product list for selected unit */}
+          <div className="flex-1">
+            {isCurrentLocked ? (
+              <div className={`rounded-xl border ${palette.border} p-6 text-center`}>
+                <Lock size={24} className="mx-auto text-orange-400 mb-2" />
+                <p className="font-semibold text-gray-800 mb-1">Modification verrouillée — {currentUnit?.name}</p>
+                <p className="text-sm text-gray-500">
+                  Les commandes pour cette unité ne peuvent plus être modifiées.<br />
+                  Utilisez <strong>Demande d&apos;ajout</strong> ou <strong>Demande d&apos;annulation</strong> dans le menu de gauche.
+                </p>
+              </div>
+            ) : currentProducts.length === 0 ? (
+              <div className="bg-white rounded-xl border border-gray-200 px-5 py-12 text-center text-gray-400">
+                Aucun produit disponible
+              </div>
+            ) : (
+              <div className={`rounded-xl border ${palette.border} overflow-hidden`}>
+                <div className="flex items-center gap-3 px-5 py-3 border-b border-inherit">
+                  <div className={`w-3 h-3 rounded-full ${palette.dot}`} />
+                  <h2 className="font-semibold text-gray-900">{currentUnit?.name}</h2>
                 </div>
-              )
-            })}
+                <div className="bg-white">
+                  {Object.entries(grouped).map(([catName, catProds]) => (
+                    <div key={catName}>
+                      <div className="px-5 py-2 bg-gray-50 border-b border-gray-100">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{catName}</p>
+                      </div>
+                      {catProds.map(p => {
+                        const locked = lockedProductIds.has(p.id)
+                        return (
+                          <div key={p.id} className={`flex items-center gap-4 px-5 py-3 border-b border-gray-50 last:border-0 ${locked ? 'bg-orange-50/30' : 'hover:bg-gray-50'}`}>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">{p.name}</p>
+                              <p className="text-xs text-gray-400">{p.unit}</p>
+                            </div>
+                            {locked ? (
+                              <div className="flex items-center gap-2 text-orange-600">
+                                <Lock size={12} />
+                                <span className="text-sm font-semibold">{quantities[p.id] ?? 0} {p.unit}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <button type="button" onClick={() => setQuantities(q => ({ ...q, [p.id]: Math.max(0, (q[p.id] ?? 0) - 1) }))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-sm font-bold">−</button>
+                                <input
+                                  type="number" min="0" step="0.5"
+                                  value={quantities[p.id] ?? 0}
+                                  onChange={e => setQuantities(q => ({ ...q, [p.id]: parseFloat(e.target.value) || 0 }))}
+                                  className="w-16 text-center border border-gray-300 rounded-lg py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <button type="button" onClick={() => setQuantities(q => ({ ...q, [p.id]: (q[p.id] ?? 0) + 1 }))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-sm font-bold">+</button>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Right: order summary panel */}
+          {/* Right: order summary panel (read-only, all units) */}
           <div className="w-72 sticky top-6 shrink-0">
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-100">
@@ -209,23 +242,14 @@ export default function CafeteriaOrderPage() {
                   allProducts()
                     .filter(p => (quantities[p.id] ?? 0) > 0)
                     .map(p => {
-                      const locked = lockedProductIds.has(p.id)
-                      const palette = PALETTES[p.unitIdx % PALETTES.length]
+                      const p2 = PALETTES[p.unitIdx % PALETTES.length]
                       return (
                         <div key={p.id} className="flex items-center gap-2 px-4 py-2.5">
-                          <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${palette.dot}`} />
+                          <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${p2.dot}`} />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">{p.name}</p>
                             <p className="text-xs text-gray-400">{quantities[p.id]} {p.unit}</p>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => setQuantities(q => ({ ...q, [p.id]: 0 }))}
-                            className={`p-1 rounded-lg transition-colors shrink-0 ${locked ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50' : 'text-gray-300 hover:text-red-500 hover:bg-red-50'}`}
-                            title={locked ? 'Annuler (même si verrouillé)' : 'Retirer'}
-                          >
-                            <X size={14} />
-                          </button>
                         </div>
                       )
                     })
@@ -245,13 +269,6 @@ export default function CafeteriaOrderPage() {
                 </div>
               )}
             </div>
-
-            {existingOrderId && lockedProductIds.size > 0 && (
-              <div className="mt-3 bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs text-orange-700">
-                <Lock size={12} className="inline mr-1" />
-                {lockedProductIds.size} produit{lockedProductIds.size > 1 ? 's' : ''} verrouillé{lockedProductIds.size > 1 ? 's' : ''} — vous pouvez les annuler (X) mais pas changer la quantité.
-              </div>
-            )}
           </div>
         </div>
       </form>
