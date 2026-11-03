@@ -36,7 +36,13 @@ export async function GET(req: NextRequest, { params }: { params: { unit: string
 
   const result = orders
     .filter(o => o.items.length > 0)
-    .map(o => ({ cafeteriaName: o.cafeteria.name, items: o.items, orderId: o.id, status: o.status }))
+    .map(o => ({
+      cafeteriaName: o.cafeteria.name,
+      items: o.items,
+      orderId: o.id,
+      status: o.status,
+      unitConfirmed: o.confirmedUnits.includes(unitType),
+    }))
 
   return NextResponse.json(result)
 }

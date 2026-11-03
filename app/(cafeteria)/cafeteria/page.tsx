@@ -74,10 +74,6 @@ export default function CafeteriaOrderPage() {
 
   const totalItems = Object.values(quantities).filter(q => q > 0).length
 
-  function allProducts(): (Product & { unitIdx: number })[] {
-    return data.units.flatMap((u, idx) => (data.products[u.type] ?? []).map(p => ({ ...p, unitIdx: idx })))
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(''); setSuccess(''); setLoading(true)
@@ -116,7 +112,7 @@ export default function CafeteriaOrderPage() {
   }
 
   const unitIdx = data.units.findIndex(u => u.type === selectedUnit)
-  const palette = PALETTES[unitIdx % PALETTES.length] ?? PALETTES[0]
+  const palette = PALETTES[unitIdx >= 0 ? unitIdx % PALETTES.length : 0]
   const grouped = groupByCategory(currentProducts)
   const minDate = toDateInputValue(new Date())
 
@@ -163,114 +159,81 @@ export default function CafeteriaOrderPage() {
       {success && <p className="text-green-700 bg-green-50 border border-green-200 px-4 py-3 rounded-xl text-sm font-medium">{success}</p>}
       {error && <p className="text-red-700 bg-red-50 border border-red-200 px-4 py-3 rounded-xl text-sm">{error}</p>}
 
-      <form onSubmit={handleSubmit}>
-        <div className="flex gap-6 items-start">
-          {/* Left: product list for selected unit */}
-          <div className="flex-1">
-            {isCurrentLocked ? (
-              <div className={`rounded-xl border ${palette.border} p-6 text-center`}>
-                <Lock size={24} className="mx-auto text-orange-400 mb-2" />
-                <p className="font-semibold text-gray-800 mb-1">Modification verrouillée — {currentUnit?.name}</p>
-                <p className="text-sm text-gray-500">
-                  Les commandes pour cette unité ne peuvent plus être modifiées.<br />
-                  Utilisez <strong>Demande d&apos;ajout</strong> ou <strong>Demande d&apos;annulation</strong> dans le menu de gauche.
-                </p>
-              </div>
-            ) : currentProducts.length === 0 ? (
-              <div className="bg-white rounded-xl border border-gray-200 px-5 py-12 text-center text-gray-400">
-                Aucun produit disponible
-              </div>
-            ) : (
-              <div className={`rounded-xl border ${palette.border} overflow-hidden`}>
-                <div className="flex items-center gap-3 px-5 py-3 border-b border-inherit">
-                  <div className={`w-3 h-3 rounded-full ${palette.dot}`} />
-                  <h2 className="font-semibold text-gray-900">{currentUnit?.name}</h2>
-                </div>
-                <div className="bg-white">
-                  {Object.entries(grouped).map(([catName, catProds]) => (
-                    <div key={catName}>
-                      <div className="px-5 py-2 bg-gray-50 border-b border-gray-100">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{catName}</p>
-                      </div>
-                      {catProds.map(p => {
-                        const locked = lockedProductIds.has(p.id)
-                        return (
-                          <div key={p.id} className={`flex items-center gap-4 px-5 py-3 border-b border-gray-50 last:border-0 ${locked ? 'bg-orange-50/30' : 'hover:bg-gray-50'}`}>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">{p.name}</p>
-                              <p className="text-xs text-gray-400">{p.unit}</p>
-                            </div>
-                            {locked ? (
-                              <div className="flex items-center gap-2 text-orange-600">
-                                <Lock size={12} />
-                                <span className="text-sm font-semibold">{quantities[p.id] ?? 0} {p.unit}</span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <button type="button" onClick={() => setQuantities(q => ({ ...q, [p.id]: Math.max(0, (q[p.id] ?? 0) - 1) }))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-sm font-bold">−</button>
-                                <input
-                                  type="number" min="0" step="0.5"
-                                  value={quantities[p.id] ?? 0}
-                                  onChange={e => setQuantities(q => ({ ...q, [p.id]: parseFloat(e.target.value) || 0 }))}
-                                  className="w-16 text-center border border-gray-300 rounded-lg py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                <button type="button" onClick={() => setQuantities(q => ({ ...q, [p.id]: (q[p.id] ?? 0) + 1 }))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-sm font-bold">+</button>
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {isCurrentLocked ? (
+          <div className={`rounded-xl border ${palette.border} p-6 text-center`}>
+            <Lock size={24} className="mx-auto text-orange-400 mb-2" />
+            <p className="font-semibold text-gray-800 mb-1">Modification verrouillée — {currentUnit?.name}</p>
+            <p className="text-sm text-gray-500">
+              Les commandes pour cette unité ne peuvent plus être modifiées.<br />
+              Utilisez <strong>Demande d&apos;ajout</strong> ou <strong>Demande d&apos;annulation</strong> dans le menu de gauche.
+            </p>
           </div>
-
-          {/* Right: order summary panel (read-only, all units) */}
-          <div className="w-72 sticky top-6 shrink-0">
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="px-4 py-3 border-b border-gray-100">
-                <h2 className="font-semibold text-gray-900">Ma commande</h2>
-                <p className="text-xs text-gray-400 mt-0.5">{totalItems} produit{totalItems !== 1 ? 's' : ''} sélectionné{totalItems !== 1 ? 's' : ''}</p>
+        ) : currentProducts.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 px-5 py-12 text-center text-gray-400">
+            Aucun produit disponible
+          </div>
+        ) : (
+          <>
+            <div className={`rounded-xl border ${palette.border} overflow-hidden`}>
+              <div className="flex items-center gap-3 px-5 py-3 border-b border-inherit">
+                <div className={`w-3 h-3 rounded-full ${palette.dot}`} />
+                <h2 className="font-semibold text-gray-900">{currentUnit?.name}</h2>
               </div>
-
-              <div className="divide-y divide-gray-50 max-h-[50vh] overflow-y-auto">
-                {totalItems === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-8">Aucun produit sélectionné</p>
-                ) : (
-                  allProducts()
-                    .filter(p => (quantities[p.id] ?? 0) > 0)
-                    .map(p => {
-                      const p2 = PALETTES[p.unitIdx % PALETTES.length]
+              <div className="bg-white">
+                {Object.entries(grouped).map(([catName, catProds]) => (
+                  <div key={catName}>
+                    <div className="px-5 py-2 bg-gray-50 border-b border-gray-100">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{catName}</p>
+                    </div>
+                    {catProds.map(p => {
+                      const locked = lockedProductIds.has(p.id)
                       return (
-                        <div key={p.id} className="flex items-center gap-2 px-4 py-2.5">
-                          <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${p2.dot}`} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{p.name}</p>
-                            <p className="text-xs text-gray-400">{quantities[p.id]} {p.unit}</p>
+                        <div key={p.id} className={`flex items-center gap-4 px-5 py-3 border-b border-gray-50 last:border-0 ${locked ? 'bg-orange-50/30' : 'hover:bg-gray-50'}`}>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">{p.name}</p>
+                            <p className="text-xs text-gray-400">{p.unit}</p>
                           </div>
+                          {locked ? (
+                            <div className="flex items-center gap-2 text-orange-600">
+                              <Lock size={12} />
+                              <span className="text-sm font-semibold">{quantities[p.id] ?? 0} {p.unit}</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <button type="button" onClick={() => setQuantities(q => ({ ...q, [p.id]: Math.max(0, (q[p.id] ?? 0) - 1) }))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-sm font-bold">−</button>
+                              <input
+                                type="number" min="0" step="0.5"
+                                value={quantities[p.id] ?? 0}
+                                onChange={e => setQuantities(q => ({ ...q, [p.id]: parseFloat(e.target.value) || 0 }))}
+                                className="w-16 text-center border border-gray-300 rounded-lg py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              <button type="button" onClick={() => setQuantities(q => ({ ...q, [p.id]: (q[p.id] ?? 0) + 1 }))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-sm font-bold">+</button>
+                            </div>
+                          )}
                         </div>
                       )
-                    })
-                )}
+                    })}
+                  </div>
+                ))}
               </div>
-
-              {totalItems > 0 && (
-                <div className="p-4 border-t border-gray-100">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors disabled:opacity-50 shadow-sm"
-                  >
-                    <ShoppingCart size={16} />
-                    {loading ? 'Envoi...' : existingOrderId ? 'Mettre à jour' : 'Envoyer'}
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
-        </div>
+
+            {totalItems > 0 && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500">{totalItems} produit{totalItems !== 1 ? 's' : ''} sélectionné{totalItems !== 1 ? 's' : ''}</p>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors disabled:opacity-50 shadow-sm"
+                >
+                  <ShoppingCart size={16} />
+                  {loading ? 'Envoi...' : existingOrderId ? 'Mettre à jour' : 'Passer la commande'}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </form>
     </div>
   )

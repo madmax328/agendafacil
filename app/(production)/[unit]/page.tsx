@@ -6,7 +6,7 @@ import { formatDate, toDateInputValue } from '@/lib/utils'
 
 type Product = { name: string; unit: string; category: { name: string } | null }
 type OrderItem = { id: string; quantity: number; notes: string | null; product: Product }
-type CafeteriaOrder = { cafeteriaName: string; items: OrderItem[]; orderId: string; status: string }
+type CafeteriaOrder = { cafeteriaName: string; items: OrderItem[]; orderId: string; status: string; unitConfirmed: boolean }
 type CategoryGroup = { name: string; products: { name: string; quantity: number; unit: string }[] }
 type AmendProduct = { name: string; unit: string }
 type AmendItem = { id: string; quantity: number; product: AmendProduct }
@@ -277,10 +277,14 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
             <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <h2 className="font-semibold text-gray-900">{caf.cafeteriaName}</h2>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span>
+                {caf.unitConfirmed ? (
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Confirmée</span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">En attente</span>
+                )}
               </div>
               <div className="flex items-center gap-2 no-print">
-                {caf.status === 'PENDING' && (
+                {!caf.unitConfirmed && (
                   <button
                     onClick={() => confirmOrder(caf.orderId)}
                     disabled={confirming === caf.orderId}

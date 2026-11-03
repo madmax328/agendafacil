@@ -12,10 +12,15 @@ export async function PUT(req: NextRequest, { params }: { params: { unit: string
   const { status } = await req.json()
   if (status !== 'CONFIRMED') return NextResponse.json({ error: 'Seule la confirmation est autorisée' }, { status: 422 })
 
+  const unitType = unit.toUpperCase()
+
   const order = await prisma.order.findUnique({ where: { id: params.id } })
   if (!order) return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 })
-  if (order.status !== 'PENDING') return NextResponse.json({ error: 'Commande déjà traitée' }, { status: 409 })
+  if (order.confirmedUnits.includes(unitType)) return NextResponse.json({ error: 'Déjà confirmé' }, { status: 409 })
 
-  const updated = await prisma.order.update({ where: { id: params.id }, data: { status: 'CONFIRMED' } })
+  const updated = await prisma.order.update({
+    where: { id: params.id },
+    data: { confirmedUnits: { push: unitType } },
+  })
   return NextResponse.json(updated)
 }
