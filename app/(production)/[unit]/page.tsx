@@ -18,32 +18,45 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   DELIVERED: { label: 'Livrée',      color: 'bg-blue-100 text-blue-700' },
 }
 
-function printElement(id: string, title: string) {
+const PRINT_STYLES = `
+  *{box-sizing:border-box}
+  body{font-family:system-ui,sans-serif;font-size:13px;color:#111;padding:28px 32px;max-width:780px;margin:0 auto}
+  .ph-date{font-size:11px;color:#9ca3af;text-align:right;margin-bottom:6px}
+  .ph{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #111}
+  .ph img{height:40px}
+  .ph-unit{font-size:15px;font-weight:700;color:#111;line-height:1.2}
+  .ph-sub{font-size:12px;color:#6b7280;margin-top:2px}
+  .print-only,.no-print{display:none}
+  h2{font-size:14px;font-weight:700;margin:0 0 16px}
+  .cat-group{margin-bottom:16px}
+  .cat-group:last-child{margin-bottom:0}
+  h3{font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;letter-spacing:.06em;margin:0 0 4px;padding-bottom:4px;border-bottom:1px solid #e5e7eb}
+  table{width:100%;border-collapse:collapse}
+  td{padding:5px 0;border-top:1px solid #f3f4f6;font-size:13px}
+  td:last-child{text-align:right;font-weight:600}
+`
+
+function buildPrintHeader(origin: string, unit: string, sub: string, dateStr: string) {
+  return `
+    <div class="ph-date">${dateStr}</div>
+    <div class="ph">
+      <img src="${origin}/logo.png" alt="Artigus" />
+      <div>
+        <div class="ph-unit">${unit}</div>
+        ${sub ? `<div class="ph-sub">${sub}</div>` : ''}
+      </div>
+    </div>`
+}
+
+function printElement(id: string, unit: string, sub: string, dateStr: string) {
   const el = document.getElementById(id)
   if (!el) return
   const w = window.open('', '_blank', 'width=800,height=600')
   if (!w) return
   const origin = window.location.origin
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
-  <style>
-    *{box-sizing:border-box}
-    body{font-family:system-ui,sans-serif;font-size:13px;color:#111;padding:28px 32px;max-width:780px;margin:0 auto}
-    .logo-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #111}
-    .logo-header img{height:44px}
-    .logo-header-title{font-size:15px;font-weight:700;color:#111}
-    .print-only,.no-print{display:none}
-    h2{font-size:14px;font-weight:700;margin:0 0 16px}
-    .cat-group{margin-bottom:16px}
-    .cat-group:last-child{margin-bottom:0}
-    h3{font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;letter-spacing:.06em;margin:0 0 4px;padding-bottom:4px;border-bottom:1px solid #e5e7eb}
-    table{width:100%;border-collapse:collapse}
-    td{padding:5px 0;border-top:1px solid #f3f4f6;font-size:13px}
-    td:last-child{text-align:right;font-weight:600}
-  </style></head><body>
-  <div class="logo-header">
-    <img src="${origin}/logo.png" alt="Artigus" />
-    <div class="logo-header-title">${title}</div>
-  </div>
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${unit} — ${sub}</title>
+  <style>${PRINT_STYLES}</style></head><body>
+  ${buildPrintHeader(origin, unit, sub, dateStr)}
   ${el.innerHTML}
   </body></html>`)
   w.document.close()
@@ -119,29 +132,18 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
   }
 
   function printAmendment(a: Amendment, unitLabel: string) {
-    const typeLabel = a.type === 'ADD' ? 'Ajout' : 'Annulation'
-    const title = `${typeLabel} — ${a.cafeteria.name} — ${formatDate(date)}`
+    const typeLabel = a.type === 'ADD' ? 'Demande d\'ajout' : 'Demande d\'annulation'
     const w = window.open('', '_blank', 'width=800,height=600')
     if (!w) return
     const origin = window.location.origin
+    const badgeStyle = a.type === 'ADD' ? 'background:#dcfce7;color:#166534' : 'background:#fee2e2;color:#991b1b'
     const rows = a.items.map(item =>
       `<tr><td style="padding:5px 0;border-top:1px solid #f3f4f6">${item.product.name}</td><td style="padding:5px 0;text-align:right;font-weight:600;border-top:1px solid #f3f4f6">${item.quantity} ${item.product.unit}</td></tr>`
     ).join('')
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
-    <style>
-      *{box-sizing:border-box}
-      body{font-family:system-ui,sans-serif;font-size:13px;color:#111;padding:28px 32px;max-width:780px;margin:0 auto}
-      .logo-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #111}
-      .logo-header img{height:44px}
-      .logo-header-title{font-size:15px;font-weight:700;color:#111}
-      .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:16px;${a.type === 'ADD' ? 'background:#dcfce7;color:#166534' : 'background:#fee2e2;color:#991b1b'}}
-      table{width:100%;border-collapse:collapse}
-    </style></head><body>
-    <div class="logo-header">
-      <img src="${origin}/logo.png" alt="Artigus" />
-      <div class="logo-header-title">${title}</div>
-    </div>
-    <div class="badge">Demande d'${a.type === 'ADD' ? 'ajout' : 'annulation'} — ${unitLabel}</div>
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${typeLabel} — ${a.cafeteria.name}</title>
+    <style>${PRINT_STYLES}.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:16px}table{width:100%;border-collapse:collapse}</style></head><body>
+    ${buildPrintHeader(origin, unitLabel, a.cafeteria.name, formatDate(date))}
+    <div class="badge" style="${badgeStyle}">${typeLabel}</div>
     <table><tbody>${rows}</tbody></table>
     </body></html>`)
     w.document.close()
@@ -227,7 +229,7 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
               <p className="text-xs text-gray-400 mt-0.5">Tous cafétérias confondus</p>
             </div>
             <button
-              onClick={() => printElement('recap-total', `${unitLabel} — Récapitulatif ${formatDate(date)}`)}
+              onClick={() => printElement('recap-total', unitLabel, 'Récapitulatif total', formatDate(date))}
               className="no-print flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Printer size={14} /> Imprimer récapitulatif
@@ -295,7 +297,7 @@ export default function ProductionOrdersPage({ params }: { params: { unit: strin
                   </button>
                 )}
                 <button
-                  onClick={() => printElement(`caf-order-${i}`, `${unitLabel} — ${caf.cafeteriaName} — ${formatDate(date)}`)}
+                  onClick={() => printElement(`caf-order-${i}`, unitLabel, caf.cafeteriaName, formatDate(date))}
                   className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors bg-white"
                 >
                   <Printer size={14} /> Imprimer
